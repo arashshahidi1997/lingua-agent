@@ -100,6 +100,25 @@ def init():
 
 
 @app.command()
+def serve(
+    host: str = typer.Option("127.0.0.1", "--host", help="Bind host. Use 0.0.0.0 for LAN."),
+    port: int = typer.Option(8000, "--port"),
+    reload: bool = typer.Option(False, "--reload", help="Auto-reload on code changes (dev)."),
+):
+    """Start the FastAPI HTTP server (Phase 8 backend for the React PWA)."""
+    try:
+        import uvicorn
+    except ImportError:
+        console.print(
+            "[red]uvicorn not installed.[/red] Install with: "
+            "[bold]pip install -e \".[api]\"[/bold]"
+        )
+        raise typer.Exit(code=1)
+    console.print(f"[green]→[/green] http://{host}:{port}/api/health")
+    uvicorn.run("lingua_agent.api.main:app", host=host, port=port, reload=reload)
+
+
+@app.command()
 def playground(
     port: int = typer.Option(8501, "--port", help="Port for the Streamlit server."),
     open_browser: bool = typer.Option(True, "--open/--no-open", help="Open in browser."),

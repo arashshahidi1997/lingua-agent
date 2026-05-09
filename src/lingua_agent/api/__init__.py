@@ -1,6 +1,12 @@
-"""HTTP API (Phase 8 — stub).
+"""HTTP API — FastAPI server mirroring the CLI surface.
 
-The FastAPI server is not built yet. When it is, it will mount on the same
-package and expose every CLI command as an HTTP endpoint, so that Tauri /
-Flutter clients can drive `lingua-agent` over HTTP. See `docs/clients.md`.
+Every CLI command is reachable as an HTTP endpoint so any client (React PWA,
+desktop wrapper, mobile app) can drive the same Python core. See
+docs/clients.md for the multi-platform plan.
+
+Launch:  lingua-agent serve   (or: uvicorn lingua_agent.api.main:app)
 """
+
+from .main import app, build_app
+
+__all__ = ["app", "build_app"]
