@@ -37,6 +37,18 @@
 - **Etymology backbones**: parse Wiktionary's etymology chains so we can render them as `Persian کتاب ← Arabic كتاب [k-t-b] ← Proto-Semitic *ktb` and **PIE → en/de/nl/it/ru/fa cognate panels**. Backbones we surface: PIE, Proto-Germanic, Latin, Greek, Arabic, Proto-Slavic, Old Persian / Avestan. Genuinely useful for someone studying multiple languages from this set (e.g. seeing that `heart / Herz / cuore / сердце` all descend from PIE `*ḱérd-` while Persian `دل` is a different root).
 - Same lexical data regardless of which AI provider drives the tutor — and same etymology view across providers.
 
+## Phase 6d — FME-inspired pedagogy layer
+Borrowed from Ikenna D. Obi's *Fluency Made Easy* (2019) — the pedagogical core, not the specific resource recommendations.
+
+- **Per-pair stage tracker** on `LearnerProfile`: `current_stage: input | output | refinement`, `stage_started_at`, `stage_estimated_weeks` (from CEFR difficulty class).
+- **`media_diary`**: TV/film/podcast/songs the learner is consuming, with progress (`"3/25 episodes"`), genuine-enjoyment rating, words encountered. Honours the "fun is non-negotiable" principle.
+- **New exercise type `sentence_rep`** (Glossika-style): 5–20 target-language sentences using known + 1–2 new vocab items, audio-paired (Phase 9). Reveal-on-tap translation. Tracked as "reps".
+- **Unit-level second-wave review** (Assimil's signature): `LessonUnit.next_revisit_at` auto-scheduled ~25 lessons later. Different from card SRS; pulls back the whole bilingual reading + grammar focus, not just individual cards.
+- **Subtitle ingestion** (`.srt` / `.vtt`) as a first-class ingest mode — bilingual subtitle reader, click any line to expand vocab/grammar. Pairs with Phase 14 (YouTube) and Phase 6c (materials adapter).
+- **Stage-aware `recommend_next_activity`**: Input → "watch 30 min of *X*, then 1 Assimil-style lesson"; Output → "book italki session, prep these phrases on *topic*"; Refinement → "find a dialect coach" / "read advanced podcast transcript".
+- **Tutor-session prep + post-session ingest**: pre-session phrase list generation; post-session ingest of italki Google Doc corrections directly into vocab + grammar + a mini lesson unit. The italki Doc becomes a first-class material source via the Phase 6c adapter.
+- **Material-pack templates** for FME backbone resources (Pimsleur audio → listening exercises; Assimil dialogues → bilingual + auto second wave; Glossika reps → sentence_rep batches). Used only with legitimately-licensed copies the learner owns.
+
 ## Phase 7 — Richer ingestion
 - PDF (via `pypdf`) and EPUB (via `ebooklib`) ingestion.
 - URL fetcher for articles (text-only, no JS execution).
