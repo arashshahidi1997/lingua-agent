@@ -4,7 +4,15 @@ from lingua_agent.languages.scripts import detect_dominant_script
 
 def test_seed_languages_present():
     codes = {lang.code for lang in list_languages()}
-    assert codes == {"en", "fa", "it", "ru"}
+    assert codes == {"en", "fa", "it", "ru", "de", "nl"}
+
+
+def test_german_and_dutch_are_ltr_latin():
+    for code in ("de", "nl"):
+        lang = get_language(code)
+        assert lang.script.value == "latin"
+        assert lang.direction.value == "ltr"
+        assert lang.transliteration_supported is False
 
 
 def test_persian_is_rtl():

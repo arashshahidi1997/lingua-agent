@@ -105,7 +105,29 @@ register_language(
         notes="Ezafe; light verbs; no grammatical gender; formal vs colloquial register.",
     )
 )
+register_language(
+    Language(
+        code="de",
+        name="German",
+        native_name="Deutsch",
+        script=Script.LATIN,
+        direction=Direction.LTR,
+        transliteration_supported=False,
+        notes="Three genders; four cases; V2 word order; separable verbs; capitalised nouns.",
+    )
+)
+register_language(
+    Language(
+        code="nl",
+        name="Dutch",
+        native_name="Nederlands",
+        script=Script.LATIN,
+        direction=Direction.LTR,
+        transliteration_supported=False,
+        notes="Two genders (de/het); no case marking; V2 word order; separable verbs.",
+    )
+)
 
 
 # Convenience type alias for callers that want to constrain at the type level.
-LanguageCode = Literal["en", "it", "ru", "fa"]
+LanguageCode = Literal["en", "it", "ru", "fa", "de", "nl"]

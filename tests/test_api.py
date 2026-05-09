@@ -34,7 +34,7 @@ def test_languages(client: TestClient):
     r = client.get("/api/languages")
     assert r.status_code == 200
     codes = {lang["code"] for lang in r.json()}
-    assert codes == {"en", "fa", "it", "ru"}
+    assert codes == {"en", "fa", "it", "ru", "de", "nl"}
     fa = next(lang for lang in r.json() if lang["code"] == "fa")
     assert fa["direction"] == "rtl"
 

@@ -28,6 +28,13 @@
 - Bayesian Knowledge Tracing module (clean-room port of OATutor's BKT).
 - `recommend_next_activity` with mastery-aware item selection.
 
+## Phase 6b — Dictionary-grounded lookup tool
+- `lingua-agent download dictionaries --lang fa` — pulls kaikki.org Wiktionary extract + OpenSubtitles frequency list, indexes into SQLite at `~/.lingua-agent/dict/`.
+- Optional download of Tatoeba (~700 MB) for example sentences.
+- `lookup_word` tool exposed to the tutor agent: returns translations, POS, IPA, frequency rank, CEFR estimate, example sentences. Grounded answers, no LLM hallucination of translations.
+- Wiktionary REST API as online fallback for words missing locally.
+- Same lexical data regardless of which AI provider drives the tutor.
+
 ## Phase 7 — Richer ingestion
 - PDF (via `pypdf`) and EPUB (via `ebooklib`) ingestion.
 - URL fetcher for articles (text-only, no JS execution).

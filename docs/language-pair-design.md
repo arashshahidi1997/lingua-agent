@@ -19,6 +19,8 @@
 | `it` | Italian | Latin | ltr | n/a | Romance, gendered nouns, rich verb conjugation. |
 | `ru` | Russian | Cyrillic | ltr | optional | Six cases, aspect, mobile stress. |
 | `fa` | Persian (Farsi) | Arabic | **rtl** | optional | Ezafe construction, light verbs, no grammatical gender, formal/colloquial diglossia. |
+| `de` | German | Latin | ltr | n/a | Three genders, four cases, V2 word order, separable verbs, capitalised nouns. |
+| `nl` | Dutch | Latin | ltr | n/a | Two genders (de/het), no case marking, V2 word order, separable verbs. Closely related to German with simpler morphology. |
 
 ## Per-pair concerns
 
@@ -59,6 +61,26 @@
 ### Italian ↔ Russian
 - Both gendered, both inflectional. Map Italian agreement chains onto Russian case+gender+number agreement; the *what to track* is similar, the *how* is different.
 - Italian tense system is rich on the past axis (passato prossimo, imperfetto, trapassato, …); Russian collapses much of it into aspect on a smaller tense set.
+
+### English ↔ German
+- Three genders (`der/die/das`); learners must memorise gender with each noun.
+- Four cases (nominative / accusative / dative / genitive). Articles, adjectives, and pronouns inflect.
+- **V2 word order**: the finite verb is the second constituent in main clauses; subordinate clauses send the verb to the end.
+- **Separable verbs** (`aufstehen` → `Ich stehe auf`). Always teach both halves and the position rule together.
+- Compound nouns (`Geschwindigkeitsbegrenzung`); the gender comes from the last component.
+- All nouns capitalised — purely orthographic, but easy to enforce in graders.
+
+### English ↔ Dutch
+- Two genders (`de` for common, `het` for neuter). No case marking on nouns/articles.
+- V2 word order, like German. Subordinate clauses also push the verb to the end.
+- Separable verbs (`opstaan` → `Ik sta op`).
+- Strong cognate pull with both English and German — surface false friends (`huren` ≠ "horror"; it's "hire/rent").
+- Diminutive `-je` is productive and changes nuance (`biertje` is the friendly "small beer").
+
+### German ↔ Dutch
+- Mostly close cognates; the trap is the gender system mismatch (German 3-way → Dutch 2-way) and the loss of cases in Dutch.
+- Verb position is essentially identical (V2 main, verb-final subordinate).
+- Useful as a contrastive pair for learners who already know one and want to bootstrap the other quickly.
 
 ## RTL policy
 
