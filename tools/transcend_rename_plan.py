@@ -110,17 +110,25 @@ def is_piracy_decoration(name: str) -> bool:
     return False
 
 
+_EXT_OK_RE = re.compile(r"^[A-Za-z0-9]{1,8}$")
+
+
 def slugify(name: str, *, keep_ext: bool = True) -> str:
     """snake_case_lowercase, ASCII-friendly, preserves extension if any.
-    Non-extension dots become underscores (so "D." in author names doesn't
-    survive as "d.")."""
+    - Piracy bracket suffixes are stripped FIRST so the dot inside
+      `[www.foo.com]` doesn't get mistaken for an extension marker.
+    - Non-extension dots become underscores (so "D." in author names
+      doesn't survive as "d.").
+    - The extension is only kept if it's plain alphanumeric — `com]`
+      and similar garbage are treated as part of the stem.
+    """
+    name = PIRACY_RE.sub("", name)
     stem, dot, ext = name.rpartition(".")
-    if not dot or len(ext) > 8 or "/" in ext:  # not really an extension
+    if not dot or not _EXT_OK_RE.match(ext) or "/" in ext:
         stem, ext = name, ""
     elif not keep_ext:
         ext = ""
-    s = PIRACY_RE.sub("", stem)
-    s = re.sub(r"[\s\-/.]+", "_", s)  # treat dots in stem as separators
+    s = re.sub(r"[\s\-/.]+", "_", stem)
     # Keep word chars + Persian (U+0600-06FF), Devanagari, Cyrillic
     s = re.sub(r"[^\w؀-ۿऀ-ॿЀ-ӿ]", "_", s)
     s = re.sub(r"_+", "_", s).strip("_")
@@ -226,7 +234,14 @@ def main() -> None:
 
         # Junk → quarantine, never delete
         if any(is_macos_junk(p) for p in parts):
-            quarantine = "_junk/" + "/".join(slugify(p) for p in parts)
+            # macOS resource forks (`._FOO`) often shadow a real folder named
+            # `FOO`. Prefix the leaf slug with `_macresource_` so the junk
+            # file doesn't collide with the quarantined contents of the
+            # real folder.
+            slug_parts = [slugify(p) for p in parts]
+            if parts[-1].startswith("._"):
+                slug_parts[-1] = "_macresource_" + slug_parts[-1]
+            quarantine = "_junk/" + "/".join(slug_parts)
             rows.append(("QUARANTINE", str(path), str(ROOT / quarantine), "macOS junk"))
             counters["QUARANTINE"] += 1
             continue
