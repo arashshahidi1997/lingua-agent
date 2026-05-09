@@ -21,3 +21,11 @@ content/cards/
 .DS_Store
 .idea/
 .vscode/
+
+# React frontend
+web/node_modules/
+web/dist/
+web/.vite/
+web/*.log
+.npm/
+npm-debug.log*

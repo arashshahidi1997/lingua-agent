@@ -1,0 +1,13 @@
+@import "tailwindcss";
+
+/* App-wide defaults. We rely on Tailwind for almost everything; only the
+ * RTL/LTR direction-based tweaks live here so they survive global styling. */
+
+html {
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue",
+    Arial, "Noto Sans", sans-serif;
+}
+
+[dir="rtl"] {
+  text-align: right;
+}
