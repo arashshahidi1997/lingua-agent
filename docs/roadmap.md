@@ -37,6 +37,20 @@
 - **Etymology backbones**: parse Wiktionary's etymology chains so we can render them as `Persian کتاب ← Arabic كتاب [k-t-b] ← Proto-Semitic *ktb` and **PIE → en/de/nl/it/ru/fa cognate panels**. Backbones we surface: PIE, Proto-Germanic, Latin, Greek, Arabic, Proto-Slavic, Old Persian / Avestan. Genuinely useful for someone studying multiple languages from this set (e.g. seeing that `heart / Herz / cuore / сердце` all descend from PIE `*ḱérd-` while Persian `دل` is a different root).
 - Same lexical data regardless of which AI provider drives the tutor — and same etymology view across providers.
 
+## Phase 6e — Diglot-weave reader (idea credit: Maria Molina)
+A reading mode that starts in the source/support language and **gradually substitutes target-language words and phrases** as the reader progresses through a book. Pedagogically grounded in the *diglot weave* method (Robbins Burling, 1968) and Krashen's comprehensible-input theory — different from LingQ / Readlang (which mark or translate-on-click but don't substitute), this is *progressive substitution* that forces context-based guessing.
+
+- New ingest mode `ingest_book_for_diglot(source_text, target_language, profile, saturation_curve)`. Source can be a paste, a markdown file, or a book pulled via the Phase 6c materials adapter (Drive / local SSD).
+- **Substitution algorithm** picks words/phrases per chunk based on:
+  - Learner's known vocabulary (from SRS — start by substituting words they already see often).
+  - CEFR-level frequency (Phase 6b dictionary frequency lists).
+  - Current saturation: chapter 1 → ~5% target words; chapter 10 → ~30%; chapter 30 → ~70% (curve is configurable).
+  - Concrete + high-context words first (`house`, `walk`, `red`); abstract last.
+- **Grammatical agreement** preserved: substitute *phrases* not bare words, so Italian gender / German case / Persian ezafe stay correct. Per-language validators reject ungrammatical substitutions (Phase 5b prompt-tuning + structured-output schema).
+- **Per-book substitution log** so "house → `Haus`" in chapter 1 stays consistent in chapter 12. Persisted in `data/diglot_books/<book_id>/log.json`.
+- React reader: substituted words highlighted with hover-to-reveal source + "add to SRS" + "explain conjugation" tutor tool buttons.
+- **Copyright posture**: derivative work created from the user's own legitimately-owned copy, scoped to that reader, never shared via the app — same boundary as Phase 6c materials.
+
 ## Phase 6d — FME-inspired pedagogy layer
 Borrowed from Ikenna D. Obi's *Fluency Made Easy* (2019) — the pedagogical core, not the specific resource recommendations.
 
