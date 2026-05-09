@@ -8,7 +8,6 @@ content without any network call.
 from __future__ import annotations
 
 import json
-from datetime import datetime, timezone
 from pathlib import Path
 from typing import Optional
 
@@ -19,11 +18,9 @@ from rich.table import Table
 from . import __version__
 from .ai import get_provider
 from .config import Settings
-from .ids import make_id
 from .ingest import ingest_text
 from .ingest.markdown import read_markdown
 from .languages import list_languages
-from .lesson.markdown_export import write_unit
 from .models import Flashcard, LearnerProfile, LessonUnit, ReviewEvent
 from .models.exercises import Exercise
 from .srs import SM2Scheduler, export_cards_csv

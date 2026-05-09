@@ -9,7 +9,6 @@ schema-valid drafts so the whole thing runs end-to-end with no API key.
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from datetime import timedelta
 from typing import Literal
 
 from pydantic import BaseModel, Field
@@ -35,7 +34,7 @@ from ..models import (
 from ..models.base import utcnow
 from ..models.exercises import GeneratedFrom, GradingMode
 from ..storage import JsonRepository
-from .text import normalize_text, segment_sentences
+from .text import normalize_text
 
 
 # --- Provider draft schemas (what the AI returns) -------------------------

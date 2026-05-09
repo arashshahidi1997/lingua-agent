@@ -3,7 +3,7 @@ from lingua_agent.languages.scripts import detect_dominant_script
 
 
 def test_seed_languages_present():
-    codes = {l.code for l in list_languages()}
+    codes = {lang.code for lang in list_languages()}
     assert codes == {"en", "fa", "it", "ru"}
 
 
