@@ -1,0 +1,77 @@
+site_name: lingua-agent
+site_description: Agentic AI language-learning platform — any language A → B, local-first.
+site_url: https://arashshahidi1997.github.io/lingua-agent/
+repo_url: https://github.com/arashshahidi1997/lingua-agent
+repo_name: arashshahidi1997/lingua-agent
+edit_uri: edit/main/docs/
+
+docs_dir: docs
+
+theme:
+  name: material
+  language: en
+  features:
+    - navigation.instant
+    - navigation.tracking
+    - navigation.sections
+    - navigation.top
+    - navigation.indexes
+    - toc.follow
+    - content.code.copy
+    - content.code.annotate
+    - content.action.edit
+    - search.suggest
+    - search.highlight
+  palette:
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: deep purple
+      accent: deep purple
+      toggle:
+        icon: material/weather-night
+        name: Switch to dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: deep purple
+      accent: deep purple
+      toggle:
+        icon: material/weather-sunny
+        name: Switch to light mode
+  icon:
+    repo: fontawesome/brands/github
+  font:
+    text: Inter
+    code: JetBrains Mono
+
+nav:
+  - Home: index.md
+  - Architecture: architecture.md
+  - Content schema: content-schema.md
+  - Language pairs: language-pair-design.md
+  - Tutor agent: agent-design.md
+  - AI providers: providers.md
+  - Clients (desktop & mobile): clients.md
+  - Roadmap: roadmap.md
+  - Decisions: decisions.md
+  - References: references.md
+
+markdown_extensions:
+  - admonition
+  - attr_list
+  - md_in_html
+  - tables
+  - toc:
+      permalink: "¶"
+  - pymdownx.details
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.inlinehilite
+  - pymdownx.superfences
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.tasklist:
+      custom_checkbox: true
+  - pymdownx.snippets
+
+plugins:
+  - search
