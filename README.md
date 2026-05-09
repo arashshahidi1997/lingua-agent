@@ -39,6 +39,15 @@ pip install -e ".[anthropic]"
 
 Python 3.11+.
 
+## Try it without typing CLI commands
+
+```bash
+pip install -e ".[playground]"
+lingua-agent playground   # → http://localhost:8501
+```
+
+A Streamlit UI with tabs for ingest / lessons / review / tutor on top of the same core. **Not the production UI** (that's Phase 8 — FastAPI + React PWA), just the iteration tool. See [`docs/playground.md`](docs/playground.md).
+
 ## Quickstart
 
 ```bash

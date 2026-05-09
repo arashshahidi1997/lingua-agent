@@ -99,6 +99,34 @@ def init():
     console.print(f"AI provider: [bold]{s.ai_provider}[/bold]")
 
 
+@app.command()
+def playground(
+    port: int = typer.Option(8501, "--port", help="Port for the Streamlit server."),
+    open_browser: bool = typer.Option(True, "--open/--no-open", help="Open in browser."),
+):
+    """Launch the Streamlit playground UI in your browser."""
+    import subprocess
+    import sys
+    from importlib.resources import files
+    try:
+        import streamlit  # noqa: F401
+    except ImportError:
+        console.print(
+            "[red]Streamlit is not installed.[/red] Install with: "
+            "[bold]pip install -e \".[playground]\"[/bold]"
+        )
+        raise typer.Exit(code=1)
+    app_path = str(files("lingua_agent.playground").joinpath("app.py"))
+    cmd = [
+        sys.executable, "-m", "streamlit", "run", app_path,
+        "--server.port", str(port),
+        "--server.headless", "false" if open_browser else "true",
+        "--browser.gatherUsageStats", "false",
+    ]
+    console.print(f"[dim]→ {' '.join(cmd)}[/dim]")
+    subprocess.run(cmd)
+
+
 # --- languages -------------------------------------------------------------
 
 @languages_app.command("list")

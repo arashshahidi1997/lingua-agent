@@ -50,6 +50,7 @@ nav:
   - Language pairs: language-pair-design.md
   - Tutor agent: agent-design.md
   - AI providers: providers.md
+  - Playground UI: playground.md
   - Clients (desktop & mobile): clients.md
   - Roadmap: roadmap.md
   - Decisions: decisions.md

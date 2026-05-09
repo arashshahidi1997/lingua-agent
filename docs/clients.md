@@ -1,75 +1,89 @@
-# Client platforms (desktop + Android)
+# Client platforms
 
-`lingua-agent` is built as a **headless Python core** plus thin clients. This separation means we can ship desktop and Android (and iOS, web, CLI) without rewriting the language-learning logic.
-
-## Architecture
+`lingua-agent` is built as a **headless Python core** plus thin clients. This separation means we can ship desktop and mobile without rewriting the language-learning logic.
 
 ```
-┌──────────────────────────────────────────┐
-│            Clients (thin)                │
-├──────────────┬───────────────────────────┤
-│ CLI (Typer)  │ Desktop UI │ Mobile UI    │
-│ shell        │ (Tauri 2)  │ (Tauri 2     │
-│              │            │  or Flutter) │
-└──────┬───────┴─────┬──────┴──────┬───────┘
-       │   HTTP      │   HTTP      │   HTTP / LAN / cloud
-       ▼             ▼             ▼
-┌──────────────────────────────────────────┐
-│       Python core (this repo)            │
-│  models · ingest · srs · tutor · ai      │
-│  CLI (Phase 4)  ·  FastAPI (Phase 8)     │
-└──────────────────────────────────────────┘
+┌────────────────────────────────────────────────────────────────────┐
+│                         Clients (thin)                             │
+├──────────────┬───────────────────┬───────────────────┬─────────────┤
+│ CLI (Typer)  │ Streamlit         │ Web SPA (React/   │ (optional)  │
+│ shell        │ playground        │ Svelte) + PWA     │ Tauri /     │
+│              │ (dev/iteration)   │ — desktop browser │ Electron    │
+│              │                   │ + Android/iOS     │ wrapper     │
+│              │                   │ home-screen       │             │
+└──────┬───────┴────────┬──────────┴──────────┬────────┴──────┬──────┘
+       │  in-process    │  in-process         │  HTTP         │  HTTP
+       ▼                ▼                     ▼               ▼
+┌────────────────────────────────────────────────────────────────────┐
+│        Python core (this repo)                                     │
+│  models · ingest · srs · tutor · ai                                │
+│  CLI (✓) · Streamlit playground (Phase 5b) · FastAPI (Phase 8)     │
+└────────────────────────────────────────────────────────────────────┘
 ```
 
-The CLI and the future FastAPI server are both clients of the same core package. UIs talk to FastAPI over HTTP. **Python does not run on the phone.**
+## Why this shape
 
-## Desktop (Phase 8)
+The honest answer about what professional AI/dev-tool teams ship today:
 
-**Recommendation: Tauri 2.**
-- One web-tech UI (React + Tailwind, with `dir="rtl"` per language) packaged as native binaries for macOS / Windows / Linux.
-- Bundles the FastAPI Python process as a sidecar; UI talks to `http://127.0.0.1:<port>`.
-- Small bundles (~5–15 MB shell), good native integration, MIT-friendly.
+- **Python AI core + FastAPI server + React/Svelte SPA + PWA** is the dominant pattern. Open WebUI, LibreChat, AnythingLLM, Jan.ai — all ship a web app. Mobile coverage comes from PWA "install to home screen", which on Android (Chrome) and iOS (Safari) is genuinely a real-app experience for non-camera, non-push-heavy tools.
+- **Streamlit / Gradio** is what every AI/ML team uses internally for prototyping and demos (Hugging Face Spaces is Gradio; OpenAI, Anthropic, Cohere ship internal tools on Streamlit). Not a production UI; the right "let me actually play with it this afternoon" tool.
+- **Tauri** is rising and is a fine choice for shipping a desktop binary, but it's not yet the default any pro team picks for cross-platform mobile in production. Treat it as an optional desktop wrapper.
+- **Native React Native / Flutter** is correct only when the app needs camera, push notifications, true offline-first, or app-store discoverability that PWA can't deliver — a real product decision, not a default.
 
-**Alternative: Electron.**
-- Bigger bundles (~80–150 MB) but a more mature ecosystem. Fall back to this only if Tauri sidecar packaging blocks us.
+## Today (in the repo)
 
-**Alternative: Native Python + PyWebView.**
-- Smallest dev cost, but no shared codebase with mobile. Use only as a stop-gap.
+- **CLI (Typer)** — works now. `lingua-agent ingest text`, `review due`, `tutor chat`, etc.
+- **Streamlit playground** — `lingua-agent playground` opens a local browser UI for clicking through ingest → lesson → review → tutor against the same core. Single-file Streamlit app; for iteration, not production.
 
-## Mobile (Phase 11)
+## Phase 8 — FastAPI + React PWA (the default product UI)
 
-The core question: **can the mobile UI share code with the desktop UI?**
+- **FastAPI** server mounted on the same package; every CLI command is reachable over HTTP.
+- **React (or Svelte) SPA** as the frontend. Ships as static files served by FastAPI. RTL-aware (Persian, future Arabic / Hebrew). Built-in dark mode.
+- **PWA**: `manifest.json` + service worker, so "Install to Home Screen" on Chrome (Android) and Safari (iOS) gets you an app icon, full-screen launch, and offline shell. Covers mobile for free without an app store, code-signing, or store fees.
+- Distribution: `pip install lingua-agent && lingua-agent serve` for self-hosters; Docker image for one-line install.
 
-### Recommendation: Tauri 2 mobile (single web UI for desktop + mobile)
-- **Pros**: one React codebase ships to all five OSes. RTL works out of the box. Native plugins for camera/storage/notifications via Tauri plugins.
-- **Cons**: Tauri mobile shipped in 2024 — younger than Flutter's mobile story. Some native plugins still maturing.
+This is the boring, professional, ships-today choice.
 
-### Alternative: Flutter (separate from desktop UI)
-- **Pros**: most mature cross-platform mobile framework. Strong RTL support. Excellent text rendering for Persian/Arabic/Cyrillic.
-- **Cons**: Dart codebase, no sharing with the Tauri desktop UI. Two UI codebases to maintain.
+## Phase 8b — Optional desktop binary wrapper
 
-### Alternative: React Native + Expo (or React Native + Capacitor)
-- **Pros**: very mature on Android/iOS. JS shared with desktop in principle.
-- **Cons**: bridging to a Tauri desktop shell is awkward; usually you end up with two builds anyway.
+For users who prefer a `.dmg` / `.exe` / AppImage over "open the browser":
+- **Electron** (mature, large bundles ~80–150 MB) — boring default. VS Code, Slack, Linear, Discord, Figma desktop.
+- **Tauri** (Rust, small bundles ~5–15 MB, growing) — picked when bundle size or memory matters. Spacedrive, Pot, Cap.
 
-## Backend hosting model for mobile
+Both wrap the same React SPA built in Phase 8. Pick one when there's demand; either is straightforward.
 
-Since Python doesn't run on the phone, the mobile app needs to reach a `lingua-agent` server somewhere. Three modes, all supported by the same FastAPI build:
+## Phase 11 — Native mobile (only if PWA isn't enough)
 
-1. **Local desktop pairing.** Phone talks to the user's desktop on LAN (or via Tailscale / Wireguard). Local-first, private, works offline as long as both devices are on the same network.
-2. **Self-hosted cloud.** User runs the FastAPI image on a small VPS / Fly.io / Coolify instance. Single-tenant; user owns the data.
-3. **Slim offline review.** Mobile keeps a local SQLite of due flashcards and `ReviewEvent`s; review works offline; ingest + tutor + lesson generation require connecting to a server. The replication layer pushes `ReviewEvent`s back to the server when online.
+A real native app is correct when one of these matters and PWA can't do it:
+- Push notifications for review streaks (PWA push works on Android Chrome but is unreliable on iOS Safari).
+- Deep on-device offline review (PWA offline works but storage limits are tight).
+- App-store discoverability (App Store and Play Store distribution).
+- Background sync for `ReviewEvent`s.
 
-Mode 3 is the only one that requires a small TypeScript / Dart port of the SRS scheduler (~80 LOC) on the client. It's optional and can be added when offline review becomes a hard requirement.
+Framework picks at that point:
+- **React Native + Expo** — what consumer-mobile-first AI startups use in 2025/2026. Best ecosystem, easiest hot-reload dev loop, ships to iOS + Android + web from one codebase.
+- **Flutter** — what cross-platform indie shops with desktop ambitions pick. Best text-rendering for Persian / Cyrillic; one codebase across iOS / Android / desktop / web.
 
-## What this means for the current build
+Either talks to the same FastAPI backend.
 
-Nothing changes in Phases 1–4. The headless Python core, models, SRS, ingest pipeline, and CLI are the foundation regardless of which client framework wins.
+## Distribution paths when we get there
 
-The first concrete commitment to a client framework happens in Phase 8 when we scaffold the FastAPI server + first desktop UI. Until then we can keep this open.
+- **GitHub Releases** with APK from CI: zero-friction, free, Obtainium auto-updates.
+- **F-Droid**: free OSS distribution, no developer fee, requires reproducible builds + open license (we have MIT). Best fit for our open-source posture.
+- **Google Play**: $25 one-time + 2024 closed-test rule (12+ testers for 14+ days for new accounts). Wait for actual demand.
+- **Apple App Store**: $99/year + review process. Same — wait for demand.
 
-## Open decisions (tracked in `docs/decisions.md` when made)
+## Backend hosting model for mobile / multi-device
 
-- D14 (open): pick Tauri 2 vs Flutter vs Electron for desktop.
-- D15 (open): pick Tauri 2 mobile vs Flutter for Android.
-- D16 (open): commit to one of the three backend hosting modes as the default mobile experience.
+The same FastAPI server supports three modes:
+1. **Local desktop pairing** — phone talks to your desktop on LAN or via Tailscale / Wireguard. Local-first, private.
+2. **Self-hosted cloud** — run the FastAPI image on a small VPS / Fly.io / Coolify. Single-tenant.
+3. **Slim offline review** — phone keeps a local SQLite of due flashcards; review works fully offline; ingest + tutor + lesson generation require online. The replication layer pushes `ReviewEvent`s back when online. This is the only mode that requires a small TypeScript / Dart port of the SM-2 scheduler (~80 LOC) on the client.
+
+Mode 1 is the local-first default; Mode 2 is the "share across my devices" upgrade; Mode 3 is the "review on the train" optimisation.
+
+## Open decisions (still tracked in `docs/decisions.md` when made)
+
+- D14 (open): SPA framework for Phase 8 — React vs Svelte. Default React for ecosystem; Svelte if we want smaller bundles + simpler state.
+- D15 (open, deferred): desktop wrapper — Electron vs Tauri vs none. Decide in Phase 8b based on user requests.
+- D16 (open, deferred): native mobile — React Native vs Flutter. Decide in Phase 11 only if PWA falls short.

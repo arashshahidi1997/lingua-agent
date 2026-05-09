@@ -34,11 +34,20 @@
 - Subtitle (`.srt`, `.vtt`) ingestion with sentence-mining preset.
 - AnkiConnect upload as an alternative to CSV export.
 
-## Phase 8 — HTTP server + first desktop client
-- FastAPI server mounted on the same package; CLI commands all reachable over HTTP.
-- First desktop UI: **Tauri 2** + React (RTL-aware) bundling the FastAPI process as a sidecar. Ships macOS / Windows / Linux from one codebase.
-- Views: language-pair selector, ingestion form, lesson view, bilingual reader (RTL-correct), exercise runner, SRS queue, tutor chat, learner dashboard.
-- See [`docs/clients.md`](clients.md) for the multi-platform plan.
+## Phase 5b — Streamlit playground (✓ shipped)
+- `lingua-agent playground` opens a local browser UI for clicking through ingest → lesson → review → tutor against the existing core.
+- Single-file Streamlit app; for iteration, not production.
+- Industry-standard "let me play with it" tool for AI / Python projects (Hugging Face Spaces, internal tools at OpenAI / Anthropic / Cohere).
+
+## Phase 8 — FastAPI + React PWA (default product UI)
+- FastAPI server mounted on the same package; every CLI command reachable over HTTP.
+- React (or Svelte) SPA, RTL-aware, dark-mode, served as static files by FastAPI.
+- **PWA** — `manifest.json` + service worker. "Install to Home Screen" on Chrome (Android) / Safari (iOS) gets you an app icon and full-screen launch. Covers mobile for free without an app store, code-signing, or store fees.
+- Distribution: `pip install lingua-agent && lingua-agent serve`; Docker image for one-line install.
+- See [`docs/clients.md`](clients.md). This is the boring, professional, ships-today choice — the same shape Open WebUI / LibreChat / AnythingLLM / Jan.ai use.
+
+## Phase 8b — Optional desktop binary wrapper
+- Wrap the same React SPA in **Electron** (mature, large bundles) or **Tauri** (Rust, small bundles). Ship on demand; both are straightforward.
 
 ## Phase 9 — Voice mode
 - `STTProvider` and `TTSProvider` implementations.
@@ -50,10 +59,10 @@
 - Drop in `py-fsrs` behind the existing `Scheduler` Protocol.
 - Migration script to replay `ReviewEvent` log into FSRS card state.
 
-## Phase 11 — Android (and iOS) client
-- **Default plan**: Tauri 2 mobile so the desktop React UI ships unchanged on Android/iOS.
-- **Fallback**: Flutter if Tauri 2 mobile blocks us on a critical native plugin or text rendering.
-- Backend hosting: phone connects to user's desktop server over LAN/Tailscale; self-hosted cloud is a configurable alternative; offline review (slim TS port of SM-2 + local SQLite) is optional and additive.
+## Phase 11 — Native mobile (only if PWA isn't enough)
+- Trigger: PWA falls short on push notifications, deep offline review, app-store discoverability, or background sync.
+- Pick at that point: **React Native + Expo** (consumer-mobile-first AI startup default) or **Flutter** (cross-platform indie default with stronger desktop story and best Persian/Cyrillic text rendering). Both talk to the same FastAPI backend.
+- Distribution: GitHub Releases first (zero-friction), F-Droid for OSS reach, Google Play / App Store only when demand justifies the friction.
 - See [`docs/clients.md`](clients.md).
 
 ## Out of scope (for now)
