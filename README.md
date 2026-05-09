@@ -74,18 +74,29 @@ lingua-agent tutor chat --source en --target it
 
 ## AI providers
 
-The default provider is `mock`: it produces deterministic, schema-valid output without any network calls. Tests run against it. So does the entire ingest pipeline if you have no API keys.
+The default provider is `mock`: it produces deterministic, schema-valid output without any network calls. Tests run against it. The ingest pipeline runs end-to-end against it.
 
-Switch providers via env vars (see `.env.example`):
+For real content there is **one** real provider — `OpenAICompatibleProvider` — that targets any backend speaking the OpenAI `/v1/chat/completions` shape. That covers **OpenAI**, **Gemma** (via Google AI Studio or Ollama), **Qwen** (via DashScope or Ollama), plus OpenRouter, vLLM, llama.cpp, and LM Studio. Switch by setting `OPENAI_BASE_URL` and `OPENAI_MODEL`:
 
 ```bash
+# OpenAI
 LINGUA_AI_PROVIDER=openai
 OPENAI_API_KEY=sk-...
-OPENAI_BASE_URL=https://api.openai.com/v1   # or any OpenAI-compatible endpoint
+OPENAI_BASE_URL=https://api.openai.com/v1
 OPENAI_MODEL=gpt-4o-mini
+
+# Local Gemma via Ollama (no API key needed for localhost)
+LINGUA_AI_PROVIDER=openai
+OPENAI_BASE_URL=http://localhost:11434/v1
+OPENAI_MODEL=gemma3:12b
+
+# Local Qwen via Ollama
+LINGUA_AI_PROVIDER=openai
+OPENAI_BASE_URL=http://localhost:11434/v1
+OPENAI_MODEL=qwen3:14b
 ```
 
-OpenAI-compatible covers OpenRouter, vLLM, llama.cpp's server, LM Studio, and Ollama (via its `/v1` shim).
+The provider includes JSON-mode + a schema-validation repair loop so small open-weights models (Gemma 3 4B, Qwen3 1.5B) still produce valid pipeline output. Full backend list and per-language model recommendations: [`docs/providers.md`](docs/providers.md).
 
 ## Custom material workflow
 

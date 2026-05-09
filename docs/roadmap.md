@@ -11,11 +11,16 @@
 - Typer CLI: `init`, `languages list`, `ingest text`, `ingest file`, `unit list`, `review due`, `review answer`, `export anki`, `tutor chat` (mock).
 - Tests for language registry, SM-2, ingest pipeline, lesson schema, exercise schema, mock pipeline, RTL preservation.
 
-## Phase 5 — Real AI providers
-- `openai_compatible` provider (works with OpenAI, OpenRouter, vLLM, llama.cpp server, LM Studio, Ollama via its OpenAI-compatibility shim).
-- `anthropic` provider.
-- Structured-JSON generation with retries on schema validation failure.
-- Per-language-pair prompt tuning.
+## ✅ Phase 5 — Real AI providers
+- `OpenAICompatibleProvider` (httpx, no SDK dependency) targets OpenAI, **Google AI Studio (Gemma)**, **Ollama (Gemma / Qwen)**, **DashScope (Qwen)**, OpenRouter, vLLM, llama.cpp, LM Studio.
+- JSON-mode by default with transparent fallback when the backend rejects it.
+- Schema-validation repair loop (default 2 attempts) so small open-weights models still produce pipeline-valid output.
+- Anthropic native API deferred — stub raises with a hint to use OpenRouter for Claude in the meantime.
+- 10 tests using `httpx.MockTransport` cover happy path, JSON-fence stripping, validation repair, give-up, json-mode fallback, prose salvage, and auth header handling.
+
+## Phase 5b — Per-language-pair prompt tuning (open)
+- Specialise the prompt templates in `ai/prompts.py` for each pair (Italian needs gender, Russian needs case, Persian needs ezafe + register).
+- Promote `LearnerProfile.correction_style` and weakness list into the tutor system prompt.
 
 ## Phase 6 — Tutor agent
 - Wire real provider to the existing tool surface.
