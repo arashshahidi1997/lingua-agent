@@ -28,12 +28,14 @@
 - Bayesian Knowledge Tracing module (clean-room port of OATutor's BKT).
 - `recommend_next_activity` with mastery-aware item selection.
 
-## Phase 6b — Dictionary-grounded lookup tool
+## Phase 6b — Dictionary-grounded lookup + "Learn more" + etymology backbones
 - `lingua-agent download dictionaries --lang fa` — pulls kaikki.org Wiktionary extract + OpenSubtitles frequency list, indexes into SQLite at `~/.lingua-agent/dict/`.
 - Optional download of Tatoeba (~700 MB) for example sentences.
-- `lookup_word` tool exposed to the tutor agent: returns translations, POS, IPA, frequency rank, CEFR estimate, example sentences. Grounded answers, no LLM hallucination of translations.
+- `lookup_word` tool exposed to the tutor agent: returns translations, POS, IPA, frequency rank, CEFR estimate, example sentences.
 - Wiktionary REST API as online fallback for words missing locally.
-- Same lexical data regardless of which AI provider drives the tutor.
+- New `LearnMore` field on `VocabularyItem`: etymology, cognates, collocations, optional cultural notes. Marked with provenance.
+- **Etymology backbones**: parse Wiktionary's etymology chains so we can render them as `Persian کتاب ← Arabic كتاب [k-t-b] ← Proto-Semitic *ktb` and **PIE → en/de/nl/it/ru/fa cognate panels**. Backbones we surface: PIE, Proto-Germanic, Latin, Greek, Arabic, Proto-Slavic, Old Persian / Avestan. Genuinely useful for someone studying multiple languages from this set (e.g. seeing that `heart / Herz / cuore / сердце` all descend from PIE `*ḱérd-` while Persian `دل` is a different root).
+- Same lexical data regardless of which AI provider drives the tutor — and same etymology view across providers.
 
 ## Phase 7 — Richer ingestion
 - PDF (via `pypdf`) and EPUB (via `ebooklib`) ingestion.
@@ -72,8 +74,26 @@
 - Distribution: GitHub Releases first (zero-friction), F-Droid for OSS reach, Google Play / App Store only when demand justifies the friction.
 - See [`docs/clients.md`](clients.md).
 
+## Phase 12 — Tandem / co-learning (multi-user)
+- Today the core pipeline is **per-user but symmetric**: any A→B pair works for one learner. Two learners teaching each other (e.g., a Farsi speaker learning English with an English speaker learning Farsi) needs a thin multi-user layer on top.
+- Auth: lift `LearnerProfile.id="default"` into real per-user profiles.
+- Material exchange: A uploads in their native language → appears in B's study queue, and vice versa.
+- Shared `TutorSession` mode where the AI tutor mediates / corrects both.
+- Tandem-partner page + invite flow in the React PWA.
+
+## Phase 13 — Chrome extension
+- MV3 extension that talks to `lingua-agent serve`.
+- Selection → popup with translation, grammar note, "Add to SRS" button (POSTs to `/api/cards` once that endpoint exists).
+- Right-click any word → definition + pronunciation.
+- Depends on **Phase 6b dictionary** for grounded lookup; without it every right-click is an expensive LLM call.
+
+## Phase 14 — YouTube / video material ingestion
+- First pass: grab the YouTube `<track>` captions directly (instant, free, but quality varies — Persian YT auto-captions are notably bad).
+- Second pass: `yt-dlp` audio + **faster-whisper large-v3** transcription, used as fallback or always-on for low-quality languages.
+- Subtitle (`.srt` / `.vtt`) ingestion sits naturally here — same pipeline that already accepts text.
+
 ## Out of scope (for now)
 - Audio synthesis caching to a CDN. Local files only.
-- Multi-user accounts / SaaS hosting.
+- SaaS hosting (multi-tenant). Self-hosting is the assumed deployment.
 - Gamification (streaks, XP, leaderboards). Optional later.
 - Pronunciation scoring (would require an alignment + phoneme model).

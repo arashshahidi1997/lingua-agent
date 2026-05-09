@@ -83,9 +83,16 @@ lingua-agent tutor chat --source en --target it
 
 ## AI providers
 
-The default provider is `mock`: it produces deterministic, schema-valid output without any network calls. Tests run against it. The ingest pipeline runs end-to-end against it.
+Four providers, all behind the same Protocol — switch with one env var:
 
-For real content there is **one** real provider — `OpenAICompatibleProvider` — that targets any backend speaking the OpenAI `/v1/chat/completions` shape. That covers **OpenAI**, **Gemma** (via Google AI Studio or Ollama), **Qwen** (via DashScope or Ollama), plus OpenRouter, vLLM, llama.cpp, and LM Studio. Switch by setting `OPENAI_BASE_URL` and `OPENAI_MODEL`:
+| Provider | When | Cost |
+|---|---|---|
+| `mock` (default) | Tests, no network | Free |
+| `openai` | OpenAI / Gemma / Qwen / Ollama / OpenRouter / vLLM / llama.cpp / LM Studio | API or free local |
+| `anthropic` | Claude API with **prompt caching** (~90% off cached tokens) | API |
+| **`claude-max`** | You have a **Claude Pro/Max subscription** — **no API key needed** | Subscription quota |
+
+For example, OpenAI-compatible (covers Gemma, Qwen, Ollama, ...):
 
 ```bash
 # OpenAI
@@ -105,7 +112,23 @@ OPENAI_BASE_URL=http://localhost:11434/v1
 OPENAI_MODEL=qwen3:14b
 ```
 
-The provider includes JSON-mode + a schema-validation repair loop so small open-weights models (Gemma 3 4B, Qwen3 1.5B) still produce valid pipeline output. Full backend list and per-language model recommendations: [`docs/providers.md`](docs/providers.md).
+For Anthropic with prompt caching:
+```bash
+pip install -e ".[anthropic]"
+LINGUA_AI_PROVIDER=anthropic
+ANTHROPIC_API_KEY=sk-ant-...
+ANTHROPIC_MODEL=claude-sonnet-4-6
+```
+
+For Claude Max users (no API key — uses your subscription):
+```bash
+npm install -g @anthropic-ai/claude-code && claude login
+pip install -e ".[claude-max]"
+LINGUA_AI_PROVIDER=claude-max
+ANTHROPIC_MODEL=claude-sonnet-4-6
+```
+
+Full backend list, per-language model recommendations, and prompt-caching details: [`docs/providers.md`](docs/providers.md).
 
 ## Custom material workflow
 
