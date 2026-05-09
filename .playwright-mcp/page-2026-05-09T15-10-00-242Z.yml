@@ -1,0 +1,80 @@
+- generic [ref=e4]:
+  - complementary [ref=e5]:
+    - generic [ref=e6]:
+      - heading "📚 lingua-agent" [level=1] [ref=e7]
+      - paragraph [ref=e8]: any A → any B
+    - navigation [ref=e9]:
+      - button "🏠 Dashboard" [ref=e10]:
+        - generic [ref=e11]: 🏠
+        - generic [ref=e12]: Dashboard
+      - button "📥 Ingest" [ref=e13]:
+        - generic [ref=e14]: 📥
+        - generic [ref=e15]: Ingest
+      - button "📖 Lessons" [ref=e16]:
+        - generic [ref=e17]: 📖
+        - generic [ref=e18]: Lessons
+      - button "🃏 Review" [ref=e19]:
+        - generic [ref=e20]: 🃏
+        - generic [ref=e21]: Review
+      - button "🤖 Tutor" [ref=e22]:
+        - generic [ref=e23]: 🤖
+        - generic [ref=e24]: Tutor
+      - button "🌐 Languages" [ref=e25]:
+        - generic [ref=e26]: 🌐
+        - generic [ref=e27]: Languages
+    - generic [ref=e28]:
+      - paragraph [ref=e29]: Active pair
+      - generic [ref=e30]:
+        - generic [ref=e31]:
+          - generic [ref=e32]: Source
+          - combobox [ref=e33]:
+            - option "de — German"
+            - option "en — English" [selected]
+            - option "fa — Persian (Farsi)"
+            - option "it — Italian"
+            - option "nl — Dutch"
+            - option "ru — Russian"
+        - generic [ref=e34]:
+          - generic [ref=e35]: Target
+          - combobox [ref=e36]:
+            - option "de — German"
+            - option "en — English"
+            - option "fa — Persian (Farsi)"
+            - option "it — Italian" [selected]
+            - option "nl — Dutch"
+            - option "ru — Russian"
+        - generic [ref=e37]:
+          - generic [ref=e38]: Support
+          - combobox [ref=e39]:
+            - option "— none —"
+            - option "de — German"
+            - option "en — English" [selected]
+            - option "fa — Persian (Farsi)"
+            - option "it — Italian"
+            - option "nl — Dutch"
+            - option "ru — Russian"
+  - main [ref=e40]:
+    - generic [ref=e110]:
+      - generic [ref=e111]:
+        - heading "Review (it)" [level=2] [ref=e112]
+        - link "Export Anki CSV" [ref=e113] [cursor=pointer]:
+          - /url: /api/export/anki?target=it
+      - generic [ref=e114]:
+        - generic [ref=e115]: Card card_9378a53022 · interval 0d · ease 2.50 · reps 0 · lapses 0
+        - generic [ref=e116]:
+          - generic [ref=e117]:
+            - heading "Front" [level=3] [ref=e118]
+            - generic [ref=e119]: world
+          - generic [ref=e120]:
+            - heading "Back" [level=3] [ref=e121]
+            - generic [ref=e124]: ⟨world⟩
+        - generic [ref=e125]:
+          - heading "Rate recall" [level=3] [ref=e126]
+          - generic [ref=e127]:
+            - button "0 blackout" [ref=e128]
+            - button "1 wrong" [ref=e129]
+            - button "2 hard miss" [ref=e130]
+            - button "3 hard but right" [ref=e131]
+            - button "4 right" [ref=e132]
+            - button "5 perfect" [ref=e133]
+        - paragraph [ref=e123]: 2 cards remaining in this session.

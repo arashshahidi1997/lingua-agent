@@ -1,0 +1,81 @@
+- generic [ref=e4]:
+  - complementary [ref=e5]:
+    - generic [ref=e6]:
+      - heading "📚 lingua-agent" [level=1] [ref=e7]
+      - paragraph [ref=e8]: any A → any B
+    - navigation [ref=e9]:
+      - button "🏠 Dashboard" [ref=e10]:
+        - generic [ref=e11]: 🏠
+        - generic [ref=e12]: Dashboard
+      - button "📥 Ingest" [active] [ref=e13]:
+        - generic [ref=e14]: 📥
+        - generic [ref=e15]: Ingest
+      - button "📖 Lessons" [ref=e16]:
+        - generic [ref=e17]: 📖
+        - generic [ref=e18]: Lessons
+      - button "🃏 Review" [ref=e19]:
+        - generic [ref=e20]: 🃏
+        - generic [ref=e21]: Review
+      - button "🤖 Tutor" [ref=e22]:
+        - generic [ref=e23]: 🤖
+        - generic [ref=e24]: Tutor
+      - button "🌐 Languages" [ref=e25]:
+        - generic [ref=e26]: 🌐
+        - generic [ref=e27]: Languages
+    - generic [ref=e28]:
+      - paragraph [ref=e29]: Active pair
+      - generic [ref=e30]:
+        - generic [ref=e31]:
+          - generic [ref=e32]: Source
+          - combobox [ref=e33]:
+            - option "de — German"
+            - option "en — English" [selected]
+            - option "fa — Persian (Farsi)"
+            - option "it — Italian"
+            - option "nl — Dutch"
+            - option "ru — Russian"
+        - generic [ref=e34]:
+          - generic [ref=e35]: Target
+          - combobox [ref=e36]:
+            - option "de — German"
+            - option "en — English"
+            - option "fa — Persian (Farsi)"
+            - option "it — Italian" [selected]
+            - option "nl — Dutch"
+            - option "ru — Russian"
+        - generic [ref=e37]:
+          - generic [ref=e38]: Support
+          - combobox [ref=e39]:
+            - option "— none —"
+            - option "de — German"
+            - option "en — English" [selected]
+            - option "fa — Persian (Farsi)"
+            - option "it — Italian"
+            - option "nl — Dutch"
+            - option "ru — Russian"
+  - main [ref=e40]:
+    - generic [ref=e121]:
+      - heading "Ingest custom material" [level=2] [ref=e123]
+      - generic [ref=e126]:
+        - generic [ref=e127]:
+          - text: Title
+          - textbox "Title" [ref=e128]: Coffee conversation
+        - generic [ref=e129]:
+          - text: CEFR level
+          - combobox "CEFR level" [ref=e130]:
+            - option "— unspecified —"
+            - option "A1" [selected]
+            - option "A2"
+            - option "B1"
+            - option "B2"
+            - option "C1"
+            - option "C2"
+        - generic [ref=e131]:
+          - text: Material
+          - textbox "Material" [ref=e132]: I would like a coffee and a glass of water. Where is the train station?
+        - generic [ref=e133]:
+          - generic [ref=e134]:
+            - text: "Pair:"
+            - generic [ref=e135]: en → it
+            - text: · support en
+          - button "Ingest" [ref=e136]

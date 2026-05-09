@@ -52,6 +52,7 @@ nav:
   - AI providers: providers.md
   - Playground UI: playground.md
   - Web app dev workflow: web-dev.md
+  - Mobile (HTTPS over LAN): mobile-https.md
   - Clients (desktop & mobile): clients.md
   - Roadmap: roadmap.md
   - Decisions: decisions.md

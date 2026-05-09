@@ -73,6 +73,27 @@ class UnitListItem(BaseModel):
     created_at: datetime
 
 
+class UnitDetail(BaseModel):
+    """Lesson unit with all referenced entities inlined.
+
+    Saves the React client a fan-out of N-by-id GETs: the modal opens with
+    one round-trip and renders the full vocab / grammar / exercises lists.
+    """
+    id: str
+    title: str
+    source_language: str
+    target_language: str
+    support_language: str | None
+    cefr_level: str | None
+    summary: str | None
+    bilingual_reading: list[dict]
+    tags: list[str]
+    vocabulary: list[dict]
+    grammar: list[dict]
+    exercises: list[dict]
+    flashcards: list[dict]
+
+
 class CardOut(BaseModel):
     id: str
     front: str

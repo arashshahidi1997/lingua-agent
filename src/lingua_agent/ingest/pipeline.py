@@ -107,6 +107,8 @@ def _repos(settings: Settings) -> dict[str, JsonRepository]:
     return {
         "documents": JsonRepository(root, "documents", Document),
         "lessons": JsonRepository(root, "lessons", LessonUnit),
+        "vocabulary": JsonRepository(root, "vocabulary", VocabularyItem),
+        "grammar": JsonRepository(root, "grammar", GrammarPoint),
         "flashcards": JsonRepository(root, "flashcards", Flashcard),
         "exercises": JsonRepository(root, "exercises", Exercise),
     }
@@ -289,6 +291,10 @@ def ingest_text(
     if persist:
         repos["documents"].save(document)
         repos["lessons"].save(unit)
+        for v in vocab:
+            repos["vocabulary"].save(v)
+        for g in grammar:
+            repos["grammar"].save(g)
         for e in exercises:
             repos["exercises"].save(e)
         for c in flashcards:

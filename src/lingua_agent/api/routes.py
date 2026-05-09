@@ -14,7 +14,16 @@ from ..ai import get_provider
 from ..config import Settings
 from ..ingest import ingest_text
 from ..languages import list_languages
-from ..models import Flashcard, LearnerProfile, LessonUnit, ReviewEvent, TutorSession
+from ..models import (
+    Exercise,
+    Flashcard,
+    GrammarPoint,
+    LearnerProfile,
+    LessonUnit,
+    ReviewEvent,
+    TutorSession,
+    VocabularyItem,
+)
 from ..srs import SM2Scheduler, export_cards_csv
 from ..storage import JsonRepository
 from ..tutor.agent import reply as tutor_reply
@@ -148,6 +157,44 @@ def get_unit(unit_id: str, s: Settings = Depends(get_settings)) -> LessonUnit:
     if not unit:
         raise HTTPException(status_code=404, detail=f"unit not found: {unit_id}")
     return unit
+
+
+@router.get("/units/{unit_id}/detail", response_model=S.UnitDetail)
+def get_unit_detail(unit_id: str, s: Settings = Depends(get_settings)) -> S.UnitDetail:
+    """Return the unit with all referenced entities inlined.
+
+    Saves the React modal a fan-out of N-by-id GETs: it opens with one
+    round-trip and renders the full vocab / grammar / exercises lists.
+    """
+    unit = JsonRepository(s.data_dir, "lessons", LessonUnit).get(unit_id)
+    if not unit:
+        raise HTTPException(status_code=404, detail=f"unit not found: {unit_id}")
+
+    vocab_repo = JsonRepository(s.data_dir, "vocabulary", VocabularyItem)
+    grammar_repo = JsonRepository(s.data_dir, "grammar", GrammarPoint)
+    ex_repo = JsonRepository(s.data_dir, "exercises", Exercise)
+    card_repo = JsonRepository(s.data_dir, "flashcards", Flashcard)
+
+    def _resolve(repo: JsonRepository, ids: list[str]) -> list[dict]:
+        out = []
+        for entity_id in ids:
+            entity = repo.get(entity_id)
+            if entity is not None:
+                out.append(entity.model_dump(mode="json"))
+        return out
+
+    return S.UnitDetail(
+        id=unit.id, title=unit.title,
+        source_language=unit.source_language, target_language=unit.target_language,
+        support_language=unit.support_language, cefr_level=unit.cefr_level,
+        summary=unit.summary,
+        bilingual_reading=[p.model_dump(mode="json") for p in unit.bilingual_reading],
+        tags=unit.tags,
+        vocabulary=_resolve(vocab_repo, unit.vocabulary_ids),
+        grammar=_resolve(grammar_repo, unit.grammar_ids),
+        exercises=_resolve(ex_repo, unit.exercise_ids),
+        flashcards=_resolve(card_repo, unit.flashcard_ids),
+    )
 
 
 @router.get("/cards/due", response_model=list[S.CardOut])

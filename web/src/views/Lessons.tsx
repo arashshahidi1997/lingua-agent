@@ -1,11 +1,12 @@
 import { useEffect, useState } from 'react'
-import { api, type LessonUnit, type UnitListItem } from '../lib/api'
+import { api, type UnitDetail, type UnitListItem } from '../lib/api'
 import { isRtl } from '../lib/rtl'
 import { Button, Card, ErrorBanner, Loading, Section } from '../components/ui'
 
 export default function Lessons() {
   const [units, setUnits] = useState<UnitListItem[] | null>(null)
-  const [open, setOpen] = useState<LessonUnit | null>(null)
+  const [open, setOpen] = useState<UnitDetail | null>(null)
+  const [openLoading, setOpenLoading] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [reload, setReload] = useState(0)
 
@@ -14,12 +15,14 @@ export default function Lessons() {
   }, [reload])
 
   const showUnit = async (id: string) => {
-    setError(null)
+    setError(null); setOpenLoading(id)
     try {
-      const unit = await api.unit(id)
-      setOpen(unit)
+      const detail = await api.unitDetail(id)
+      setOpen(detail)
     } catch (e) {
       setError(String(e))
+    } finally {
+      setOpenLoading(null)
     }
   }
 
@@ -45,7 +48,8 @@ export default function Lessons() {
             <li key={u.id}>
               <button
                 onClick={() => showUnit(u.id)}
-                className="block w-full rounded-lg border border-slate-200 bg-white p-4 text-left transition hover:border-violet-300 hover:shadow"
+                disabled={openLoading === u.id}
+                className="block w-full rounded-lg border border-slate-200 bg-white p-4 text-left transition hover:border-violet-300 hover:shadow disabled:opacity-50"
               >
                 <div className="text-xs uppercase tracking-wide text-slate-500">
                   {u.source_language} → {u.target_language} · {u.cefr_level ?? '—'}
@@ -65,8 +69,10 @@ export default function Lessons() {
   )
 }
 
-function UnitModal({ unit, onClose }: { unit: LessonUnit; onClose: () => void }) {
+function UnitModal({ unit, onClose }: { unit: UnitDetail; onClose: () => void }) {
   const targetRtl = isRtl(unit.target_language)
+  const target = unit.target_language
+
   return (
     <div
       className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 p-4"
@@ -81,6 +87,9 @@ function UnitModal({ unit, onClose }: { unit: LessonUnit; onClose: () => void })
             <h3 className="text-lg font-semibold">{unit.title}</h3>
             <p className="text-xs text-slate-500">
               {unit.source_language} → {unit.target_language} · {unit.cefr_level ?? '—'}
+              {unit.tags.length > 0 && (
+                <> · {unit.tags.map((t) => `#${t}`).join(' ')}</>
+              )}
             </p>
           </div>
           <Button variant="ghost" size="sm" onClick={onClose}>Close ✕</Button>
@@ -114,18 +123,113 @@ function UnitModal({ unit, onClose }: { unit: LessonUnit; onClose: () => void })
             </Card>
           )}
 
-          <Card title="Counts">
-            <ul className="text-sm text-slate-700">
-              <li>Vocabulary: {unit.vocabulary_ids.length}</li>
-              <li>Grammar points: {unit.grammar_ids.length}</li>
-              <li>Exercises: {unit.exercise_ids.length}</li>
-              <li>Flashcards: {unit.flashcard_ids.length}</li>
-            </ul>
-            <p className="mt-3 text-xs text-slate-500">
-              Detailed vocab / grammar / exercise rendering will land in a follow-up; the
-              underlying data is already in the unit JSON and on disk.
-            </p>
-          </Card>
+          {unit.vocabulary.length > 0 && (
+            <Card title={`Vocabulary (${unit.vocabulary.length})`}>
+              <ul className="divide-y divide-slate-100">
+                {unit.vocabulary.map((v) => {
+                  const translations = v.translations[target] ?? []
+                  return (
+                    <li key={v.id} className="py-2">
+                      <div className="flex flex-wrap items-baseline gap-2">
+                        <span className="font-medium" dir={targetRtl ? 'rtl' : 'ltr'}>{v.lemma}</span>
+                        {v.pos && <span className="text-xs text-slate-500">_{v.pos}_</span>}
+                        {v.gender && <span className="text-xs italic text-slate-500">{v.gender}.</span>}
+                        {v.cefr_level && (
+                          <span className="rounded bg-slate-100 px-1.5 py-0.5 text-[10px] font-medium uppercase text-slate-600">
+                            {v.cefr_level}
+                          </span>
+                        )}
+                      </div>
+                      <div className="mt-0.5 text-sm text-slate-700">
+                        → {translations.join(', ') || <span className="text-slate-400">—</span>}
+                      </div>
+                      {v.transliteration && (
+                        <div className="text-xs text-slate-500">/{v.transliteration}/</div>
+                      )}
+                      {v.example_text && (
+                        <div className="mt-1 text-xs italic text-slate-500">"{v.example_text}"</div>
+                      )}
+                    </li>
+                  )
+                })}
+              </ul>
+            </Card>
+          )}
+
+          {unit.grammar.length > 0 && (
+            <Card title={`Grammar (${unit.grammar.length})`}>
+              <ul className="space-y-3">
+                {unit.grammar.map((g) => (
+                  <li key={g.id}>
+                    <div className="font-medium">{g.name}</div>
+                    <p className="mt-0.5 text-sm text-slate-700">{g.summary}</p>
+                    {g.evidence.length > 0 && (
+                      <ul className="mt-1 list-inside list-disc text-xs text-slate-500">
+                        {g.evidence.map((ev, i) => (
+                          <li key={i}>{ev}</li>
+                        ))}
+                      </ul>
+                    )}
+                  </li>
+                ))}
+              </ul>
+            </Card>
+          )}
+
+          {unit.exercises.length > 0 && (
+            <Card title={`Exercises (${unit.exercises.length})`}>
+              <ol className="space-y-3">
+                {unit.exercises.map((e, i) => (
+                  <li key={e.id} className="text-sm">
+                    <div className="flex items-baseline gap-2">
+                      <span className="text-slate-400">{i + 1}.</span>
+                      <span className="rounded bg-violet-100 px-1.5 py-0.5 text-[10px] font-medium uppercase text-violet-900">
+                        {e.type}
+                      </span>
+                      <span className="text-xs text-slate-400">difficulty {e.difficulty}</span>
+                    </div>
+                    <p className="mt-1" dir={targetRtl ? 'rtl' : 'ltr'}>{e.prompt}</p>
+                    {e.expected_answer && (
+                      <p className="mt-0.5 text-xs text-slate-500">
+                        expected: <span dir={targetRtl ? 'rtl' : 'ltr'}>{e.expected_answer}</span>
+                      </p>
+                    )}
+                    {e.choices.length > 0 && (
+                      <p className="mt-0.5 text-xs text-slate-500">choices: {e.choices.join(', ')}</p>
+                    )}
+                    {e.explanation && (
+                      <p className="mt-0.5 text-xs italic text-slate-500">{e.explanation}</p>
+                    )}
+                  </li>
+                ))}
+              </ol>
+            </Card>
+          )}
+
+          {unit.flashcards.length > 0 && (
+            <Card title={`Flashcards (${unit.flashcards.length})`}>
+              <table className="w-full text-sm">
+                <thead className="text-left text-xs uppercase tracking-wide text-slate-500">
+                  <tr>
+                    <th className="pb-2 pr-3">Front</th>
+                    <th className="pb-2 pl-3">Back</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-100">
+                  {unit.flashcards.map((c) => (
+                    <tr key={c.id}>
+                      <td className="py-1.5 pr-3" dir={isRtl(c.source_language) ? 'rtl' : 'ltr'}>
+                        {c.front}
+                      </td>
+                      <td className="py-1.5 pl-3" dir={isRtl(c.target_language) ? 'rtl' : 'ltr'}>
+                        {c.back}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </Card>
+          )}
         </div>
       </div>
     </div>

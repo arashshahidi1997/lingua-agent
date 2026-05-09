@@ -48,7 +48,8 @@ class Settings:
         )
 
     def ensure_dirs(self) -> None:
-        for sub in ("documents", "lessons", "flashcards", "exercises", "attempts", "reviews", "sessions"):
+        for sub in ("documents", "lessons", "vocabulary", "grammar",
+                    "flashcards", "exercises", "attempts", "reviews", "sessions"):
             (self.data_dir / sub).mkdir(parents=True, exist_ok=True)
         for sub in ("inbox", "units", "cards", "exports"):
             (self.content_dir / sub).mkdir(parents=True, exist_ok=True)

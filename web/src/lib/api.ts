@@ -50,6 +50,61 @@ export interface LessonUnit {
   created_at: string
 }
 
+export interface VocabularyItem {
+  id: string
+  lemma: string
+  surface: string
+  target_language: string
+  translations: Record<string, string[]>
+  pos: string | null
+  gender: 'm' | 'f' | 'n' | null
+  transliteration: string | null
+  example_text: string | null
+  cefr_level: string | null
+}
+
+export interface GrammarPoint {
+  id: string
+  target_language: string
+  name: string
+  summary: string
+  evidence: string[]
+  cefr_level: string | null
+  support_language: string | null
+}
+
+export interface Exercise {
+  id: string
+  type: string
+  source_language: string
+  target_language: string
+  prompt: string
+  expected_answer: string | null
+  acceptable_answers: string[]
+  choices: string[]
+  hints: string[]
+  explanation: string | null
+  difficulty: number
+  skill_tags: string[]
+  grading_mode: string
+}
+
+export interface UnitDetail {
+  id: string
+  title: string
+  source_language: string
+  target_language: string
+  support_language: string | null
+  cefr_level: string | null
+  summary: string | null
+  bilingual_reading: ReadingPair[]
+  tags: string[]
+  vocabulary: VocabularyItem[]
+  grammar: GrammarPoint[]
+  exercises: Exercise[]
+  flashcards: Card[]
+}
+
 export interface IngestSummary {
   unit_id: string
   document_id: string
@@ -122,6 +177,7 @@ export const api = {
   units: (target?: string) =>
     request<UnitListItem[]>(`/units${target ? `?target=${target}` : ''}`),
   unit: (id: string) => request<LessonUnit>(`/units/${id}`),
+  unitDetail: (id: string) => request<UnitDetail>(`/units/${id}/detail`),
   cardsDue: (target?: string, limit = 50) =>
     request<Card[]>(`/cards/due?${new URLSearchParams({ ...(target ? { target } : {}), limit: String(limit) })}`),
   reviewCard: (id: string, rating: number) =>

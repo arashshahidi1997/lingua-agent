@@ -1,0 +1,67 @@
+- generic [ref=e4]:
+  - complementary [ref=e5]:
+    - generic [ref=e6]:
+      - heading "📚 lingua-agent" [level=1] [ref=e7]
+      - paragraph [ref=e8]: any A → any B
+    - navigation [ref=e9]:
+      - button "🏠 Dashboard" [ref=e10]:
+        - generic [ref=e11]: 🏠
+        - generic [ref=e12]: Dashboard
+      - button "📥 Ingest" [ref=e13]:
+        - generic [ref=e14]: 📥
+        - generic [ref=e15]: Ingest
+      - button "📖 Lessons" [ref=e16]:
+        - generic [ref=e17]: 📖
+        - generic [ref=e18]: Lessons
+      - button "🃏 Review" [ref=e19]:
+        - generic [ref=e20]: 🃏
+        - generic [ref=e21]: Review
+      - button "🤖 Tutor" [ref=e22]:
+        - generic [ref=e23]: 🤖
+        - generic [ref=e24]: Tutor
+      - button "🌐 Languages" [ref=e25]:
+        - generic [ref=e26]: 🌐
+        - generic [ref=e27]: Languages
+    - generic [ref=e28]:
+      - paragraph [ref=e29]: Active pair
+      - generic [ref=e30]:
+        - generic [ref=e31]:
+          - generic [ref=e32]: Source
+          - combobox [ref=e33]:
+            - option "de — German"
+            - option "en — English" [selected]
+            - option "fa — Persian (Farsi)"
+            - option "it — Italian"
+            - option "nl — Dutch"
+            - option "ru — Russian"
+        - generic [ref=e34]:
+          - generic [ref=e35]: Target
+          - combobox [ref=e36]:
+            - option "de — German"
+            - option "en — English"
+            - option "fa — Persian (Farsi)"
+            - option "it — Italian" [selected]
+            - option "nl — Dutch"
+            - option "ru — Russian"
+        - generic [ref=e37]:
+          - generic [ref=e38]: Support
+          - combobox [ref=e39]:
+            - option "— none —"
+            - option "de — German"
+            - option "en — English" [selected]
+            - option "fa — Persian (Farsi)"
+            - option "it — Italian"
+            - option "nl — Dutch"
+            - option "ru — Russian"
+  - main [ref=e40]:
+    - generic [ref=e135]:
+      - heading "Tutor chat" [level=2] [ref=e137]
+      - generic [ref=e138]:
+        - generic [ref=e140]:
+          - generic [ref=e149]: How do I order coffee in Italian?
+          - generic [ref=e151]: "[mock tutor] I read: 'How do I order coffee in Italian?'. Try `generate_exercise` or `list_due_cards`."
+        - generic [ref=e143]:
+          - generic [ref=e144]:
+            - textbox "Ask the tutor…" [ref=e145]
+            - button "Send" [disabled] [ref=e146]
+          - paragraph [ref=e147]: Session sess_5f20c32327 · pair en→it

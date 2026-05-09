@@ -1,0 +1,83 @@
+- generic [ref=e4]:
+  - complementary [ref=e5]:
+    - generic [ref=e6]:
+      - heading "📚 lingua-agent" [level=1] [ref=e7]
+      - paragraph [ref=e8]: any A → any B
+    - navigation [ref=e9]:
+      - button "🏠 Dashboard" [ref=e10]:
+        - generic [ref=e11]: 🏠
+        - generic [ref=e12]: Dashboard
+      - button "📥 Ingest" [ref=e13]:
+        - generic [ref=e14]: 📥
+        - generic [ref=e15]: Ingest
+      - button "📖 Lessons" [ref=e16]:
+        - generic [ref=e17]: 📖
+        - generic [ref=e18]: Lessons
+      - button "🃏 Review" [ref=e19]:
+        - generic [ref=e20]: 🃏
+        - generic [ref=e21]: Review
+      - button "🤖 Tutor" [ref=e22]:
+        - generic [ref=e23]: 🤖
+        - generic [ref=e24]: Tutor
+      - button "🌐 Languages" [ref=e25]:
+        - generic [ref=e26]: 🌐
+        - generic [ref=e27]: Languages
+    - generic [ref=e28]:
+      - paragraph [ref=e29]: Active pair
+      - generic [ref=e30]:
+        - generic [ref=e31]:
+          - generic [ref=e32]: Source
+          - combobox [ref=e33]:
+            - option "de — German"
+            - option "en — English" [selected]
+            - option "fa — Persian (Farsi)"
+            - option "it — Italian"
+            - option "nl — Dutch"
+            - option "ru — Russian"
+        - generic [ref=e34]:
+          - generic [ref=e35]: Target
+          - combobox [ref=e36]:
+            - option "de — German"
+            - option "en — English"
+            - option "fa — Persian (Farsi)"
+            - option "it — Italian" [selected]
+            - option "nl — Dutch"
+            - option "ru — Russian"
+        - generic [ref=e37]:
+          - generic [ref=e38]: Support
+          - combobox [ref=e39]:
+            - option "— none —"
+            - option "de — German"
+            - option "en — English" [selected]
+            - option "fa — Persian (Farsi)"
+            - option "it — Italian"
+            - option "nl — Dutch"
+            - option "ru — Russian"
+  - main [ref=e40]:
+    - generic [ref=e41]:
+      - heading "Dashboard" [level=2] [ref=e43]
+      - generic [ref=e44]:
+        - generic [ref=e45]:
+          - heading "Backend" [level=3] [ref=e46]
+          - list [ref=e47]:
+            - listitem [ref=e48]: "status: ok"
+            - listitem [ref=e49]: "version: 0.1.0"
+            - listitem [ref=e50]: "AI provider: mock"
+        - generic [ref=e51]:
+          - heading "What works here" [level=3] [ref=e52]
+          - list [ref=e53]:
+            - listitem [ref=e54]:
+              - strong [ref=e55]: Ingest
+              - text: — paste text → lesson + vocab + grammar + cards.
+            - listitem [ref=e56]:
+              - strong [ref=e57]: Lessons
+              - text: — bilingual reader with RTL handling for Persian.
+            - listitem [ref=e58]:
+              - strong [ref=e59]: Review
+              - text: — SM-2 SRS with reveal + 0–5 quality buttons.
+            - listitem [ref=e60]:
+              - strong [ref=e61]: Tutor
+              - text: — chat against the configured AI provider.
+            - listitem [ref=e62]:
+              - strong [ref=e63]: Install to home screen
+              - text: — this is a PWA. On Android Chrome and iOS Safari, the browser menu has an "Install" / "Add to Home Screen" option. Offline access works for previously-loaded pages and cached API responses (network-first with 14-day cache).

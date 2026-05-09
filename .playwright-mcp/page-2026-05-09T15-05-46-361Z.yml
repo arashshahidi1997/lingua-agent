@@ -1,0 +1,110 @@
+- generic [ref=e4]:
+  - complementary [ref=e5]:
+    - generic [ref=e6]:
+      - heading "📚 lingua-agent" [level=1] [ref=e7]
+      - paragraph [ref=e8]: any A → any B
+    - navigation [ref=e9]:
+      - button "🏠 Dashboard" [ref=e10]:
+        - generic [ref=e11]: 🏠
+        - generic [ref=e12]: Dashboard
+      - button "📥 Ingest" [ref=e13]:
+        - generic [ref=e14]: 📥
+        - generic [ref=e15]: Ingest
+      - button "📖 Lessons" [ref=e16]:
+        - generic [ref=e17]: 📖
+        - generic [ref=e18]: Lessons
+      - button "🃏 Review" [ref=e19]:
+        - generic [ref=e20]: 🃏
+        - generic [ref=e21]: Review
+      - button "🤖 Tutor" [ref=e22]:
+        - generic [ref=e23]: 🤖
+        - generic [ref=e24]: Tutor
+      - button "🌐 Languages" [ref=e25]:
+        - generic [ref=e26]: 🌐
+        - generic [ref=e27]: Languages
+    - generic [ref=e28]:
+      - paragraph [ref=e29]: Active pair
+      - generic [ref=e30]:
+        - generic [ref=e31]:
+          - generic [ref=e32]: Source
+          - combobox [active] [ref=e33]:
+            - option "de — German"
+            - option "en — English" [selected]
+            - option "fa — Persian (Farsi)"
+            - option "it — Italian"
+            - option "nl — Dutch"
+            - option "ru — Russian"
+        - generic [ref=e34]:
+          - generic [ref=e35]: Target
+          - combobox [ref=e36]:
+            - option "de — German"
+            - option "en — English"
+            - option "fa — Persian (Farsi)"
+            - option "it — Italian" [selected]
+            - option "nl — Dutch"
+            - option "ru — Russian"
+        - generic [ref=e37]:
+          - generic [ref=e38]: Support
+          - combobox [ref=e39]:
+            - option "— none —"
+            - option "de — German"
+            - option "en — English" [selected]
+            - option "fa — Persian (Farsi)"
+            - option "it — Italian"
+            - option "nl — Dutch"
+            - option "ru — Russian"
+  - main [ref=e40]:
+    - generic [ref=e64]:
+      - heading "Supported languages" [level=2] [ref=e66]
+      - table [ref=e69]:
+        - rowgroup [ref=e70]:
+          - row "Code Name Native Script Direction Translit" [ref=e71]:
+            - columnheader "Code" [ref=e72]
+            - columnheader "Name" [ref=e73]
+            - columnheader "Native" [ref=e74]
+            - columnheader "Script" [ref=e75]
+            - columnheader "Direction" [ref=e76]
+            - columnheader "Translit" [ref=e77]
+        - rowgroup [ref=e78]:
+          - row "de German Deutsch latin ltr —" [ref=e79]:
+            - cell "de" [ref=e80]
+            - cell "German" [ref=e81]
+            - cell "Deutsch" [ref=e82]
+            - cell "latin" [ref=e83]
+            - cell "ltr" [ref=e84]
+            - cell "—" [ref=e85]
+          - row "en English English latin ltr —" [ref=e86]:
+            - cell "en" [ref=e87]
+            - cell "English" [ref=e88]
+            - cell "English" [ref=e89]
+            - cell "latin" [ref=e90]
+            - cell "ltr" [ref=e91]
+            - cell "—" [ref=e92]
+          - row "fa Persian (Farsi) فارسی arabic rtl yes" [ref=e93]:
+            - cell "fa" [ref=e94]
+            - cell "Persian (Farsi)" [ref=e95]
+            - cell "فارسی" [ref=e96]
+            - cell "arabic" [ref=e97]
+            - cell "rtl" [ref=e98]
+            - cell "yes" [ref=e99]
+          - row "it Italian Italiano latin ltr —" [ref=e100]:
+            - cell "it" [ref=e101]
+            - cell "Italian" [ref=e102]
+            - cell "Italiano" [ref=e103]
+            - cell "latin" [ref=e104]
+            - cell "ltr" [ref=e105]
+            - cell "—" [ref=e106]
+          - row "nl Dutch Nederlands latin ltr —" [ref=e107]:
+            - cell "nl" [ref=e108]
+            - cell "Dutch" [ref=e109]
+            - cell "Nederlands" [ref=e110]
+            - cell "latin" [ref=e111]
+            - cell "ltr" [ref=e112]
+            - cell "—" [ref=e113]
+          - row "ru Russian Русский cyrillic ltr yes" [ref=e114]:
+            - cell "ru" [ref=e115]
+            - cell "Russian" [ref=e116]
+            - cell "Русский" [ref=e117]
+            - cell "cyrillic" [ref=e118]
+            - cell "ltr" [ref=e119]
+            - cell "yes" [ref=e120]
