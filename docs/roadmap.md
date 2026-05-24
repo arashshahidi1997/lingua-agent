@@ -28,6 +28,15 @@
 - Bayesian Knowledge Tracing module (clean-room port of OATutor's BKT).
 - `recommend_next_activity` with mastery-aware item selection.
 
+## ✅ Phase 6c — Materials adapter (shipped)
+- `MaterialsProvider` Protocol with **LocalDirProvider** (filesystem; handles intermittently-mounted SSD gracefully) and **RcloneDriveProvider** (any rclone remote, e.g. `gdrive:3-Language`, via subprocess; reuses the user's existing rclone auth).
+- `LearnerProfile.materials_sources: list[MaterialsSourceConfig]` persists configured sources; default empty.
+- API endpoints under `/api/materials/`: list/add/remove sources, browse folders, ingest a file straight into the lesson pipeline.
+- CLI: `lingua-agent materials list/add/remove/browse`.
+- `materials/ingest` derives `source_language` from the first path segment when it's an ISO code, so `de/pimsleur/lesson1.txt` ingests as German source without explicit configuration. Refuses files larger than `max_bytes` (default 2MB) and non-UTF-8 binary content (PDF/audio ingest is a later phase).
+- Dotfiles (.DS_Store, ._*) hidden at the provider level so the UI stays clean.
+- 36 new tests (LocalDir + RcloneDrive with mocked subprocess + API endpoints incl. Persian-path roundtrip + path-escape protection).
+
 ## Phase 6b — Dictionary-grounded lookup + "Learn more" + etymology backbones
 - `lingua-agent download dictionaries --lang fa` — pulls kaikki.org Wiktionary extract + OpenSubtitles frequency list, indexes into SQLite at `~/.lingua-agent/dict/`.
 - Optional download of Tatoeba (~700 MB) for example sentences.

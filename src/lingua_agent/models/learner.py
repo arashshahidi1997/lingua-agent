@@ -7,6 +7,7 @@ from typing import Literal
 
 from pydantic import BaseModel, Field
 
+from ..materials.base import MaterialsSourceConfig
 from .base import utcnow
 
 
@@ -39,5 +40,10 @@ class LearnerProfile(BaseModel):
     interests: list[str] = Field(default_factory=list)
     last_active_pair: tuple[str, str] | None = None
     memory: list[MemoryEntry] = Field(default_factory=list)
+    materials_sources: list[MaterialsSourceConfig] = Field(
+        default_factory=list,
+        description="Configured material sources (SSD, Drive, ...). Empty by default; "
+                     "add via `lingua-agent materials add` or the API.",
+    )
     created_at: datetime = Field(default_factory=utcnow)
     updated_at: datetime = Field(default_factory=utcnow)

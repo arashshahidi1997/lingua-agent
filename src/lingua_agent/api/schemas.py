@@ -145,3 +145,54 @@ class TutorMessageResponse(BaseModel):
     role: str
     content: str
     created_at: datetime
+
+
+# ---- Materials adapter (Phase 6c) -----------------------------------------
+
+class MaterialsSourceOut(BaseModel):
+    name: str
+    provider: str
+    root: str
+    read_only: bool
+    available: bool
+    notes: str | None = None
+
+
+class AddMaterialsSourceRequest(BaseModel):
+    name: str = Field(min_length=1)
+    provider: str = Field(pattern=r"^(local_dir|rclone_drive)$")
+    root: str = Field(min_length=1)
+    read_only: bool = True
+    notes: str | None = None
+
+
+class MaterialsEntryOut(BaseModel):
+    source: str
+    path: str
+    name: str
+    is_dir: bool
+    size_bytes: int | None = None
+    mime_type: str | None = None
+    modified_at: datetime | None = None
+
+
+class MaterialsListResponse(BaseModel):
+    source: str
+    folder: str
+    available: bool
+    entries: list[MaterialsEntryOut] = Field(default_factory=list)
+    error: str | None = None
+
+
+class MaterialsIngestRequest(BaseModel):
+    source: str = Field(min_length=1)
+    path: str = Field(min_length=1)
+    target_language: str
+    source_language: str | None = Field(default=None,
+        description="If omitted, derived from the file's containing language folder if present.")
+    support_language: str | None = "en"
+    title: str | None = Field(default=None,
+        description="If omitted, derived from the file name.")
+    cefr_level: str | None = None
+    max_bytes: int = Field(default=2_000_000, ge=1,
+        description="Reject files larger than this many bytes to avoid blowing the LLM context.")

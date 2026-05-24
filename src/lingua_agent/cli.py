@@ -41,12 +41,14 @@ unit_app = typer.Typer(help="Inspect generated lesson units.")
 review_app = typer.Typer(help="Review SRS cards.")
 export_app = typer.Typer(help="Export learning artifacts.")
 tutor_app = typer.Typer(help="Tutor agent (mock in MVP).")
+materials_app = typer.Typer(help="Manage and browse materials sources (SSD, Drive, ...).")
 app.add_typer(languages_app, name="languages")
 app.add_typer(ingest_app, name="ingest")
 app.add_typer(unit_app, name="unit")
 app.add_typer(review_app, name="review")
 app.add_typer(export_app, name="export")
 app.add_typer(tutor_app, name="tutor")
+app.add_typer(materials_app, name="materials")
 
 console = Console()
 
@@ -352,6 +354,114 @@ def tutor_grade(
     style = "green" if result.correct else "red"
     console.print(f"[{style}]{'CORRECT' if result.correct else 'INCORRECT'}[/{style}] "
                   f"score={result.score:.2f} — {result.feedback}")
+
+
+# --- materials ------------------------------------------------------------
+
+@materials_app.command("list")
+def materials_list_sources():
+    """List configured materials sources and their availability."""
+    from .materials import build_provider
+    s = _settings()
+    profile = _load_or_default_profile(s)
+    if not profile.materials_sources:
+        console.print("[yellow]No materials sources configured.[/yellow] "
+                       "Add one with: [bold]lingua-agent materials add[/bold]")
+        return
+    table = Table(title="Materials sources")
+    for col in ("name", "provider", "root", "available", "notes"):
+        table.add_column(col)
+    for cfg in profile.materials_sources:
+        try:
+            avail = build_provider(cfg).is_available()
+        except Exception:
+            avail = False
+        table.add_row(cfg.name, cfg.provider, cfg.root,
+                       "[green]yes[/green]" if avail else "[red]no[/red]",
+                       cfg.notes or "")
+    console.print(table)
+
+
+@materials_app.command("add")
+def materials_add(
+    name: str = typer.Option(..., "--name", help="Human-readable label, e.g. 'Transcend SSD'."),
+    provider: str = typer.Option(..., "--provider", help="local_dir | rclone_drive"),
+    root: str = typer.Option(..., "--root",
+                              help="Filesystem path or rclone remote+path, e.g. 'gdrive:3-Language'."),
+    notes: Optional[str] = typer.Option(None, "--notes"),
+):
+    """Add a materials source to the learner profile."""
+    from .materials.base import MaterialsSourceConfig
+    if provider not in ("local_dir", "rclone_drive"):
+        console.print(f"[red]Unknown provider:[/red] {provider}")
+        raise typer.Exit(code=1)
+    s = _settings()
+    profile = _load_or_default_profile(s)
+    if any(src.name == name for src in profile.materials_sources):
+        console.print(f"[red]Source {name!r} already exists.[/red]")
+        raise typer.Exit(code=1)
+    profile.materials_sources.append(MaterialsSourceConfig(
+        name=name, provider=provider, root=root, notes=notes,  # type: ignore[arg-type]
+    ))
+    _save_profile(s, profile)
+    console.print(f"[green]Added[/green] source [bold]{name}[/bold] "
+                   f"({provider}: {root})")
+
+
+@materials_app.command("remove")
+def materials_remove(name: str):
+    """Remove a materials source from the learner profile."""
+    s = _settings()
+    profile = _load_or_default_profile(s)
+    before = len(profile.materials_sources)
+    profile.materials_sources = [src for src in profile.materials_sources if src.name != name]
+    if len(profile.materials_sources) == before:
+        console.print(f"[red]No such source:[/red] {name}")
+        raise typer.Exit(code=1)
+    _save_profile(s, profile)
+    console.print(f"[green]Removed[/green] source [bold]{name}[/bold]")
+
+
+@materials_app.command("browse")
+def materials_browse(
+    source: str = typer.Argument(..., help="Name of the source to browse."),
+    folder: str = typer.Option("", "--folder",
+                                help="Sub-folder path (relative to source root)."),
+):
+    """List entries in a materials folder."""
+    from .materials import MaterialsError, build_provider
+    from .materials.registry import find_source
+    s = _settings()
+    profile = _load_or_default_profile(s)
+    cfg = find_source(profile, source)
+    if cfg is None:
+        console.print(f"[red]No such source:[/red] {source}")
+        raise typer.Exit(code=1)
+    provider = build_provider(cfg)
+    if not provider.is_available():
+        console.print(f"[yellow]Source {source!r} is not available right now.[/yellow]")
+        raise typer.Exit(code=1)
+    try:
+        entries = provider.list(folder)
+    except MaterialsError as exc:
+        console.print(f"[red]Error:[/red] {exc}")
+        raise typer.Exit(code=1)
+    table = Table(title=f"{source} : /{folder}".rstrip("/"))
+    for col in ("name", "kind", "size", "mime"):
+        table.add_column(col)
+    for e in entries:
+        kind = "📁 dir" if e.is_dir else "📄 file"
+        size = "—" if e.size_bytes is None else _human_size(e.size_bytes)
+        table.add_row(e.name, kind, size, e.mime_type or "—")
+    console.print(table)
+
+
+def _human_size(n: int) -> str:
+    for unit in ("B", "KB", "MB", "GB", "TB"):
+        if n < 1024:
+            return f"{n:.0f}{unit}" if unit == "B" else f"{n:.1f}{unit}"
+        n /= 1024
+    return f"{n:.1f}PB"
 
 
 def main() -> None:  # pragma: no cover - convenience for `python -m lingua_agent.cli`

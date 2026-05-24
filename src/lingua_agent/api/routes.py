@@ -14,6 +14,8 @@ from ..ai import get_provider
 from ..config import Settings
 from ..ingest import ingest_text
 from ..languages import list_languages
+from ..materials import MaterialsError, MaterialsSourceConfig, build_provider
+from ..materials.registry import find_source
 from ..models import (
     Exercise,
     Flashcard,
@@ -273,4 +275,150 @@ def _session_out(sess: TutorSession) -> S.TutorSessionOut:
         messages=[m.model_dump(mode="json") for m in sess.messages],
         created_at=sess.created_at,
         updated_at=sess.updated_at,
+    )
+
+
+# ---- Materials adapter (Phase 6c) -----------------------------------------
+
+@router.get("/materials/sources", response_model=list[S.MaterialsSourceOut])
+def materials_sources(s: Settings = Depends(get_settings)) -> list[S.MaterialsSourceOut]:
+    profile = _load_profile(s)
+    out: list[S.MaterialsSourceOut] = []
+    for cfg in profile.materials_sources:
+        try:
+            available = build_provider(cfg).is_available()
+        except MaterialsError:
+            available = False
+        out.append(S.MaterialsSourceOut(
+            name=cfg.name, provider=cfg.provider, root=cfg.root,
+            read_only=cfg.read_only, available=available, notes=cfg.notes,
+        ))
+    return out
+
+
+@router.post("/materials/sources", response_model=S.MaterialsSourceOut, status_code=201)
+def materials_add_source(req: S.AddMaterialsSourceRequest,
+                          s: Settings = Depends(get_settings)) -> S.MaterialsSourceOut:
+    profile = _load_profile(s)
+    if any(src.name == req.name for src in profile.materials_sources):
+        raise HTTPException(status_code=409, detail=f"source named {req.name!r} already exists")
+    cfg = MaterialsSourceConfig(
+        name=req.name, provider=req.provider, root=req.root,  # type: ignore[arg-type]
+        read_only=req.read_only, notes=req.notes,
+    )
+    profile.materials_sources.append(cfg)
+    _save_profile(s, profile)
+    try:
+        available = build_provider(cfg).is_available()
+    except MaterialsError:
+        available = False
+    return S.MaterialsSourceOut(
+        name=cfg.name, provider=cfg.provider, root=cfg.root,
+        read_only=cfg.read_only, available=available, notes=cfg.notes,
+    )
+
+
+@router.delete("/materials/sources/{name}", status_code=204)
+def materials_remove_source(name: str, s: Settings = Depends(get_settings)) -> None:
+    profile = _load_profile(s)
+    before = len(profile.materials_sources)
+    profile.materials_sources = [src for src in profile.materials_sources if src.name != name]
+    if len(profile.materials_sources) == before:
+        raise HTTPException(status_code=404, detail=f"no such source: {name!r}")
+    _save_profile(s, profile)
+
+
+@router.get("/materials/list", response_model=S.MaterialsListResponse)
+def materials_list(source: str, folder: str = "",
+                    s: Settings = Depends(get_settings)) -> S.MaterialsListResponse:
+    profile = _load_profile(s)
+    cfg = find_source(profile, source)
+    if cfg is None:
+        raise HTTPException(status_code=404, detail=f"no such source: {source!r}")
+    provider = build_provider(cfg)
+    if not provider.is_available():
+        return S.MaterialsListResponse(
+            source=source, folder=folder, available=False, entries=[],
+            error=f"source {source!r} is not available right now",
+        )
+    try:
+        entries = provider.list(folder)
+    except MaterialsError as exc:
+        return S.MaterialsListResponse(
+            source=source, folder=folder, available=True, entries=[], error=str(exc),
+        )
+    return S.MaterialsListResponse(
+        source=source, folder=folder, available=True,
+        entries=[S.MaterialsEntryOut.model_validate(e.model_dump()) for e in entries],
+    )
+
+
+@router.post("/materials/ingest", response_model=S.IngestSummary)
+def materials_ingest(req: S.MaterialsIngestRequest,
+                      s: Settings = Depends(get_settings)) -> S.IngestSummary:
+    profile = _load_profile(s)
+    cfg = find_source(profile, req.source)
+    if cfg is None:
+        raise HTTPException(status_code=404, detail=f"no such source: {req.source!r}")
+    provider = build_provider(cfg)
+    try:
+        entry = provider.metadata(req.path)
+    except MaterialsError as exc:
+        raise HTTPException(status_code=404, detail=str(exc))
+    if entry.is_dir:
+        raise HTTPException(status_code=400, detail=f"path is a directory: {req.path!r}")
+    if entry.size_bytes is not None and entry.size_bytes > req.max_bytes:
+        raise HTTPException(
+            status_code=413,
+            detail=f"file too large ({entry.size_bytes} > {req.max_bytes} bytes); raise max_bytes if you really mean it",
+        )
+    try:
+        raw = provider.read(req.path)
+    except MaterialsError as exc:
+        raise HTTPException(status_code=502, detail=str(exc))
+
+    try:
+        text = raw.decode("utf-8")
+    except UnicodeDecodeError:
+        raise HTTPException(status_code=415,
+                             detail=f"file is not utf-8 text ({entry.mime_type or 'unknown mime'}); "
+                                    "binary ingest (audio/PDF/...) lands in a later phase")
+
+    # Derive defaults: title from the file name; source_language from the
+    # path's first segment if it's a known ISO code.
+    title = req.title or Path(req.path).stem.replace("_", " ").strip() or "Untitled lesson"
+    source_lang = req.source_language
+    if source_lang is None:
+        first = req.path.split("/", 1)[0]
+        if len(first) in (2, 3) and first.isalpha() and first.islower():
+            source_lang = first  # likely an ISO code matching our registry
+    if source_lang is None:
+        raise HTTPException(
+            status_code=400,
+            detail="source_language not provided and could not be derived from path",
+        )
+
+    ai = get_provider(s.ai_provider)
+    try:
+        result = ingest_text(
+            text=text, title=title,
+            source_language=source_lang, target_language=req.target_language,
+            support_language=req.support_language, cefr_level=req.cefr_level,
+            tags=[f"material:{req.source}", f"path:{req.path}"],
+            provider=ai, settings=s,
+        )
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc))
+
+    return S.IngestSummary(
+        unit_id=result.unit.id,
+        document_id=result.document.id,
+        title=result.unit.title,
+        source_language=result.unit.source_language,
+        target_language=result.unit.target_language,
+        vocabulary_count=len(result.vocabulary),
+        grammar_count=len(result.grammar),
+        exercise_count=len(result.exercises),
+        flashcard_count=len(result.flashcards),
+        unit_path=result.unit_path,
     )
