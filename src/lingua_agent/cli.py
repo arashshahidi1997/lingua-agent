@@ -101,13 +101,61 @@ def init():
     console.print(f"AI provider: [bold]{s.ai_provider}[/bold]")
 
 
+def _build_web(web_dir: Path) -> None:
+    """Build the React PWA into ``web_dir/dist`` so FastAPI can serve it.
+
+    Runs ``npm install`` (only when ``node_modules`` is missing) then
+    ``npm run build``. Raises ``typer.Exit`` with a clear message when the
+    toolchain or the ``web/`` directory is missing, or the build fails.
+    """
+    import shutil
+    import subprocess
+
+    if not (web_dir / "package.json").exists():
+        console.print(
+            f"[red]No web app found at {web_dir}[/red] "
+            "(expected a package.json). Run from the repo root."
+        )
+        raise typer.Exit(code=1)
+    if shutil.which("npm") is None:
+        console.print(
+            "[red]npm not found on PATH.[/red] Install Node.js (>=18) to build "
+            "the PWA, or serve the API alone without [bold]--build[/bold]."
+        )
+        raise typer.Exit(code=1)
+
+    if not (web_dir / "node_modules").exists():
+        console.print("[cyan]→[/cyan] installing web dependencies (first run)…")
+        if subprocess.run(
+            ["npm", "install", "--no-audit", "--no-fund"], cwd=web_dir
+        ).returncode != 0:
+            console.print("[red]npm install failed.[/red]")
+            raise typer.Exit(code=1)
+
+    console.print("[cyan]→[/cyan] building the PWA (npm run build)…")
+    if subprocess.run(["npm", "run", "build"], cwd=web_dir).returncode != 0:
+        console.print("[red]web build failed.[/red]")
+        raise typer.Exit(code=1)
+    console.print(f"[green]✓[/green] built {web_dir / 'dist'}")
+
+
 @app.command()
 def serve(
     host: str = typer.Option("127.0.0.1", "--host", help="Bind host. Use 0.0.0.0 for LAN."),
     port: int = typer.Option(8000, "--port"),
     reload: bool = typer.Option(False, "--reload", help="Auto-reload on code changes (dev)."),
+    build: bool = typer.Option(
+        False, "--build",
+        help="Build the React PWA into web/dist first, then serve it from this process.",
+    ),
 ):
-    """Start the FastAPI HTTP server (Phase 8 backend for the React PWA)."""
+    """Start the FastAPI HTTP server (Phase 8 backend for the React PWA).
+
+    With [bold]--build[/bold] this is the one-command way to run the installable
+    app: it compiles the PWA into web/dist and serves both the API and the UI
+    from a single origin. For "Install to Home Screen" on Android/iOS the origin
+    must be HTTPS — see docs/mobile-https.md.
+    """
     try:
         import uvicorn
     except ImportError:
@@ -116,6 +164,26 @@ def serve(
             "[bold]pip install -e \".[api]\"[/bold]"
         )
         raise typer.Exit(code=1)
+
+    web_dir = Path.cwd() / "web"
+    if build:
+        _build_web(web_dir)
+
+    dist = web_dir / "dist"
+    if (dist / "index.html").exists():
+        console.print(f"[green]✓[/green] serving PWA from {dist}")
+    else:
+        console.print(
+            "[yellow]![/yellow] no built UI at web/dist — serving the API only. "
+            "Add [bold]--build[/bold] to compile and serve the installable app."
+        )
+    if host == "0.0.0.0":
+        console.print(
+            "[yellow]![/yellow] bound to 0.0.0.0 (LAN). Plain HTTP works in a "
+            "phone browser, but 'Install to Home Screen' needs HTTPS — "
+            "see [bold]docs/mobile-https.md[/bold]."
+        )
+
     console.print(f"[green]→[/green] http://{host}:{port}/api/health")
     uvicorn.run("lingua_agent.api.main:app", host=host, port=port, reload=reload)
 

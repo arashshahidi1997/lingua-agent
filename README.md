@@ -48,6 +48,37 @@ lingua-agent playground   # → http://localhost:8501
 
 A Streamlit UI with tabs for ingest / lessons / review / tutor on top of the same core. **Not the production UI** (that's Phase 8 — FastAPI + React PWA), just the iteration tool. See [`docs/playground.md`](docs/playground.md).
 
+## Use it on your phone (Android PWA)
+
+The React front end is an installable **PWA** — no app store, no native build.
+One command compiles it and serves both the API and the UI from a single origin:
+
+```bash
+pip install -e ".[api]"                 # one-time: installs uvicorn + FastAPI
+lingua-agent serve --build --host 0.0.0.0   # build the PWA, then serve on your LAN
+```
+
+`--build` runs `npm install` (first time) + `npm run build` into `web/dist`, so
+you need Node.js ≥ 18 on the machine. Then, from your phone on the same Wi-Fi:
+
+1. **Browse it now** — open `http://<your-computer-ip>:8000` in Android Chrome.
+   Reading, ingest, review, and tutor all work over plain HTTP.
+2. **Install to Home Screen** — this needs **HTTPS** (Android won't register a
+   service worker over `http://192.168.x.x`). The fastest path is a tunnel:
+
+   ```bash
+   # in a second terminal, with the server already running
+   cloudflared tunnel --url http://localhost:8000   # or: ngrok http 8000
+   ```
+
+   Open the printed `https://…` URL on the phone → Chrome menu → **Install app**.
+   You'll get a home-screen icon, a standalone window, and offline SRS review
+   (the service worker caches `/api/*` network-first).
+
+For a stable LAN cert (`mkcert`) or an off-Wi-Fi setup (`tailscale serve`), see
+[`docs/mobile-https.md`](docs/mobile-https.md). Everything is **self-hosted** —
+your lessons and API keys live on your machine, not a third-party server.
+
 ## Quickstart
 
 ```bash
