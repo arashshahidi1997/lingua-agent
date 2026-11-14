@@ -3,14 +3,7 @@
   "configurations": [
     {
       "name": "lingua-agent",
-      "runtimeExecutable": "env",
-      "runtimeArgs": [
-        "LINGUA_AI_PROVIDER=openai",
-        "OPENAI_BASE_URL=http://localhost:11434/v1",
-        "OPENAI_MODEL=qwen2.5:7b",
-        "OPENAI_TIMEOUT=900",
-        ".venv/bin/lingua-agent", "serve"
-      ],
+      "url": "http://localhost:8000",
       "port": 8000
     }
   ]

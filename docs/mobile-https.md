@@ -67,6 +67,28 @@ Open that URL on the phone (which must also be signed in to your tailnet). Insta
 
 This is the **best long-term workflow** if you're a Tailscale user already — stable, no per-device cert management, works off-LAN.
 
+## Running it for your phones (the setup in use)
+
+The XPS serves the app as a systemd **user** service, and `tailscale serve` puts it on the tailnet with HTTPS:
+
+```bash
+# ~/.config/systemd/user/lingua-agent.service runs:
+#   .venv/bin/lingua-agent serve --host 127.0.0.1 --port 8000   (Ollama env vars set in the unit)
+systemctl --user status lingua-agent
+tailscale serve --bg 8000          # → https://your-laptop.your-tailnet.ts.net
+```
+
+Phones on any network (Wi-Fi or mobile data) reach it while they're signed in to Tailscale and the laptop is
+awake. Share the laptop with other people from the Tailscale admin page (machine → Share) rather than adding
+them to the tailnet.
+
+**Shipping an update** to the phones: build the web app, restart the service; installed apps pick up the new
+version the next time they're opened.
+
+```bash
+npm --prefix web run build && systemctl --user restart lingua-agent
+```
+
 ## Quick recommendation
 
 | Goal | Pick |
