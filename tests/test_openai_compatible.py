@@ -63,7 +63,10 @@ def test_generate_structured_happy_path(monkeypatch):
     result = p.generate_structured("anything", Item)
     assert result == Item(name="coffee", score=5)
     assert payload_seen["model"] == "gemma3:12b"
-    assert payload_seen["response_format"] == {"type": "json_object"}
+    fmt = payload_seen["response_format"]
+    assert fmt["type"] == "json_schema"
+    assert fmt["json_schema"]["name"] == "Item"
+    assert fmt["json_schema"]["schema"] == Item.model_json_schema()
 
 
 def test_strips_json_fences(monkeypatch):
@@ -126,9 +129,26 @@ def test_falls_back_when_json_mode_rejected(monkeypatch):
     p = _provider(handler, settings)
     result = p.generate_structured("anything", Item)
     assert result == Item(name="ok", score=1)
-    # First call had json mode, second did not.
-    assert "response_format" in calls[0]
-    assert "response_format" not in calls[1]
+    # Steps down json_schema -> json_object -> plain prompt.
+    assert calls[0]["response_format"]["type"] == "json_schema"
+    assert calls[1]["response_format"] == {"type": "json_object"}
+    assert "response_format" not in calls[2]
+
+
+def test_steps_down_to_json_object_only_when_schema_rejected(monkeypatch):
+    settings = _make_settings(monkeypatch)
+    calls = []
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        body = json.loads(request.content)
+        calls.append(body)
+        if body.get("response_format", {}).get("type") == "json_schema":
+            return httpx.Response(400, text="json_schema is not supported")
+        return httpx.Response(200, json=_completion('{"name": "ok", "score": 2}'))
+
+    p = _provider(handler, settings)
+    assert p.generate_structured("anything", Item) == Item(name="ok", score=2)
+    assert [c["response_format"]["type"] for c in calls] == ["json_schema", "json_object"]
 
 
 def test_chat_passes_through(monkeypatch):

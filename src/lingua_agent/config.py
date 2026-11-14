@@ -26,6 +26,7 @@ class Settings:
     openai_api_key: str | None
     openai_base_url: str
     openai_model: str
+    openai_timeout: float  # seconds per request; local CPU models need several minutes
     anthropic_api_key: str | None
     anthropic_model: str
     ollama_base_url: str
@@ -42,6 +43,7 @@ class Settings:
             openai_api_key=os.environ.get("OPENAI_API_KEY") or None,
             openai_base_url=os.environ.get("OPENAI_BASE_URL", "https://api.openai.com/v1"),
             openai_model=os.environ.get("OPENAI_MODEL", "gpt-4o-mini"),
+            openai_timeout=float(os.environ.get("OPENAI_TIMEOUT", "120")),
             anthropic_api_key=os.environ.get("ANTHROPIC_API_KEY") or None,
             anthropic_model=os.environ.get("ANTHROPIC_MODEL", "claude-sonnet-4-6"),
             ollama_base_url=os.environ.get("OLLAMA_BASE_URL", "http://localhost:11434"),

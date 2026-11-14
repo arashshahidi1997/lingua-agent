@@ -19,9 +19,11 @@ Local-only Ollama runs without an API key; if `OPENAI_API_KEY` is unset
 
 Two real-world adjustments for small open-weights models:
 
-1. JSON mode — we send `response_format={"type": "json_object"}` by default.
-   On a 400/422 from a backend that doesn't support it (older Ollama
-   builds, certain models), we fall back to a plain prompt + JSON-parse.
+1. Structured output — we send `response_format={"type": "json_schema", ...}`
+   with the target Pydantic schema by default. Backends that honour it
+   (OpenAI, Ollama >= 0.5, vLLM, llama.cpp) constrain decoding to the schema,
+   which is what makes small local models usable. On a 400/422 we step down
+   to `{"type": "json_object"}`, then to a plain prompt + JSON-parse.
 
 2. Schema-validation repair loop — small models (Gemma/Qwen at the smaller
    sizes) sometimes emit nearly-valid JSON. On a Pydantic ValidationError
@@ -44,7 +46,6 @@ from .base import ChatMessage, ChatResponse, GenerationError
 T = TypeVar("T", bound=BaseModel)
 
 
-_DEFAULT_TIMEOUT = httpx.Timeout(120.0, connect=10.0)
 _FENCED_JSON_RE = re.compile(r"^\s*```(?:json)?\s*(.*?)\s*```\s*$", re.DOTALL)
 _FIRST_JSON_OBJECT_RE = re.compile(r"\{.*\}", re.DOTALL)
 
@@ -90,7 +91,8 @@ class OpenAICompatibleProvider:
             )
 
         self._owns_client = client is None
-        self._client = client or httpx.Client(timeout=_DEFAULT_TIMEOUT)
+        self._client = client or httpx.Client(
+            timeout=httpx.Timeout(self.settings.openai_timeout, connect=10.0))
 
     def __del__(self):  # pragma: no cover - best-effort cleanup
         if getattr(self, "_owns_client", False):
@@ -167,7 +169,15 @@ class OpenAICompatibleProvider:
             {"role": "user", "content": user_prompt},
         ]
 
-        json_mode = self.json_mode
+        # Strongest output constraint first; each backend rejection steps down one level.
+        formats: list[dict[str, Any] | None] = [None]
+        if self.json_mode:
+            formats = [
+                {"type": "json_schema",
+                 "json_schema": {"name": schema.__name__, "schema": schema_json, "strict": False}},
+                {"type": "json_object"},
+                None,
+            ]
         last_error: str | None = None
         last_text: str | None = None
 
@@ -177,19 +187,22 @@ class OpenAICompatibleProvider:
                 "messages": messages,
                 "temperature": 0,
             }
-            if json_mode:
-                payload["response_format"] = {"type": "json_object"}
-
-            try:
-                body = self._post(payload)
-            except GenerationError as exc:
-                # If json_mode is rejected by the backend, fall back to plain text
-                # mode and retry the same attempt without consuming a repair budget.
-                msg = str(exc)
-                if json_mode and ("response_format" in msg or " 400" in msg or " 422" in msg):
-                    json_mode = False
-                    continue
-                raise
+            while True:
+                if formats[0] is not None:
+                    payload["response_format"] = formats[0]
+                else:
+                    payload.pop("response_format", None)
+                try:
+                    body = self._post(payload)
+                    break
+                except GenerationError as exc:
+                    # If the output format is rejected by the backend, step down to the
+                    # next one and retry without consuming a repair attempt.
+                    msg = str(exc)
+                    if len(formats) > 1 and ("response_format" in msg or " 400" in msg or " 422" in msg):
+                        formats.pop(0)
+                        continue
+                    raise
 
             text = (body.get("choices", [{}])[0].get("message", {}).get("content") or "").strip()
             last_text = text
