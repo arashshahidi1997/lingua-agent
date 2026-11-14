@@ -61,7 +61,9 @@ two sections, which `round.py board` keeps in place:
 ## Units of work and where their state lives
 
 The units of work are the phases in `docs/roadmap.md` (✅ marks shipped ones), plus bugs and the PWA /
-Android client. Their state lives in `docs/roadmap.md`, the commits, and `docs/log/handoff/`.
+Android client. Concrete items are in `docs/backlog.md` (Now / Next / Housekeeping / Done; `**user**` marks
+the user's items); the direction under review is `docs/product-v2.md`. Their state lives in those files, the
+commits, and `docs/log/handoff/`.
 
 | Work | Typical unit(s) | Notes |
 |---|---|---|
@@ -83,7 +85,7 @@ approved, a note's status once handled, and `→ manager` items a session hands 
 ## Collision unit
 
 The top-level directory, as the units in `.projio/manager.yml` map it (`docs/log/` is `notes`, the rest of
-`docs/` is `docs`). `docs/roadmap.md` is touched by most phase sessions: two sessions may tick items in it,
+`docs/` is `docs`). `docs/backlog.md` and `docs/roadmap.md` are touched by most sessions: two sessions may tick items in it,
 but only with small hunks committed by path; flag it when both have it dirty. `pyproject.toml` and
 `pixi.lock` likewise (dependency changes): one session at a time.
 
@@ -113,8 +115,9 @@ to lingua-manager by session id (board's Sync).
    (`round.py dirty`).
 2. **Files:** `python3 .claude/skills/project-manager/incoming.py` and
    `python3 .claude/skills/project-manager/round.py`.
-3. **Roadmap:** what was ticked or added since the last round (`git log -p -- docs/roadmap.md`), and which
-   open phases are unblocked.
+3. **Backlog:** what was ticked or added since the last round
+   (`git log -p -- docs/backlog.md docs/roadmap.md`), and which open items are unblocked. `**user**` items go
+   under "Waiting on you".
 4. **Health:** `.venv/bin/python -m pytest -q -p no:warnings` and `.venv/bin/ruff check src tests`
    (read-only), and whether CI on `main` is green (`gh run list -L 3`).
 5. **Board:** `python3 .claude/skills/project-manager/round.py board`, then What's up and the hand-written

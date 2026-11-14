@@ -8,7 +8,7 @@ incoming:
   body_markers: ["### Source context:"]
   open_statuses: [open, partial, scheduled, queued]
   cited_by:
-    globs: [docs/roadmap.md]
+    globs: [docs/backlog.md, docs/roadmap.md]
     git_log: true
 handoffs:
   dir: docs/log/handoff

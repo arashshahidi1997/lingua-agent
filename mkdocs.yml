@@ -43,6 +43,9 @@ theme:
     text: Inter
     code: JetBrains Mono
 
+exclude_docs: |
+  log/
+
 nav:
   - Home: index.md
   - Architecture: architecture.md
@@ -55,6 +58,7 @@ nav:
   - Mobile (HTTPS over LAN): mobile-https.md
   - Clients (desktop & mobile): clients.md
   - Roadmap: roadmap.md
+  - Product v2 (draft): product-v2.md
   - Decisions: decisions.md
   - References: references.md
 

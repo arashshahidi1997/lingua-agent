@@ -1,5 +1,7 @@
 # Roadmap
 
+> **Under review:** [Product v2 — proposal](product-v2.md) reframes the app around a Path, Library, Talk and a single practice engine, and proposes a new build order. Where they conflict, treat the phases below as references, not a fixed plan.
+
 ## ✅ MVP (this release)
 - Pure Python core, JSON-on-disk persistence.
 - `Language`, `LanguagePair`, `Document`, `TextSegment`, `VocabularyItem`, `GrammarPoint`, `LessonUnit`, `Exercise`, `ExerciseAttempt`, `Flashcard`, `ReviewEvent`, `LearnerProfile`, `TutorSession` models.
