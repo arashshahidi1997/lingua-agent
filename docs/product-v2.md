@@ -1,6 +1,9 @@
-# Product v2 — proposal (draft)
+# Product v2 — proposal
 
-> **Status: draft for review.** Nothing here is fixed, and neither is the spec it revises. It reframes the
+> **Status: first pass implemented (2026-11-14)** — the four tabs, the Path with a hand-written Farsi A1
+> course, the exercise engine, practice and checkpoint quizzes, stories with shadowing, recordings, imported
+> audio with transcripts, Talk with corrections and summaries, and Piper speech. Still open for review:
+> nothing here is fixed, and neither is the spec it revises. It reframes the
 > app from "paste text, get a lesson" into a daily learning companion. The existing core (ingest pipeline,
 > SRS, providers, materials adapter, PWA) stays; this adds structure and surfaces on top of it.
 

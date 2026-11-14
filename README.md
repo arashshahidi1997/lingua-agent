@@ -28,6 +28,35 @@ Most OSS language-learning projects assume English is the source. `lingua-agent`
 
 Persian is a first-class citizen. Lesson exports wrap Persian blocks in `dir="rtl"` so they render correctly. Transliteration is an opt-in scaffold, never a substitute for the original script.
 
+## What's in the app
+
+The web app (`lingua-agent serve --build`) has four tabs:
+
+- **Today** — continue your course, review due cards, a quick quiz, a story, and a conversation to try.
+- **Path** — a structured course, unit by unit: lessons as Duolingo-style exercises (choose, listen, match,
+  word order, type the transliteration), a story and a role-play per unit, and a checkpoint quiz that also
+  lets you test out. The first course is **Farsi A1 for English speakers** (8 units, hand-written, with
+  transliteration throughout: `src/lingua_agent/course/data/fa-en-a1.yaml`).
+- **Library** — stories and dialogues to read and listen to (play all, per line, and shadowing: record yourself
+  right after the model line), your own recordings and speaking diary, imported audio with synced `.srt`/`.vtt`
+  transcripts, and lessons generated from your own texts.
+- **Talk** — role-play the unit's scenario (or talk freely) with the AI, by text or voice, with gentle
+  corrections and a summary at the end that turns mistakes and new words into flashcards.
+
+Settings hold the language pair, script display (Persian script / transliteration / both), speech, daily goal,
+and the AI provider. The direction and its open questions are in [`docs/product-v2.md`](docs/product-v2.md).
+
+### Speech
+
+Audio comes from a local [Piper](https://github.com/rhasspy/piper) voice when one is installed, else from the
+browser's voices (most devices have none for Persian):
+
+```bash
+pip install -e ".[voice]"            # piper-tts (+ faster-whisper for transcribing your audio)
+lingua-agent voices download fa      # ~63 MB, from rhasspy/piper-voices
+lingua-agent voices list
+```
+
 ## Install
 
 ```bash

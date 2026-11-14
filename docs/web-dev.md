@@ -52,18 +52,22 @@ npm --prefix web run build              # writes web/dist/
 
 ```
 web/
-├── index.html              # Vite entry HTML (sets <title>, <meta>, etc.)
-├── package.json            # React, Vite, Tailwind v4
-├── vite.config.ts          # Vite config + /api proxy to :8000
-├── tsconfig*.json          # TypeScript config (strict)
-├── public/                 # Static assets served as-is (favicon, manifest, icons later)
+├── index.html              # Vite entry HTML (<title>, theme-color, viewport-fit=cover)
+├── package.json            # React, Vite, Tailwind v4, lucide-react, @fontsource (Inter, Vazirmatn, Literata)
+├── vite.config.ts          # Vite config + PWA manifest + /api proxy to :8000
+├── public/                 # Static assets served as-is (favicon, icons)
 └── src/
-    ├── main.tsx            # React entry
-    ├── App.tsx             # Layout shell + view switcher
-    ├── index.css           # @import "tailwindcss"; + RTL/LTR globals
-    └── lib/
-        └── api.ts          # Tiny typed fetch wrapper for /api/*
+    ├── main.tsx            # React entry; imports only the font subsets we use
+    ├── App.tsx             # Shell: header (pair chip, settings), tab bar / rail, overlay stack
+    ├── index.css           # Design tokens (CSS variables, dark mode) exposed to Tailwind via @theme
+    ├── state/              # settings + language pair (localStorage), navigation (tabs + overlays + history)
+    ├── lib/                # api.ts, course-api.ts (Product v2 contract), speech, recorder, dictation, grading, rtl
+    ├── components/         # ui primitives, Text (target text + transliteration + gloss), PlayButton, Exercises
+    └── views/              # Today, Path, Library, Talk, Settings, and the full-screen Player, Review, readers, chat
 ```
+
+Navigation has no router: `state/nav.ts` holds the active tab plus a stack of overlays (player, readers,
+chat, settings). Opening an overlay pushes a history entry, so the Android back button closes it.
 
 ## Stack choices and why
 
@@ -71,7 +75,7 @@ web/
 - **Vite 8** — instant HMR, no Webpack, default for new React projects in 2026.
 - **Tailwind v4** — single `@import "tailwindcss";` with the `@tailwindcss/vite` plugin, no PostCSS config, no `tailwind.config.js` required for basic use. Major simplification over v3.
 - **No shadcn/ui yet** — bringing it in adds initial-component scaffolding noise without a clear payoff at this scaffold stage; Phase 8.2 will pull in the components we actually use (Button, Dialog, Tabs, Select).
-- **No router yet** — view switching is a single piece of state in `App.tsx`. We'll switch to React Router or TanStack Router when we have ≥6 views or want shareable URLs.
+- **No router yet** — tabs and overlays are state in `state/NavProvider.tsx`, with `history.pushState` for the back button. A router comes in when we want shareable URLs.
 
 ## What ships in each phase
 
