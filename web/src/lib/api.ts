@@ -158,6 +158,15 @@ export interface TutorSession {
   updated_at: string
 }
 
+export interface MaterialsSource {
+  name: string
+  provider: string
+  root: string
+  read_only: boolean
+  available: boolean
+  notes: string | null
+}
+
 async function request<T>(path: string, init?: RequestInit): Promise<T> {
   const res = await fetch(`/api${path}`, {
     headers: { 'Content-Type': 'application/json', ...(init?.headers ?? {}) },
@@ -200,5 +209,6 @@ export const api = {
     request<{ role: string; content: string; created_at: string }>(
       `/tutor/sessions/${id}/messages`, { method: 'POST', body: JSON.stringify({ content }) },
     ),
+  materialsSources: () => request<MaterialsSource[]>('/materials/sources'),
   exportAnkiUrl: (target: string) => `/api/export/anki?target=${encodeURIComponent(target)}`,
 }

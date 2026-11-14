@@ -18,8 +18,8 @@ export default defineConfig({
         name: 'lingua-agent',
         short_name: 'lingua-agent',
         description: 'Agentic AI language-learning platform — any A → B.',
-        theme_color: '#7c3aed',
-        background_color: '#0f172a',
+        theme_color: '#fafaf9',
+        background_color: '#fafaf9',
         display: 'standalone',
         start_url: '/',
         scope: '/',
@@ -34,6 +34,12 @@ export default defineConfig({
         // Don't precache the API responses; they're handled at runtime below.
         globPatterns: ['**/*.{js,css,html,png,svg,ico,woff2}'],
         runtimeCaching: [
+          {
+            // Audio (TTS, recordings, imported tracks) streams with range
+            // requests; keep it out of the cache.
+            urlPattern: ({ request }) => request.destination === 'audio' || request.destination === 'video',
+            handler: 'NetworkOnly',
+          },
           {
             // Network-first for API: always prefer fresh data, fall back to
             // cached responses when offline so SRS review keeps working

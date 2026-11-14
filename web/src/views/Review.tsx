@@ -1,107 +1,128 @@
 import { useEffect, useState } from 'react'
-import { api, type Card as Flashcard } from '../lib/api'
-import { useLangPair } from '../state/LangPair'
-import { isRtl } from '../lib/rtl'
-import { Button, Card, ErrorBanner, Loading, Section } from '../components/ui'
+import { api, type Card } from '../lib/api'
+import { errorMessage, useAsync } from '../lib/hooks'
+import { dirOf } from '../lib/rtl'
+import { useNav } from '../state/nav'
+import { useSettings } from '../state/settings'
+import { Button, Empty, ErrorNote, Loading, ProgressLine, Screen } from '../components/ui'
+import { PlayButton } from '../components/PlayButton'
 
-const LABELS: { q: number; label: string; tone: 'danger' | 'secondary' | 'primary' }[] = [
-  { q: 0, label: '0 blackout', tone: 'danger' },
-  { q: 1, label: '1 wrong', tone: 'danger' },
-  { q: 2, label: '2 hard miss', tone: 'danger' },
-  { q: 3, label: '3 hard but right', tone: 'secondary' },
-  { q: 4, label: '4 right', tone: 'primary' },
-  { q: 5, label: '5 perfect', tone: 'primary' },
+const RATINGS = [
+  { q: 1, label: 'Again', key: '1' },
+  { q: 3, label: 'Hard', key: '2' },
+  { q: 4, label: 'Good', key: '3' },
+  { q: 5, label: 'Easy', key: '4' },
 ]
 
+/** Due flashcards: front, tap to reveal, then rate. */
 export default function Review() {
-  const { pair } = useLangPair()
-  const [cards, setCards] = useState<Flashcard[] | null>(null)
-  const [idx, setIdx] = useState(0)
-  const [showBack, setShowBack] = useState(false)
-  const [error, setError] = useState<string | null>(null)
+  const nav = useNav()
+  const { pair } = useSettings()
+  const { data, error, loading, reload } = useAsync(`due|${pair.target}`, () => api.cardsDue(pair.target))
+  const [done, setDone] = useState<string[]>([])
+  const [shown, setShown] = useState(false)
   const [busy, setBusy] = useState(false)
+  const [rateError, setRateError] = useState<string | null>(null)
 
-  const load = () => {
-    setError(null); setShowBack(false); setIdx(0)
-    api.cardsDue(pair.target).then(setCards).catch((e) => setError(String(e)))
-  }
+  const cards = (data ?? []).filter((c) => !done.includes(c.id))
+  const total = data?.length ?? 0
+  const card: Card | undefined = cards[0]
 
-  useEffect(load, [pair.target])
-
-  const grade = async (q: number) => {
-    if (!cards || cards.length === 0) return
-    const card = cards[idx % cards.length]
-    setBusy(true); setError(null)
+  const rate = async (q: number) => {
+    if (!card || busy) return
+    setBusy(true); setRateError(null)
     try {
       await api.reviewCard(card.id, q)
-      // Drop the just-reviewed card and advance.
-      const next = cards.filter((c) => c.id !== card.id)
-      setCards(next)
-      setShowBack(false)
-      setIdx((i) => (next.length === 0 ? 0 : i % next.length))
+      setDone((d) => [...d, card.id])
+      setShown(false)
+      if (cards.length === 1) nav.bumpData()
     } catch (e) {
-      setError(String(e))
+      setRateError(errorMessage(e))
     } finally {
       setBusy(false)
     }
   }
 
-  return (
-    <Section
-      title={`Review (${pair.target})`}
-      action={
-        <a
-          href={api.exportAnkiUrl(pair.target)}
-          className="rounded-md bg-slate-100 px-3 py-1.5 text-sm font-medium hover:bg-slate-200"
-        >
-          Export Anki CSV
-        </a>
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (!card) return
+      if (!shown && (e.key === ' ' || e.key === 'Enter')) { e.preventDefault(); setShown(true); return }
+      if (shown) {
+        const r = RATINGS.find((x) => x.key === e.key)
+        if (r) void rate(r.q)
       }
-    >
-      <ErrorBanner error={error} />
-      {!cards && !error && <Loading />}
-      {cards && cards.length === 0 && <Card><p className="text-emerald-700">No cards due. ✓</p></Card>}
-      {cards && cards.length > 0 && (() => {
-        const card = cards[idx % cards.length]
-        const targetIsRtl = isRtl(card.target_language)
-        return (
+    }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  })
+
+  const frontLang = card?.source_language ?? pair.source
+  const backLang = card?.target_language ?? pair.target
+  // Cards can run either way; speak whichever side is in the target language.
+  const targetSide = card ? (card.target_language === pair.target ? card.back : card.front) : ''
+
+  return (
+    <Screen title="Review" onBack={nav.close} backIcon="close">
+      <div className="mx-auto flex min-h-full w-full max-w-xl flex-col px-4 pb-8 pt-4">
+        {total > 0 && (
+          <div className="mb-6 flex items-center gap-3">
+            <ProgressLine value={done.length / total} label="Reviewed" />
+            <span className="shrink-0 text-[13px] tabular-nums text-ink-3">{done.length}/{total}</span>
+          </div>
+        )}
+        {loading && !data && <Loading />}
+        <ErrorNote error={error} onRetry={reload} />
+        {data && !card && (
+          <div className="pt-8">
+            <Empty title={total ? 'All caught up' : 'Nothing to review right now'}>
+              {total ? `You reviewed ${total} card${total === 1 ? '' : 's'}.` : 'New cards appear here as you finish lessons.'}
+            </Empty>
+            <div className="mt-6 flex justify-center"><Button onClick={nav.close}>Done</Button></div>
+          </div>
+        )}
+
+        {card && (
           <>
-            <div className="text-xs text-slate-500">
-              Card <span className="font-mono">{card.id}</span> · interval {card.interval}d ·
-              ease {card.ease_factor.toFixed(2)} · reps {card.repetitions} · lapses {card.lapses}
+            <button
+              type="button"
+              onClick={() => setShown(true)}
+              aria-label={shown ? 'Card' : 'Show answer'}
+              className="flex min-h-[18rem] flex-1 flex-col items-center justify-center rounded-3xl border border-line bg-surface px-6 py-10 text-center"
+            >
+              <span lang={frontLang} dir={dirOf(frontLang)} className={`${dirOf(frontLang) === 'rtl' ? 'text-[2rem]' : 'text-2xl'} text-ink`}>
+                {card.front}
+              </span>
+              {shown ? (
+                <>
+                  <span className="my-6 h-px w-16 bg-line" aria-hidden />
+                  <span lang={backLang} dir={dirOf(backLang)} className={`${dirOf(backLang) === 'rtl' ? 'text-[2rem]' : 'text-2xl'} text-ink`}>
+                    {card.back}
+                  </span>
+                </>
+              ) : (
+                <span className="mt-8 text-[13px] text-ink-3">Tap to reveal</span>
+              )}
+            </button>
+            <div className="mt-3 flex justify-center">
+              <PlayButton text={targetSide} lang={pair.target} />
             </div>
-
-            <div className="grid gap-4 sm:grid-cols-2">
-              <Card title="Front">
-                <div className="text-2xl" dir={isRtl(card.source_language) ? 'rtl' : 'ltr'}>
-                  {card.front}
-                </div>
-              </Card>
-              <Card title="Back">
-                {showBack ? (
-                  <div className="text-2xl" dir={targetIsRtl ? 'rtl' : 'ltr'}>{card.back}</div>
-                ) : (
-                  <Button variant="secondary" onClick={() => setShowBack(true)}>Show back</Button>
-                )}
-              </Card>
+            <div className="mt-4"><ErrorNote error={rateError} /></div>
+            <div className="mt-4 grid grid-cols-4 gap-2">
+              {RATINGS.map((r) => (
+                <Button
+                  key={r.q}
+                  variant={r.q === 4 ? 'primary' : 'secondary'}
+                  disabled={!shown || busy}
+                  onClick={() => rate(r.q)}
+                  className="px-1"
+                >
+                  {r.label}
+                </Button>
+              ))}
             </div>
-
-            {showBack && (
-              <Card title="Rate recall">
-                <div className="grid grid-cols-2 gap-2 sm:grid-cols-6">
-                  {LABELS.map((b) => (
-                    <Button key={b.q} variant={b.tone} disabled={busy} onClick={() => grade(b.q)}>
-                      {b.label}
-                    </Button>
-                  ))}
-                </div>
-              </Card>
-            )}
-
-            <p className="text-xs text-slate-500">{cards.length} card{cards.length === 1 ? '' : 's'} remaining in this session.</p>
           </>
-        )
-      })()}
-    </Section>
+        )}
+      </div>
+    </Screen>
   )
 }
