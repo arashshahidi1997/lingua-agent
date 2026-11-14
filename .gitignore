@@ -29,4 +29,7 @@ web/.vite/
 web/*.log
 .npm/
 npm-debug.log*
+# pixi environments
+.pixi/*
+!.pixi/config.toml
 .scratch/
