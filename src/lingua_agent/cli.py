@@ -42,6 +42,7 @@ review_app = typer.Typer(help="Review SRS cards.")
 export_app = typer.Typer(help="Export learning artifacts.")
 tutor_app = typer.Typer(help="Tutor agent (mock in MVP).")
 materials_app = typer.Typer(help="Manage and browse materials sources (SSD, Drive, ...).")
+voices_app = typer.Typer(help="Local text-to-speech voices (Piper).")
 app.add_typer(languages_app, name="languages")
 app.add_typer(ingest_app, name="ingest")
 app.add_typer(unit_app, name="unit")
@@ -49,6 +50,7 @@ app.add_typer(review_app, name="review")
 app.add_typer(export_app, name="export")
 app.add_typer(tutor_app, name="tutor")
 app.add_typer(materials_app, name="materials")
+app.add_typer(voices_app, name="voices")
 
 console = Console()
 
@@ -422,6 +424,37 @@ def tutor_grade(
     style = "green" if result.correct else "red"
     console.print(f"[{style}]{'CORRECT' if result.correct else 'INCORRECT'}[/{style}] "
                   f"score={result.score:.2f} — {result.feedback}")
+
+
+# --- voices ---------------------------------------------------------------
+
+@voices_app.command("list")
+def voices_list():
+    """Show which languages have a local Piper voice."""
+    from .voice import piper
+    s = _settings()
+    table = Table(title="Local voices (Piper)")
+    for col in ("language", "voice", "ready"):
+        table.add_column(col)
+    for lang in sorted(piper.DEFAULT_VOICES):
+        model = piper.find_voice(s, lang)
+        table.add_row(lang, model.stem if model else "—",
+                      "[green]yes[/green]" if piper.tts_available(s, lang) else "[red]no[/red]")
+    console.print(table)
+    if not piper.tts_available(s, "fa") and piper.find_voice(s, "fa"):
+        console.print("[yellow]Voice files found but Piper isn't installed:[/yellow] pip install piper-tts")
+
+
+@voices_app.command("download")
+def voices_download(
+    lang: str = typer.Argument(..., help="Language code, e.g. fa."),
+    voice: Optional[str] = typer.Option(None, help="Voice path in rhasspy/piper-voices, e.g. fa/fa_IR/gyro/medium/fa_IR-gyro-medium."),
+):
+    """Download a Piper voice (about 60 MB) from rhasspy/piper-voices on Hugging Face."""
+    from .voice import piper
+    s = _settings()
+    path = piper.download_voice(s, lang, voice=voice)
+    console.print(f"[green]Voice ready:[/green] {path}")
 
 
 # --- materials ------------------------------------------------------------

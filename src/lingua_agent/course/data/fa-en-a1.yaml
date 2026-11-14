@@ -1,0 +1,837 @@
+# Farsi A1 for English speakers — hand-authored course.
+#
+# Format (see src/lingua_agent/course/models.py):
+#   text   target-language text (Persian script, with ZWNJ where standard: می‌روم)
+#   tr     transliteration, scheme below
+#   gloss  support-language meaning (English)
+#   note   optional short explanation in English (markdown)
+#
+# Transliteration scheme (simple, readable, ASCII + â):
+#   â = long a (آ / ا as in "father") · a = short a (cat) · e = short e · o = short o
+#   i = long i (ee) · u = long u (oo) · kh = خ · gh = غ/ق · sh = ش · zh = ژ · ch = چ
+#   ' = glottal stop (ع / ء) only where clearly pronounced · ezafe written -e / -ye
+#
+# Lesson kinds: script (letters), words, phrases, grammar. Exercises are generated
+# from the items, so every item must stand on its own as a flashcard.
+# Phrases (2+ words) also feed word-order exercises: keep them short at A1 (2–6 words).
+
+id: fa-en-a1
+target: fa
+support: en
+level: A1
+title: Farsi A1
+description: From the alphabet to ordering tea in Tehran. Everyday Persian with transliteration throughout.
+
+units:
+  - id: u1
+    title: Hello
+    goal: Greet people, say who you are, and say goodbye.
+    lessons:
+      - id: u1-l1
+        title: First greetings
+        kind: phrases
+        note: >
+          **Salâm** works any time of day, with anyone. Persian is written right to left;
+          the transliteration is there to help you start speaking before you can read.
+        items:
+          - {id: salam, text: "سلام", tr: "salâm", gloss: "hello"}
+          - {id: khodahafez, text: "خداحافظ", tr: "khodâhâfez", gloss: "goodbye"}
+          - {id: merci, text: "مرسی", tr: "mersi", gloss: "thanks"}
+          - {id: mamnun, text: "ممنون", tr: "mamnun", gloss: "thank you"}
+          - {id: bale, text: "بله", tr: "bale", gloss: "yes"}
+          - {id: na, text: "نه", tr: "na", gloss: "no"}
+      - id: u1-l2
+        title: How are you?
+        kind: phrases
+        note: >
+          **Shomâ** is the polite "you" and the safe default with strangers; **to** is for friends
+          and family. **Khub** means "good" and is the usual answer to "how are you?".
+        items:
+          - {id: halet-chetore, text: "حالت چطوره؟", tr: "hâlet chetore?", gloss: "how are you? (informal)"}
+          - {id: hale-shoma, text: "حال شما چطور است؟", tr: "hâl-e shomâ chetor ast?", gloss: "how are you? (polite)"}
+          - {id: khubam, text: "خوبم", tr: "khubam", gloss: "I'm fine"}
+          - {id: kheyli-khub, text: "خیلی خوب", tr: "kheyli khub", gloss: "very good"}
+          - {id: to-chetori, text: "تو چطوری؟", tr: "to chetori?", gloss: "how about you? (informal)"}
+          - {id: bad-nistam, text: "بد نیستم", tr: "bad nistam", gloss: "I'm not bad"}
+      - id: u1-l3
+        title: My name is…
+        kind: phrases
+        note: >
+          **Esm-e man** = "name of me". The little **-e** linking two words is the *ezafe*;
+          you will meet it everywhere. **Ast** ("is") is often shortened to **-e** in speech.
+        items:
+          - {id: esme-man, text: "اسم من سارا است", tr: "esm-e man Sârâ ast", gloss: "my name is Sara"}
+          - {id: esmet-chie, text: "اسمت چیه؟", tr: "esmet chiye?", gloss: "what's your name? (informal)"}
+          - {id: esme-shoma, text: "اسم شما چیست؟", tr: "esm-e shomâ chist?", gloss: "what is your name? (polite)"}
+          - {id: khoshbakhtam, text: "خوشبختم", tr: "khoshbakhtam", gloss: "nice to meet you"}
+          - {id: man, text: "من", tr: "man", gloss: "I / me"}
+          - {id: shoma, text: "شما", tr: "shomâ", gloss: "you (polite / plural)"}
+          - {id: to, text: "تو", tr: "to", gloss: "you (informal)"}
+    story: s-u1-meeting
+    scenario: t-u1-new-neighbour
+
+  - id: u2
+    title: The alphabet I
+    goal: Read the first fifteen letters and the short vowels, and sound out your first real words.
+    lessons:
+      - id: u2-l1
+        title: Alef, be, pe, te
+        kind: script
+        note: >
+          Persian is written right to left and most letters join the next one, so each letter has
+          a full shape and a shorter joined shape. **ب پ ت** share one body and differ only in their dots.
+          **آ** (alef with a *madd* hat) is how a long **â** is written at the start of a word.
+        items:
+          - {id: alef, text: "ا", tr: "â", gloss: "alef — long a, as in father"}
+          - {id: alef-madd, text: "آ", tr: "â", gloss: "alef madd — â at the start of a word"}
+          - {id: be, text: "ب", tr: "b", gloss: "be — b (one dot below)"}
+          - {id: pe, text: "پ", tr: "p", gloss: "pe — p (three dots below)"}
+          - {id: te, text: "ت", tr: "t", gloss: "te — t (two dots above)"}
+          - {id: read-ab, text: "آب", tr: "âb", gloss: "water"}
+          - {id: read-baba, text: "بابا", tr: "bâbâ", gloss: "dad"}
+          - {id: read-pa, text: "پا", tr: "pâ", gloss: "foot / leg"}
+      - id: u2-l2
+        title: Dal, re, ze, vav
+        kind: script
+        note: >
+          **د ر ز و** (like **ا**) never join the letter after them: the next letter starts a new piece,
+          which is why words look "broken" in places. **و** is **v** as a consonant and **u** or **o** as a vowel.
+        items:
+          - {id: dal, text: "د", tr: "d", gloss: "dal — d"}
+          - {id: re, text: "ر", tr: "r", gloss: "re — r (rolled)"}
+          - {id: ze, text: "ز", tr: "z", gloss: "ze — z"}
+          - {id: vav, text: "و", tr: "v / u / o", gloss: "vav — v, u or o"}
+          - {id: read-bad, text: "باد", tr: "bâd", gloss: "wind"}
+          - {id: read-ruz, text: "روز", tr: "ruz", gloss: "day"}
+          - {id: read-daru, text: "دارو", tr: "dâru", gloss: "medicine"}
+          - {id: read-to, text: "تو", tr: "to", gloss: "you (informal)"}
+      - id: u2-l3
+        title: Sin, shin, mim, nun, ye
+        kind: script
+        note: >
+          **س** and **ش** are the same wavy shape; three dots make **sh**. **ی** is **y** as a consonant
+          and **i** as a vowel; like **ن**, it only shows its full tail at the end of a word (**نان**, **سیب**).
+        items:
+          - {id: sin, text: "س", tr: "s", gloss: "sin — s"}
+          - {id: shin, text: "ش", tr: "sh", gloss: "shin — sh"}
+          - {id: mim, text: "م", tr: "m", gloss: "mim — m"}
+          - {id: nun, text: "ن", tr: "n", gloss: "nun — n"}
+          - {id: ye, text: "ی", tr: "y / i", gloss: "ye — y or i"}
+          - {id: read-nan, text: "نان", tr: "nân", gloss: "bread"}
+          - {id: read-sib, text: "سیب", tr: "sib", gloss: "apple"}
+          - {id: read-mast, text: "ماست", tr: "mâst", gloss: "yogurt"}
+      - id: u2-l4
+        title: Short vowels
+        kind: script
+        note: >
+          The short vowels **a, e, o** are small marks above or below a letter, and everyday Persian
+          leaves them out: **شب** is just *sh-b*, and you read it **shab**. You learn each word's sound with
+          its spelling, so always look at the transliteration.
+        items:
+          - {id: zebar, text: "بَ", tr: "ba", gloss: "zebar — short a (mark above)"}
+          - {id: zir, text: "بِ", tr: "be", gloss: "zir — short e (mark below)"}
+          - {id: pish, text: "بُ", tr: "bo", gloss: "pish — short o (little vav above)"}
+          - {id: read-shab, text: "شب", tr: "shab", gloss: "night"}
+          - {id: read-dast, text: "دست", tr: "dast", gloss: "hand"}
+          - {id: read-sar, text: "سر", tr: "sar", gloss: "head"}
+          - {id: read-dust, text: "دوست", tr: "dust", gloss: "friend"}
+          - {id: read-bastani, text: "بستنی", tr: "bastani", gloss: "ice cream"}
+    story: s-u2-bread
+    scenario: t-u2-reading-with-sina
+
+  - id: u3
+    title: The alphabet II
+    goal: Read the remaining letters and recognise everyday words on signs and menus.
+    lessons:
+      - id: u3-l1
+        title: Kaf, gaf, lam, fe
+        kind: script
+        note: >
+          **ک** and **گ** differ only by the extra stroke on **گ** (g). **ل** followed by **ا** is written
+          as one combined shape, **لا** (lâ), as in **کلاس** (kelâs, class).
+        items:
+          - {id: kaf, text: "ک", tr: "k", gloss: "kaf — k"}
+          - {id: gaf, text: "گ", tr: "g", gloss: "gaf — g (as in go)"}
+          - {id: lam, text: "ل", tr: "l", gloss: "lam — l"}
+          - {id: fe, text: "ف", tr: "f", gloss: "fe — f"}
+          - {id: read-ketab, text: "کتاب", tr: "ketâb", gloss: "book"}
+          - {id: read-gol, text: "گل", tr: "gol", gloss: "flower"}
+          - {id: read-sag, text: "سگ", tr: "sag", gloss: "dog"}
+          - {id: read-barf, text: "برف", tr: "barf", gloss: "snow"}
+      - id: u3-l2
+        title: Jim, che, khe and the two h's
+        kind: script
+        note: >
+          **ج چ ح خ** share one body; only the dots change (j, ch, h, kh). Persian has two h letters,
+          **ح** and **ه**; at the end of a word **ه** is usually the vowel **e**, as in **خانه** (khâne).
+        items:
+          - {id: jim, text: "ج", tr: "j", gloss: "jim — j"}
+          - {id: che, text: "چ", tr: "ch", gloss: "che — ch"}
+          - {id: he-jimi, text: "ح", tr: "h", gloss: "he (jimi) — h, dot-free"}
+          - {id: khe, text: "خ", tr: "kh", gloss: "khe — kh, as in Scottish loch"}
+          - {id: he-docheshm, text: "ه", tr: "h / e", gloss: "he (do-cheshm) — h, or e at word end"}
+          - {id: read-chay, text: "چای", tr: "chây", gloss: "tea"}
+          - {id: read-khane, text: "خانه", tr: "khâne", gloss: "house / home"}
+          - {id: read-juje, text: "جوجه", tr: "juje", gloss: "chick"}
+      - id: u3-l3
+        title: Ein, gheyn, ghaf, zhe
+        kind: script
+        note: >
+          **غ** and **ق** sound the same in Tehran Persian (**gh**, a throaty g). **ع** is a light catch
+          in the throat or silent. **ژ** (zh, as in *measure*) never joins the next letter.
+        items:
+          - {id: ein, text: "ع", tr: "'", gloss: "ein — glottal stop or silent"}
+          - {id: gheyn, text: "غ", tr: "gh", gloss: "gheyn — gh (dot above)"}
+          - {id: ghaf, text: "ق", tr: "gh", gloss: "ghaf — gh (two dots above)"}
+          - {id: zhe, text: "ژ", tr: "zh", gloss: "zhe — zh, as in measure"}
+          - {id: read-eynak, text: "عینک", tr: "eynak", gloss: "glasses"}
+          - {id: read-bagh, text: "باغ", tr: "bâgh", gloss: "garden"}
+          - {id: read-ghand, text: "قند", tr: "ghand", gloss: "sugar cube"}
+          - {id: read-zhaket, text: "ژاکت", tr: "zhâket", gloss: "cardigan"}
+      - id: u3-l4
+        title: Arabic look-alikes
+        kind: script
+        note: >
+          **ث ص** sound like s, **ذ ض ظ** like z, and **ط** like t; they come from Arabic loanwords, so
+          you learn spellings word by word. Now you know the seven letters that never join the next one:
+          **ا د ذ ر ز ژ و**.
+        items:
+          - {id: se, text: "ث", tr: "s", gloss: "se — s (three dots)"}
+          - {id: sad, text: "ص", tr: "s", gloss: "sad — s (loop shape)"}
+          - {id: zal, text: "ذ", tr: "z", gloss: "zal — z (dal with a dot)"}
+          - {id: zad, text: "ض", tr: "z", gloss: "zad — z (sad with a dot)"}
+          - {id: ta, text: "ط", tr: "t", gloss: "ta — t (tall stroke)"}
+          - {id: za, text: "ظ", tr: "z", gloss: "za — z (ta with a dot)"}
+          - {id: read-sobh, text: "صبح", tr: "sobh", gloss: "morning"}
+          - {id: read-zohr, text: "ظهر", tr: "zohr", gloss: "noon"}
+    story: s-u3-snowy-morning
+    scenario: t-u3-bookshop
+
+  - id: u4
+    title: To be & who's who
+    goal: Say who you are, where you're from and what you do, and talk about your family.
+    lessons:
+      - id: u4-l1
+        title: He, she, we, they
+        kind: words
+        note: >
+          Persian has no gender: **u** means both "he" and "she". **Ishân** is a very polite "he/she"
+          for elders. In speech **ânhâ** often becomes **unâ**.
+        items:
+          - {id: u, text: "او", tr: "u", gloss: "he / she"}
+          - {id: ishan, text: "ایشان", tr: "ishân", gloss: "he / she (very polite)"}
+          - {id: ma, text: "ما", tr: "mâ", gloss: "we"}
+          - {id: anha, text: "آنها", tr: "ânhâ", gloss: "they"}
+          - {id: in, text: "این", tr: "in", gloss: "this"}
+          - {id: an, text: "آن", tr: "ân", gloss: "that"}
+          - {id: ki, text: "کی؟", tr: "ki?", gloss: "who? (spoken)"}
+          - {id: in-kiye, text: "این کیه؟", tr: "in kiye?", gloss: "who is this? (spoken)"}
+      - id: u4-l2
+        title: I am, you are
+        kind: grammar
+        note: >
+          "To be": **hastam, hasti, ast, hastim, hastid, hastand**; "not" is **nistam, nisti, nist…**.
+          The verb goes at the end. In speech, after a noun or adjective you mostly hear short endings:
+          **khaste-am** (I'm tired), **mo'alleme** (he's a teacher), with **ast → -e**.
+        items:
+          - {id: khaste-hastam, text: "من خسته هستم", tr: "man khaste hastam", gloss: "I am tired"}
+          - {id: khaste-hasti, text: "تو خسته هستی؟", tr: "to khaste hasti?", gloss: "are you tired? (informal)"}
+          - {id: moallem-ast, text: "او معلم است", tr: "u mo'allem ast", gloss: "he / she is a teacher"}
+          - {id: daneshju-hastim, text: "ما دانشجو هستیم", tr: "mâ dâneshju hastim", gloss: "we are students"}
+          - {id: irani-hastid, text: "شما ایرانی هستید؟", tr: "shomâ irâni hastid?", gloss: "are you Iranian? (polite)"}
+          - {id: inja-hastand, text: "آنها اینجا هستند", tr: "ânhâ injâ hastand", gloss: "they are here"}
+          - {id: khaste-nistam, text: "من خسته نیستم", tr: "man khaste nistam", gloss: "I'm not tired"}
+          - {id: inja-nist, text: "او اینجا نیست", tr: "u injâ nist", gloss: "he / she isn't here"}
+      - id: u4-l3
+        title: Where are you from? What do you do?
+        kind: phrases
+        note: >
+          Add **-i** to a country to get the nationality: **Irân → irâni**. **Ahl-e …** means "from …"
+          (literally "of the people of"). Jobs need no article: **man doktor hastam**, "I am (a) doctor".
+        items:
+          - {id: engelisi-hastam, text: "من انگلیسی هستم", tr: "man engelisi hastam", gloss: "I'm English"}
+          - {id: amrikayi-hastam, text: "من آمریکایی هستم", tr: "man âmrikâyi hastam", gloss: "I'm American"}
+          - {id: ahle-koja, text: "اهل کجا هستید؟", tr: "ahl-e kojâ hastid?", gloss: "where are you from? (polite)"}
+          - {id: ahle-landan, text: "من اهل لندن هستم", tr: "man ahl-e Landan hastam", gloss: "I'm from London"}
+          - {id: moallem, text: "معلم", tr: "mo'allem", gloss: "teacher"}
+          - {id: doktor, text: "دکتر", tr: "doktor", gloss: "doctor"}
+          - {id: daneshju, text: "دانشجو", tr: "dâneshju", gloss: "university student"}
+          - {id: mohandes, text: "مهندس", tr: "mohandes", gloss: "engineer"}
+      - id: u4-l4
+        title: My family
+        kind: words
+        note: >
+          "My father" is **pedar-e man** (ezafe again); in speech it is usually **pedaram**, with **-am**
+          meaning "my". Iranians will happily ask about your family; it is friendly, not nosy.
+        items:
+          - {id: khanevade, text: "خانواده", tr: "khânevâde", gloss: "family"}
+          - {id: pedar, text: "پدر", tr: "pedar", gloss: "father"}
+          - {id: madar, text: "مادر", tr: "mâdar", gloss: "mother"}
+          - {id: baradar, text: "برادر", tr: "barâdar", gloss: "brother"}
+          - {id: khahar, text: "خواهر", tr: "khâhar", gloss: "sister"}
+          - {id: pesar, text: "پسر", tr: "pesar", gloss: "son / boy"}
+          - {id: dokhtar, text: "دختر", tr: "dokhtar", gloss: "daughter / girl"}
+          - {id: in-madare-man, text: "این مادر من است", tr: "in mâdar-e man ast", gloss: "this is my mother"}
+    story: s-u4-who-is-this
+    scenario: t-u4-family-gathering
+
+  - id: u5
+    title: Numbers & time
+    goal: Count to 100, ask how many, tell the time and name the days of the week.
+    lessons:
+      - id: u5-l1
+        title: One to eight
+        kind: words
+        note: >
+          Persian digits are **۰ ۱ ۲ ۳ ۴ ۵ ۶ ۷ ۸ ۹** (0–9). Numbers are written left to right even inside
+          right-to-left text: **۲۵** is 25. You will see these digits on prices, buses and clocks.
+        items:
+          - {id: yek, text: "یک", tr: "yek", gloss: "one"}
+          - {id: do, text: "دو", tr: "do", gloss: "two"}
+          - {id: se-num, text: "سه", tr: "se", gloss: "three"}
+          - {id: chahar, text: "چهار", tr: "chahâr", gloss: "four"}
+          - {id: panj, text: "پنج", tr: "panj", gloss: "five"}
+          - {id: shesh, text: "شش", tr: "shesh", gloss: "six"}
+          - {id: haft, text: "هفت", tr: "haft", gloss: "seven"}
+          - {id: hasht, text: "هشت", tr: "hasht", gloss: "eight"}
+      - id: u5-l2
+        title: Nine to twenty
+        kind: words
+        note: >
+          The teens: 11 yâzdah, 12 davâzdah, 13 sizdah, 14 chahârdah, 15 pânzdah, 16 shânzdah,
+          17 hefdah, 18 hijdah, 19 nuzdah. Careful: **نه** is both **noh** (nine) and **na** (no); context tells.
+          After a number the noun stays singular: **se dust**, three friends.
+        items:
+          - {id: sefr, text: "صفر", tr: "sefr", gloss: "zero"}
+          - {id: noh, text: "نه", tr: "noh", gloss: "nine"}
+          - {id: dah, text: "ده", tr: "dah", gloss: "ten"}
+          - {id: yazdah, text: "یازده", tr: "yâzdah", gloss: "eleven"}
+          - {id: davazdah, text: "دوازده", tr: "davâzdah", gloss: "twelve"}
+          - {id: sizdah, text: "سیزده", tr: "sizdah", gloss: "thirteen"}
+          - {id: panzdah, text: "پانزده", tr: "pânzdah", gloss: "fifteen"}
+          - {id: bist, text: "بیست", tr: "bist", gloss: "twenty"}
+      - id: u5-l3
+        title: Tens, how many, what time?
+        kind: phrases
+        note: >
+          The tens: 30 si, 40 chehel, 50 panjâh, 60 shast, 70 haftâd, 80 hashtâd, 90 navad, 100 sad.
+          Join with **o** ("and"): **bist-o panj** = 25. "What time is it?" is written **sâ'at chand ast?**
+          but said **sâ'at chande?**
+        items:
+          - {id: si, text: "سی", tr: "si", gloss: "thirty"}
+          - {id: chehel, text: "چهل", tr: "chehel", gloss: "forty"}
+          - {id: panjah, text: "پنجاه", tr: "panjâh", gloss: "fifty"}
+          - {id: sad-num, text: "صد", tr: "sad", gloss: "a hundred"}
+          - {id: bist-o-panj, text: "بیست و پنج", tr: "bist-o panj", gloss: "twenty-five"}
+          - {id: chand, text: "چند؟", tr: "chand?", gloss: "how many?"}
+          - {id: saat-chande, text: "ساعت چنده؟", tr: "sâ'at chande?", gloss: "what time is it? (spoken)"}
+          - {id: se-o-nim, text: "ساعت سه و نیم است", tr: "sâ'at se-o nim ast", gloss: "it's half past three"}
+      - id: u5-l4
+        title: Days of the week
+        kind: words
+        note: >
+          The Iranian week starts on Saturday, **shanbe**; the next days are "one-shanbe", "two-shanbe" and so on.
+          **Jom'e** (Friday) is the weekend, and many offices also close on Thursday.
+        items:
+          - {id: shanbe, text: "شنبه", tr: "shanbe", gloss: "Saturday"}
+          - {id: yekshanbe, text: "یکشنبه", tr: "yekshanbe", gloss: "Sunday"}
+          - {id: doshanbe, text: "دوشنبه", tr: "doshanbe", gloss: "Monday"}
+          - {id: seshanbe, text: "سه‌شنبه", tr: "seshanbe", gloss: "Tuesday"}
+          - {id: chaharshanbe, text: "چهارشنبه", tr: "chahârshanbe", gloss: "Wednesday"}
+          - {id: panjshanbe, text: "پنجشنبه", tr: "panjshanbe", gloss: "Thursday"}
+          - {id: jome, text: "جمعه", tr: "jom'e", gloss: "Friday"}
+          - {id: emruz-chandshanbe, text: "امروز چندشنبه است؟", tr: "emruz chandshanbe ast?", gloss: "what day is it today?"}
+    story: s-u5-saras-week
+    scenario: t-u5-doctors-appointment
+
+  - id: u6
+    title: At the café
+    goal: Order drinks and snacks politely, ask the price and pay the bill.
+    lessons:
+      - id: u6-l1
+        title: Drinks and snacks
+        kind: words
+        note: >
+          Persian has no word for "the", and **yek** ("one") doubles as "a": **yek chây**, a tea.
+          Tea (**chây**) is the national drink, served strong with sugar cubes on the side.
+        items:
+          - {id: chay, text: "چای", tr: "chây", gloss: "tea"}
+          - {id: ghahve, text: "قهوه", tr: "ghahve", gloss: "coffee"}
+          - {id: ab, text: "آب", tr: "âb", gloss: "water"}
+          - {id: shir, text: "شیر", tr: "shir", gloss: "milk"}
+          - {id: shekar, text: "شکر", tr: "shekar", gloss: "sugar"}
+          - {id: kik, text: "کیک", tr: "kik", gloss: "cake"}
+          - {id: ab-porteghal, text: "آب پرتقال", tr: "âb-porteghâl", gloss: "orange juice"}
+          - {id: fenjan, text: "فنجان", tr: "fenjân", gloss: "cup"}
+      - id: u6-l2
+        title: Ordering
+        kind: phrases
+        note: >
+          "I want" is written **می‌خواهم** (mikhâham) but always said **mikhâm**; "a/one" **yek** is said **ye**.
+          We teach the spoken forms here, because this is what you will say and hear in a café.
+        items:
+          - {id: lotfan, text: "لطفاً", tr: "lotfan", gloss: "please"}
+          - {id: yek-chay-lotfan, text: "یه چای، لطفاً", tr: "ye chây, lotfan", gloss: "a tea, please"}
+          - {id: mikham, text: "می‌خوام", tr: "mikhâm", gloss: "I want (spoken)"}
+          - {id: ye-ghahve-mikham, text: "یه قهوه می‌خوام", tr: "ye ghahve mikhâm", gloss: "I'd like a coffee (spoken)"}
+          - {id: chi-mikhorid, text: "چی می‌خورید؟", tr: "chi mikhorid?", gloss: "what will you have?"}
+          - {id: ba-shekar, text: "با شکر", tr: "bâ shekar", gloss: "with sugar"}
+          - {id: bedune-shekar, text: "بدون شکر", tr: "bedun-e shekar", gloss: "without sugar"}
+          - {id: dige-chi, text: "دیگه چی؟", tr: "dige chi?", gloss: "anything else? (spoken)"}
+      - id: u6-l3
+        title: Green tea, cold water
+        kind: grammar
+        note: >
+          An adjective follows its noun, linked by the ezafe **-e**: **chây-e sabz**, green tea. After a vowel
+          it is **-ye** (**ghahve-ye tork**). Measure words take no ezafe: **yek fenjân chây**, a cup of tea.
+        items:
+          - {id: chaye-sabz, text: "چای سبز", tr: "chây-e sabz", gloss: "green tea"}
+          - {id: chaye-dagh, text: "چای داغ", tr: "chây-e dâgh", gloss: "hot tea"}
+          - {id: abe-sard, text: "آب سرد", tr: "âb-e sard", gloss: "cold water"}
+          - {id: ghahveye-tork, text: "قهوه‌ی ترک", tr: "ghahve-ye tork", gloss: "Turkish coffee"}
+          - {id: kike-shokolati, text: "کیک شکلاتی", tr: "kik-e shokolâti", gloss: "chocolate cake"}
+          - {id: fenjan-chay, text: "یک فنجان چای", tr: "yek fenjân chây", gloss: "a cup of tea"}
+          - {id: livan-ab, text: "یک لیوان آب", tr: "yek livân âb", gloss: "a glass of water"}
+          - {id: menuye-kafe, text: "منوی کافه", tr: "menu-ye kâfe", gloss: "the café menu"}
+      - id: u6-l4
+        title: The bill
+        kind: phrases
+        note: >
+          Prices are said in **tomân** (1 toman = 10 rials, though price tags may show rials). If someone says
+          **ghâbeli nadâre** ("it's not worth anything"), that is *ta'ârof*, polite modesty: insist and pay.
+        items:
+          - {id: cheghadr-mishe, text: "چقدر می‌شه؟", tr: "cheghadr mishe?", gloss: "how much is it? (spoken)"}
+          - {id: surat-hesab, text: "صورت‌حساب، لطفاً", tr: "surat-hesâb, lotfan", gloss: "the bill, please"}
+          - {id: hezar, text: "هزار", tr: "hezâr", gloss: "thousand"}
+          - {id: toman, text: "تومان", tr: "tomân", gloss: "toman (Iranian currency unit)"}
+          - {id: panjah-hezar-toman, text: "پنجاه هزار تومان", tr: "panjâh hezâr tomân", gloss: "fifty thousand tomans"}
+          - {id: kart-mikesham, text: "کارت می‌کشم", tr: "kârt mikesham", gloss: "I'll pay by card"}
+          - {id: ghabeli-nadare, text: "قابلی نداره", tr: "ghâbeli nadâre", gloss: "it's nothing (polite, don't take it literally)"}
+          - {id: befarmayid, text: "بفرمایید", tr: "befarmâyid", gloss: "here you are / go ahead"}
+    story: s-u6-cafe
+    scenario: t-u6-ordering
+
+  - id: u7
+    title: Everyday verbs
+    goal: Say where you live, what you do, and what you like, using present-tense verbs.
+    lessons:
+      - id: u7-l1
+        title: I go, you go
+        kind: grammar
+        note: >
+          Present tense = **mi-** + present stem + ending: **mi-rav-am** (I go). Endings: **-am, -i, -ad, -im, -id, -and**;
+          "not" is **ne-**: **nemiravam**. Speech shortens many verbs: **miravam → miram**, **miravad → mire**.
+        items:
+          - {id: miravam, text: "می‌روم", tr: "miravam", gloss: "I go"}
+          - {id: miravi, text: "می‌روی", tr: "miravi", gloss: "you go (informal)"}
+          - {id: miravad, text: "می‌رود", tr: "miravad", gloss: "he / she goes"}
+          - {id: miravim, text: "می‌رویم", tr: "miravim", gloss: "we go"}
+          - {id: miravid, text: "می‌روید", tr: "miravid", gloss: "you go (polite / plural)"}
+          - {id: miravand, text: "می‌روند", tr: "miravand", gloss: "they go"}
+          - {id: nemiravam, text: "نمی‌روم", tr: "nemiravam", gloss: "I don't go"}
+          - {id: miram, text: "می‌رم", tr: "miram", gloss: "I go (spoken)"}
+      - id: u7-l2
+        title: Eat, drink, read
+        kind: phrases
+        note: >
+          The object comes before the verb: **ketâb mikhânam**, "book I-read". Persians "eat" tea:
+          **chây mikhoram** = I drink tea. **Khândan** (stem **khân**) means both "read" and "study"; in speech, **mikhunam**.
+        items:
+          - {id: mikhoram, text: "می‌خورم", tr: "mikhoram", gloss: "I eat"}
+          - {id: chay-mikhoram, text: "چای می‌خورم", tr: "chây mikhoram", gloss: "I drink tea"}
+          - {id: ghaza-mikhorim, text: "غذا می‌خوریم", tr: "ghazâ mikhorim", gloss: "we eat (a meal)"}
+          - {id: nemikhoram, text: "نمی‌خورم", tr: "nemikhoram", gloss: "I don't eat"}
+          - {id: mikhanam, text: "می‌خوانم", tr: "mikhânam", gloss: "I read"}
+          - {id: ketab-mikhanad, text: "کتاب می‌خواند", tr: "ketâb mikhânad", gloss: "he / she reads a book"}
+          - {id: farsi-mikhanam, text: "فارسی می‌خوانم", tr: "fârsi mikhânam", gloss: "I study Persian"}
+          - {id: ruzname-mikhani, text: "روزنامه می‌خوانی؟", tr: "ruznâme mikhâni?", gloss: "do you read the newspaper?"}
+      - id: u7-l3
+        title: Where I live, what I do
+        kind: phrases
+        note: >
+          Many verbs are a noun + **kardan** ("to do", stem **kon**): **kâr kardan** (to work), **zendegi kardan**
+          (to live). Only **kardan** changes: **kâr mikonam, kâr mikoni…** In speech **dar** ("in") is often dropped.
+        items:
+          - {id: kar-mikonam, text: "کار می‌کنم", tr: "kâr mikonam", gloss: "I work"}
+          - {id: che-kar-mikonid, text: "چه کار می‌کنید؟", tr: "che kâr mikonid?", gloss: "what do you do? (job)"}
+          - {id: koja-kar-mikonid, text: "کجا کار می‌کنید؟", tr: "kojâ kâr mikonid?", gloss: "where do you work?"}
+          - {id: bimarestan-kar, text: "در بیمارستان کار می‌کنم", tr: "dar bimârestân kâr mikonam", gloss: "I work in a hospital"}
+          - {id: zendegi-mikonam, text: "زندگی می‌کنم", tr: "zendegi mikonam", gloss: "I live"}
+          - {id: koja-zendegi, text: "کجا زندگی می‌کنی؟", tr: "kojâ zendegi mikoni?", gloss: "where do you live? (informal)"}
+          - {id: tehran-zendegi, text: "در تهران زندگی می‌کنم", tr: "dar Tehrân zendegi mikonam", gloss: "I live in Tehran"}
+          - {id: shiraz-zendegi, text: "او در شیراز زندگی می‌کند", tr: "u dar Shirâz zendegi mikonad", gloss: "he / she lives in Shiraz"}
+      - id: u7-l4
+        title: Have and like
+        kind: grammar
+        note: >
+          **Dâshtan** (to have) takes **no mi-** in the present: **dâram, dâri, dârad…**, negative **nadâram**.
+          **Dust dâshtan** = to like / love. A definite object gets **râ** (spoken **ro**): **Irân râ dust dâram**.
+        items:
+          - {id: daram, text: "دارم", tr: "dâram", gloss: "I have"}
+          - {id: yek-baradar-daram, text: "یک برادر دارم", tr: "yek barâdar dâram", gloss: "I have a brother"}
+          - {id: mashin-nadaram, text: "ماشین ندارم", tr: "mâshin nadâram", gloss: "I don't have a car"}
+          - {id: dust-daram, text: "دوست دارم", tr: "dust dâram", gloss: "I like / I love"}
+          - {id: chay-dust-daram, text: "چای دوست دارم", tr: "chây dust dâram", gloss: "I like tea"}
+          - {id: ghahve-dust-dari, text: "قهوه دوست داری؟", tr: "ghahve dust dâri?", gloss: "do you like coffee?"}
+          - {id: iran-dust-daram, text: "ایران را دوست دارم", tr: "Irân râ dust dâram", gloss: "I love Iran"}
+          - {id: dust-nadaram, text: "دوست ندارم", tr: "dust nadâram", gloss: "I don't like it"}
+    story: s-u7-maryams-day
+    scenario: t-u7-bus-to-isfahan
+
+  - id: u8
+    title: Getting around
+    goal: Ask the way, take a taxi, and say where you went.
+    lessons:
+      - id: u8-l1
+        title: Places in town
+        kind: words
+        note: >
+          Tehran addresses are built from squares and streets, named with the ezafe:
+          **meydân-e Enghelâb** (Revolution Square), **khiyâbân-e Vali-asr**. In speech **meydân** is often **meydun**.
+        items:
+          - {id: khiyaban, text: "خیابان", tr: "khiyâbân", gloss: "street"}
+          - {id: meydan, text: "میدان", tr: "meydân", gloss: "square"}
+          - {id: istgahe-metro, text: "ایستگاه مترو", tr: "istgâh-e metro", gloss: "metro station"}
+          - {id: bimarestan, text: "بیمارستان", tr: "bimârestân", gloss: "hospital"}
+          - {id: darukhane, text: "داروخانه", tr: "dârukhâne", gloss: "pharmacy"}
+          - {id: forudgah, text: "فرودگاه", tr: "forudgâh", gloss: "airport"}
+          - {id: bank, text: "بانک", tr: "bânk", gloss: "bank"}
+          - {id: bazar, text: "بازار", tr: "bâzâr", gloss: "bazaar / market"}
+      - id: u8-l2
+        title: Where is…?
+        kind: phrases
+        note: >
+          **Kojâst?** = **kojâ** (where) + **ast** (is): "where is…?". Start with **bebakhshid** (excuse me).
+          Right and left are **dast-e râst** and **dast-e chap**, "the right/left hand".
+        items:
+          - {id: bebakhshid, text: "ببخشید", tr: "bebakhshid", gloss: "excuse me / sorry"}
+          - {id: metro-kojast, text: "ایستگاه مترو کجاست؟", tr: "istgâh-e metro kojâst?", gloss: "where is the metro station?"}
+          - {id: nazdik, text: "نزدیک", tr: "nazdik", gloss: "near"}
+          - {id: dur, text: "دور", tr: "dur", gloss: "far"}
+          - {id: mostaghim, text: "مستقیم", tr: "mostaghim", gloss: "straight on"}
+          - {id: dast-e-rast, text: "دست راست", tr: "dast-e râst", gloss: "on the right"}
+          - {id: dast-e-chap, text: "دست چپ", tr: "dast-e chap", gloss: "on the left"}
+          - {id: be-chap-bepichid, text: "به چپ بپیچید", tr: "be chap bepichid", gloss: "turn left"}
+      - id: u8-l3
+        title: In a taxi
+        kind: phrases
+        note: >
+          Shared taxis run fixed routes: you call out your destination as a question (**âghâ, forudgâh?**).
+          **Darbast** means hiring the whole car. **Miram** is the spoken form of **miravam** (I go).
+        items:
+          - {id: taksi, text: "تاکسی", tr: "tâksi", gloss: "taxi"}
+          - {id: darbast, text: "دربست", tr: "darbast", gloss: "private hire (the whole taxi)"}
+          - {id: agha-forudgah, text: "آقا، فرودگاه؟", tr: "âghâ, forudgâh?", gloss: "sir, going to the airport?"}
+          - {id: be-forudgah-miram, text: "به فرودگاه می‌رم", tr: "be forudgâh miram", gloss: "I'm going to the airport (spoken)"}
+          - {id: inja-negah-darid, text: "اینجا نگه دارید", tr: "injâ negah dârid", gloss: "stop here (polite)"}
+          - {id: keraye-cheghadr, text: "کرایه چقدر می‌شه؟", tr: "kerâye cheghadr mishe?", gloss: "how much is the fare?"}
+          - {id: piyade-misham, text: "پیاده می‌شم", tr: "piyâde misham", gloss: "I'll get out here (spoken)"}
+          - {id: kheyli-mamnun, text: "خیلی ممنون", tr: "kheyli mamnun", gloss: "thanks a lot"}
+      - id: u8-l4
+        title: Where did you go?
+        kind: grammar
+        note: >
+          Simple past = past stem + ending, **no mi-**: **raft-am** (I went), **khord-am** (I ate). He/she has no
+          ending: **raft**. "Not" is **na-**: **naraftam**. Learn these as phrases for now.
+        items:
+          - {id: raftam, text: "رفتم", tr: "raftam", gloss: "I went"}
+          - {id: naraftam, text: "نرفتم", tr: "naraftam", gloss: "I didn't go"}
+          - {id: khordam, text: "خوردم", tr: "khordam", gloss: "I ate / I drank"}
+          - {id: diruz, text: "دیروز", tr: "diruz", gloss: "yesterday"}
+          - {id: diruz-bazar, text: "دیروز به بازار رفتم", tr: "diruz be bâzâr raftam", gloss: "yesterday I went to the bazaar"}
+          - {id: koja-raftid, text: "کجا رفتید؟", tr: "kojâ raftid?", gloss: "where did you go? (polite)"}
+          - {id: nahar-khordi, text: "ناهار خوردی؟", tr: "nâhâr khordi?", gloss: "have you had lunch?"}
+          - {id: residam, text: "رسیدم", tr: "residam", gloss: "I've arrived"}
+    story: s-u8-taxi
+    scenario: t-u8-taxi-ride
+
+stories:
+  - id: s-u1-meeting
+    unit: u1
+    kind: dialogue
+    title: سلام، من سارا هستم
+    title_gloss: Hi, I'm Sara
+    speakers:
+      sara: {name: Sara, voice: female}
+      ali: {name: Ali, voice: male}
+    lines:
+      - {speaker: sara, text: "سلام!", tr: "salâm!", gloss: "Hello!"}
+      - {speaker: ali, text: "سلام! حالت چطوره؟", tr: "salâm! hâlet chetore?", gloss: "Hi! How are you?"}
+      - {speaker: sara, text: "خوبم، مرسی. تو چطوری؟", tr: "khubam, mersi. to chetori?", gloss: "I'm fine, thanks. How about you?"}
+      - {speaker: ali, text: "بد نیستم. اسمت چیه؟", tr: "bad nistam. esmet chiye?", gloss: "Not bad. What's your name?"}
+      - {speaker: sara, text: "اسم من ساراست. اسم تو چیه؟", tr: "esm-e man Sârâst. esm-e to chiye?", gloss: "My name is Sara. What's your name?"}
+      - {speaker: ali, text: "من علی هستم. خوشبختم!", tr: "man Ali hastam. khoshbakhtam!", gloss: "I'm Ali. Nice to meet you!"}
+      - {speaker: sara, text: "منم خوشبختم. خداحافظ!", tr: "manam khoshbakhtam. khodâhâfez!", gloss: "Nice to meet you too. Goodbye!"}
+
+  - id: s-u2-bread
+    unit: u2
+    kind: story
+    title: نان و ماست
+    title_gloss: Bread and yogurt
+    speakers:
+      narrator: {name: Narrator, voice: female}
+    lines:
+      - {speaker: narrator, text: "شب است.", tr: "shab ast.", gloss: "It is night."}
+      - {speaker: narrator, text: "بابا نان دارد.", tr: "bâbâ nân dârad.", gloss: "Dad has bread."}
+      - {speaker: narrator, text: "مامان ماست دارد.", tr: "mâmân mâst dârad.", gloss: "Mum has yogurt."}
+      - {speaker: narrator, text: "سارا سیب دارد.", tr: "Sârâ sib dârad.", gloss: "Sara has an apple."}
+      - {speaker: narrator, text: "من آب دارم.", tr: "man âb dâram.", gloss: "I have water."}
+      - {speaker: narrator, text: "سارا نان ندارد.", tr: "Sârâ nân nadârad.", gloss: "Sara doesn't have bread."}
+      - {speaker: narrator, text: "«بابا، نان داری؟»", tr: "«bâbâ, nân dâri?»", gloss: "Dad, do you have bread?"}
+      - {speaker: narrator, text: "«بیا، نان و ماست!»", tr: "«biyâ, nân-o mâst!»", gloss: "Come, here's bread and yogurt!"}
+
+  - id: s-u3-snowy-morning
+    unit: u3
+    kind: story
+    title: صبح در خانه
+    title_gloss: Morning at home
+    speakers:
+      narrator: {name: Narrator, voice: female}
+    lines:
+      - {speaker: narrator, text: "صبح است.", tr: "sobh ast.", gloss: "It is morning."}
+      - {speaker: narrator, text: "برف می‌آید.", tr: "barf miâyad.", gloss: "It is snowing."}
+      - {speaker: narrator, text: "علی در خانه است.", tr: "Ali dar khâne ast.", gloss: "Ali is at home."}
+      - {speaker: narrator, text: "علی چای و قند دارد.", tr: "Ali chây-o ghand dârad.", gloss: "Ali has tea and sugar cubes."}
+      - {speaker: narrator, text: "او عینک و کتاب دارد.", tr: "u eynak-o ketâb dârad.", gloss: "He has his glasses and a book."}
+      - {speaker: narrator, text: "سگ علی در باغ است.", tr: "sag-e Ali dar bâgh ast.", gloss: "Ali's dog is in the garden."}
+      - {speaker: narrator, text: "در باغ گل نیست.", tr: "dar bâgh gol nist.", gloss: "There are no flowers in the garden."}
+      - {speaker: narrator, text: "سگ ژاکت دارد!", tr: "sag zhâket dârad!", gloss: "The dog has a cardigan!"}
+
+  - id: s-u4-who-is-this
+    unit: u4
+    kind: dialogue
+    title: این کیه؟
+    title_gloss: Who's this?
+    speakers:
+      sara: {name: Sara, voice: female}
+      ali: {name: Ali, voice: male}
+      maryam: {name: Maryam, voice: female}
+    lines:
+      - {speaker: sara, text: "علی، این مریمه. همسایه‌ی منه.", tr: "Ali, in Maryame. hamsâye-ye mane.", gloss: "Ali, this is Maryam. She's my neighbour."}
+      - {speaker: ali, text: "سلام مریم خانم! خوشبختم.", tr: "salâm Maryam khânom! khoshbakhtam.", gloss: "Hello Maryam! Nice to meet you."}
+      - {speaker: maryam, text: "منم خوشبختم. شما ایرانی هستید؟", tr: "manam khoshbakhtam. shomâ irâni hastid?", gloss: "Nice to meet you too. Are you Iranian?"}
+      - {speaker: ali, text: "بله، اهل شیرازم. شما چی؟", tr: "bale, ahl-e Shirâzam. shomâ chi?", gloss: "Yes, I'm from Shiraz. And you?"}
+      - {speaker: maryam, text: "من اهل تهرانم. معلمم.", tr: "man ahl-e Tehrânam. mo'allemam.", gloss: "I'm from Tehran. I'm a teacher."}
+      - {speaker: ali, text: "سارا انگلیسیه.", tr: "Sârâ engelisiye.", gloss: "Sara is English."}
+      - {speaker: maryam, text: "سارا، تو دانشجو هستی؟", tr: "Sârâ, to dâneshju hasti?", gloss: "Sara, are you a student?"}
+      - {speaker: sara, text: "بله، دانشجو هستم. علی دکتره.", tr: "bale, dâneshju hastam. Ali doktore.", gloss: "Yes, I'm a student. Ali is a doctor."}
+      - {speaker: maryam, text: "به به! خیلی خوب.", tr: "bah bah! kheyli khub.", gloss: "How lovely! Very good."}
+
+  - id: s-u5-saras-week
+    unit: u5
+    kind: story
+    title: هفته‌ی سارا
+    title_gloss: Sara's week
+    speakers:
+      narrator: {name: Narrator, voice: female}
+    lines:
+      - {speaker: narrator, text: "امروز شنبه است.", tr: "emruz shanbe ast.", gloss: "Today is Saturday."}
+      - {speaker: narrator, text: "ساعت هفت و نیم است.", tr: "sâ'at haft-o nim ast.", gloss: "It's half past seven."}
+      - {speaker: narrator, text: "سارا دانشجو است. کلاس او ساعت هشت است.", tr: "Sârâ dâneshju ast. kelâs-e u sâ'at-e hasht ast.", gloss: "Sara is a student. Her class is at eight."}
+      - {speaker: narrator, text: "در کلاس سارا بیست و پنج دانشجو هست.", tr: "dar kelâs-e Sârâ bist-o panj dâneshju hast.", gloss: "There are twenty-five students in Sara's class."}
+      - {speaker: narrator, text: "علی دکتر است. او از شنبه تا چهارشنبه سر کار است.", tr: "Ali doktor ast. u az shanbe tâ chahârshanbe sar-e kâr ast.", gloss: "Ali is a doctor. He is at work from Saturday to Wednesday."}
+      - {speaker: narrator, text: "جمعه روز تعطیل است.", tr: "jom'e ruz-e ta'til ast.", gloss: "Friday is the day off."}
+      - {speaker: narrator, text: "جمعه ساعت ده، سارا و علی و مریم در کافه هستند.", tr: "jom'e sâ'at-e dah, Sârâ va Ali va Maryam dar kâfe hastand.", gloss: "On Friday at ten, Sara, Ali and Maryam are at the café."}
+      - {speaker: narrator, text: "سه دوست، یک میز، سه چای!", tr: "se dust, yek miz, se chây!", gloss: "Three friends, one table, three teas!"}
+
+  - id: s-u6-cafe
+    unit: u6
+    kind: dialogue
+    title: در کافه
+    title_gloss: At the café
+    speakers:
+      waiter: {name: Reza (waiter), voice: male}
+      sara: {name: Sara, voice: female}
+      maryam: {name: Maryam, voice: female}
+    lines:
+      - {speaker: waiter, text: "سلام، خوش اومدید! چی می‌خورید؟", tr: "salâm, khosh umadid! chi mikhorid?", gloss: "Hello, welcome! What will you have?"}
+      - {speaker: maryam, text: "یه چای سبز، لطفاً.", tr: "ye chây-e sabz, lotfan.", gloss: "A green tea, please."}
+      - {speaker: sara, text: "من یه قهوه می‌خوام.", tr: "man ye ghahve mikhâm.", gloss: "I'd like a coffee."}
+      - {speaker: waiter, text: "با شکر یا بدون شکر؟", tr: "bâ shekar yâ bedun-e shekar?", gloss: "With or without sugar?"}
+      - {speaker: sara, text: "بدون شکر. یه لیوان آب سرد هم، لطفاً.", tr: "bedun-e shekar. ye livân âb-e sard ham, lotfan.", gloss: "Without sugar. And a glass of cold water too, please."}
+      - {speaker: waiter, text: "دیگه چی؟ کیک شکلاتی داریم.", tr: "dige chi? kik-e shokolâti dârim.", gloss: "Anything else? We have chocolate cake."}
+      - {speaker: maryam, text: "بله، دو تا کیک!", tr: "bale, do tâ kik!", gloss: "Yes, two pieces of cake!"}
+      - {speaker: sara, text: "ببخشید، صورت‌حساب، لطفاً.", tr: "bebakhshid, surat-hesâb, lotfan.", gloss: "Excuse me, the bill, please."}
+      - {speaker: waiter, text: "می‌شه صد و پنجاه هزار تومان.", tr: "mishe sad-o panjâh hezâr tomân.", gloss: "That's 150 thousand tomans."}
+      - {speaker: maryam, text: "کارت می‌کشم. مهمون من!", tr: "kârt mikesham. mehmun-e man!", gloss: "I'll pay by card. My treat!"}
+
+  - id: s-u7-maryams-day
+    unit: u7
+    kind: story
+    title: یک روز مریم
+    title_gloss: A day in Maryam's life
+    speakers:
+      narrator: {name: Narrator, voice: female}
+    lines:
+      - {speaker: narrator, text: "مریم در تهران زندگی می‌کند.", tr: "Maryam dar Tehrân zendegi mikonad.", gloss: "Maryam lives in Tehran."}
+      - {speaker: narrator, text: "او معلم است و در یک مدرسه کار می‌کند.", tr: "u mo'allem ast va dar yek madrese kâr mikonad.", gloss: "She is a teacher and works at a school."}
+      - {speaker: narrator, text: "صبح‌ها چای می‌خورد و روزنامه می‌خواند.", tr: "sobh-hâ chây mikhorad va ruznâme mikhânad.", gloss: "In the mornings she drinks tea and reads the newspaper."}
+      - {speaker: narrator, text: "ساعت هفت و نیم به مدرسه می‌رود.", tr: "sâ'at-e haft-o nim be madrese miravad.", gloss: "At half past seven she goes to school."}
+      - {speaker: narrator, text: "مریم یک برادر دارد. اسم او رضا است.", tr: "Maryam yek barâdar dârad. esm-e u Rezâ ast.", gloss: "Maryam has a brother. His name is Reza."}
+      - {speaker: narrator, text: "رضا در یک کافه کار می‌کند.", tr: "Rezâ dar yek kâfe kâr mikonad.", gloss: "Reza works in a café."}
+      - {speaker: narrator, text: "مریم قهوه دوست ندارد، ولی کیک شکلاتی را خیلی دوست دارد.", tr: "Maryam ghahve dust nadârad, vali kik-e shokolâti râ kheyli dust dârad.", gloss: "Maryam doesn't like coffee, but she loves chocolate cake."}
+      - {speaker: narrator, text: "جمعه‌ها با سارا و علی به کافه‌ی رضا می‌رود.", tr: "jom'e-hâ bâ Sârâ va Ali be kâfe-ye Rezâ miravad.", gloss: "On Fridays she goes to Reza's café with Sara and Ali."}
+
+  - id: s-u8-taxi
+    unit: u8
+    kind: dialogue
+    title: تاکسی تا میدان آزادی
+    title_gloss: A taxi to Azadi Square
+    speakers:
+      sara: {name: Sara, voice: female}
+      driver: {name: Taxi driver, voice: male}
+    lines:
+      - {speaker: sara, text: "آقا، میدان آزادی؟", tr: "âghâ, meydân-e Âzâdi?", gloss: "Sir, Azadi Square?"}
+      - {speaker: driver, text: "بله، بفرمایید.", tr: "bale, befarmâyid.", gloss: "Yes, get in."}
+      - {speaker: driver, text: "شما ایرانی نیستید؟ فارسی‌تون خوبه!", tr: "shomâ irâni nistid? fârsi-tun khube!", gloss: "You're not Iranian? Your Persian is good!"}
+      - {speaker: sara, text: "مرسی! من انگلیسی هستم. تهران زندگی می‌کنم.", tr: "mersi! man engelisi hastam. Tehrân zendegi mikonam.", gloss: "Thanks! I'm English. I live in Tehran."}
+      - {speaker: driver, text: "تهران رو دوست دارید؟", tr: "Tehrân ro dust dârid?", gloss: "Do you like Tehran?"}
+      - {speaker: sara, text: "خیلی! دیروز به بازار رفتم. خیلی قشنگ بود.", tr: "kheyli! diruz be bâzâr raftam. kheyli ghashang bud.", gloss: "A lot! Yesterday I went to the bazaar. It was beautiful."}
+      - {speaker: driver, text: "رسیدیم. میدان آزادی.", tr: "residim. meydân-e Âzâdi.", gloss: "Here we are. Azadi Square."}
+      - {speaker: sara, text: "اینجا نگه دارید، لطفاً. کرایه چقدر می‌شه؟", tr: "injâ negah dârid, lotfan. kerâye cheghadr mishe?", gloss: "Stop here, please. How much is the fare?"}
+      - {speaker: driver, text: "قابلی نداره.", tr: "ghâbeli nadâre.", gloss: "It's nothing. (polite)"}
+      - {speaker: sara, text: "نه، خواهش می‌کنم! بفرمایید.", tr: "na, khâhesh mikonam! befarmâyid.", gloss: "No, please! Here you are."}
+
+scenarios:
+  - id: t-u1-new-neighbour
+    unit: u1
+    title: Your new neighbour
+    title_target: همسایه‌ی جدید
+    setting: >
+      You meet your new neighbour Maryam in the stairway of your building in Tehran.
+      She is friendly and curious.
+    persona: >
+      Maryam (مریم), around 30, a teacher, warm and patient. Speaks simple, everyday Persian.
+    goal: Greet Maryam, ask how she is, tell her your name, and say goodbye.
+    opener: {text: "سلام! شما همسایه‌ی جدید هستید؟", tr: "salâm! shomâ hamsâye-ye jadid hastid?", gloss: "Hi! Are you the new neighbour?"}
+    useful:
+      - {text: "بله", tr: "bale", gloss: "yes"}
+      - {text: "اسم من … است", tr: "esm-e man … ast", gloss: "my name is …"}
+      - {text: "خوشبختم", tr: "khoshbakhtam", gloss: "nice to meet you"}
+
+  - id: t-u2-reading-with-sina
+    unit: u2
+    title: Reading with Sina
+    title_target: کتاب سینا
+    setting: >
+      Maryam's eight-year-old son Sina is in first grade and learning to read too. He shows you
+      his Persian schoolbook at the kitchen table and wants to test you.
+    persona: >
+      Sina (سینا), 8, Maryam's son. Cheerful and a little bossy, very proud of his reading.
+      Uses very short, simple sentences and points at words.
+    goal: Read the simple words Sina points at (آب، بابا، نان، سیب), ask him to repeat, and thank him.
+    opener: {text: "این چیه؟ بخون!", tr: "in chiye? bekhun!", gloss: "What's this? Read it!"}
+    useful:
+      - {text: "این … است", tr: "in … ast", gloss: "this is …"}
+      - {text: "نمی‌دونم", tr: "nemidunam", gloss: "I don't know (spoken)"}
+      - {text: "دوباره بگو", tr: "dobâre begu", gloss: "say it again"}
+      - {text: "مرسی، سینا!", tr: "mersi, Sinâ!", gloss: "thanks, Sina!"}
+
+  - id: t-u3-bookshop
+    unit: u3
+    title: At the bookshop
+    title_target: در کتاب‌فروشی
+    setting: >
+      You are in a small bookshop on Enghelab Street in Tehran, looking for an easy book to
+      practise reading. The bookseller notices you sounding out the titles.
+    persona: >
+      Mr Hosseini (آقای حسینی), around 60, a bookseller who loves helping foreigners read Persian.
+      Patient, speaks slowly, points at words on covers and signs.
+    goal: Read a few words on book covers, ask what something is, and choose a children's book.
+    opener: {text: "سلام، بفرمایید. چه کتابی می‌خواید؟", tr: "salâm, befarmâyid. che ketâbi mikhâyd?", gloss: "Hello, welcome. What kind of book do you want?"}
+    useful:
+      - {text: "این چیه؟", tr: "in chiye?", gloss: "what's this?"}
+      - {text: "یه کتاب فارسی", tr: "ye ketâb-e fârsi", gloss: "a Persian book"}
+      - {text: "این کتاب خوبه؟", tr: "in ketâb khube?", gloss: "is this book good?"}
+      - {text: "ممنون", tr: "mamnun", gloss: "thank you"}
+
+  - id: t-u4-family-gathering
+    unit: u4
+    title: A family gathering
+    title_target: مهمانی خانوادگی
+    setting: >
+      Ali has invited you to a family gathering at his parents' home. His aunt sits next to you
+      with a cup of tea and wants to know all about you.
+    persona: >
+      Pari khânom (پری خانم), Ali's aunt, in her sixties. Warm, curious, asks lots of questions about
+      where you are from, what you do, and your family. Speaks slowly and kindly.
+    goal: Say where you are from and what you do, and answer and ask about family members.
+    opener: {text: "سلام عزیزم! شما اهل کجا هستید؟", tr: "salâm azizam! shomâ ahl-e kojâ hastid?", gloss: "Hello dear! Where are you from?"}
+    useful:
+      - {text: "من اهل … هستم", tr: "man ahl-e … hastam", gloss: "I'm from …"}
+      - {text: "من دانشجو هستم", tr: "man dâneshju hastam", gloss: "I'm a student"}
+      - {text: "من یک برادر و یک خواهر دارم", tr: "man yek barâdar va yek khâhar dâram", gloss: "I have a brother and a sister"}
+      - {text: "شما چی؟", tr: "shomâ chi?", gloss: "and you?"}
+
+  - id: t-u5-doctors-appointment
+    unit: u5
+    title: Booking an appointment
+    title_target: وقت دکتر
+    setting: >
+      You phone a doctor's surgery in Tehran to book an appointment for this week.
+      The receptionist offers you days and times.
+    persona: >
+      Ms Ahmadi (خانم احمدی), the surgery receptionist. Polite, efficient, says days and times clearly
+      and repeats them if asked.
+    goal: Agree on a day and a time for your appointment and repeat it back to confirm.
+    opener: {text: "سلام، مطب دکتر رضایی. بفرمایید.", tr: "salâm, matab-e doktor Rezâyi. befarmâyid.", gloss: "Hello, Dr Rezaei's surgery. How can I help?"}
+    useful:
+      - {text: "یکشنبه خوبه؟", tr: "yekshanbe khube?", gloss: "is Sunday good?"}
+      - {text: "ساعت چند؟", tr: "sâ'at-e chand?", gloss: "at what time?"}
+      - {text: "ساعت ده خوبه", tr: "sâ'at-e dah khube", gloss: "ten o'clock is good"}
+      - {text: "دوباره بگید، لطفاً", tr: "dobâre begid, lotfan", gloss: "please say it again"}
+
+  - id: t-u6-ordering
+    unit: u6
+    title: Ordering at a café
+    title_target: سفارش در کافه
+    setting: >
+      You sit down at a busy café near Tehran University. The waiter brings the menu
+      and comes back to take your order.
+    persona: >
+      Reza (رضا), Maryam's brother, mid-twenties, a friendly waiter. Speaks fast, casual Tehrani Persian
+      but slows down when asked. Recommends the chocolate cake.
+    goal: Order a drink (with or without sugar) and something to eat, ask the price, and pay the bill.
+    opener: {text: "سلام، خوش اومدید! چی میل دارید؟", tr: "salâm, khosh umadid! chi meyl dârid?", gloss: "Hello, welcome! What would you like?"}
+    useful:
+      - {text: "یه … می‌خوام", tr: "ye … mikhâm", gloss: "I'd like a …"}
+      - {text: "بدون شکر", tr: "bedun-e shekar", gloss: "without sugar"}
+      - {text: "چقدر می‌شه؟", tr: "cheghadr mishe?", gloss: "how much is it?"}
+      - {text: "صورت‌حساب، لطفاً", tr: "surat-hesâb, lotfan", gloss: "the bill, please"}
+
+  - id: t-u7-bus-to-isfahan
+    unit: u7
+    title: On the bus to Isfahan
+    title_target: در اتوبوس اصفهان
+    setting: >
+      You are on a long-distance bus from Tehran to Isfahan. The retired man in the next seat
+      offers you a sweet and starts chatting.
+    persona: >
+      Mr Karimi (آقای کریمی), about 70, a retired teacher from Isfahan. Very chatty and hospitable,
+      asks where you live, what you do and what you like about Iran.
+    goal: Say where you live and what you do, say what you like, and ask him the same questions.
+    opener: {text: "سلام! شما توریست هستید یا اینجا زندگی می‌کنید؟", tr: "salâm! shomâ turist hastid yâ injâ zendegi mikonid?", gloss: "Hi! Are you a tourist or do you live here?"}
+    useful:
+      - {text: "در تهران زندگی می‌کنم", tr: "dar Tehrân zendegi mikonam", gloss: "I live in Tehran"}
+      - {text: "فارسی می‌خوانم", tr: "fârsi mikhânam", gloss: "I study Persian"}
+      - {text: "ایران را دوست دارم", tr: "Irân râ dust dâram", gloss: "I love Iran"}
+      - {text: "شما چه کار می‌کنید؟", tr: "shomâ che kâr mikonid?", gloss: "what do you do?"}
+
+  - id: t-u8-taxi-ride
+    unit: u8
+    title: Taking a taxi
+    title_target: تاکسی دربست
+    setting: >
+      You hire a taxi on Enghelab Square to go to Tajrish metro station. Near the end you need to
+      guide the driver and pay.
+    persona: >
+      Mr Ahmadi (آقای احمدی), about 55, a Tehran taxi driver. Knows every street, chatty, curious
+      about foreigners, and will politely refuse your money once (ta'ârof) before accepting.
+    goal: Say where you are going, give simple directions, ask the fare, and pay politely.
+    opener: {text: "سلام، بفرمایید. کجا می‌رید؟", tr: "salâm, befarmâyid. kojâ mirid?", gloss: "Hello, get in. Where are you going?"}
+    useful:
+      - {text: "به ایستگاه مترو تجریش می‌رم", tr: "be istgâh-e metro-ye Tajrish miram", gloss: "I'm going to Tajrish metro station"}
+      - {text: "مستقیم برید", tr: "mostaghim berid", gloss: "go straight on"}
+      - {text: "دست راست", tr: "dast-e râst", gloss: "on the right"}
+      - {text: "اینجا نگه دارید، لطفاً", tr: "injâ negah dârid, lotfan", gloss: "stop here, please"}
+      - {text: "کرایه چقدر می‌شه؟", tr: "kerâye cheghadr mishe?", gloss: "how much is the fare?"}

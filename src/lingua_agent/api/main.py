@@ -14,6 +14,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 
 from ..config import Settings
+from .course_routes import router as course_router
 from .routes import get_settings, router
 
 
@@ -42,6 +43,7 @@ def build_app(settings: Settings | None = None, *, web_dir: Path | None = None,
     app.dependency_overrides[get_settings] = lambda: settings
     app.state.settings = settings
     app.include_router(router)
+    app.include_router(course_router)
 
     # If a built React app exists, mount it at the root. In dev the React
     # server runs separately on :5173, so this branch is skipped silently.

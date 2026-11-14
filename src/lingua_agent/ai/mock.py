@@ -143,7 +143,33 @@ class MockProvider:
                                          target_language=target_language)
         if schema_name == "GradingResult":
             return self._grading_result(context)
+        if schema_name == "TalkTurn":
+            return self._talk_turn(text, target_language=target_language)
+        if schema_name == "TalkSummaryDraft":
+            return self._talk_summary(context, target_language=target_language)
         raise GenerationError(f"mock provider has no template for schema {schema_name!r}")
+
+    def _talk_turn(self, text: str, *, target_language: str) -> dict[str, Any]:
+        echo = _fake_translate_sentence(text, target_language) if text.strip() else ""
+        return {
+            "text": f"[mock] {echo}".strip(),
+            "tr": None,
+            "gloss": f"(mock reply to: {text[:60]})",
+            "correction": None,
+            "better": None,
+        }
+
+    def _talk_summary(self, context: dict[str, Any], *, target_language: str) -> dict[str, Any]:
+        said = [m["content"] for m in context.get("messages", []) if m.get("role") == "user"]
+        words = []
+        for w in ("coffee", "water", "friend", "today"):
+            if w in _FAKE_DICT and _FAKE_DICT[w].get(target_language):
+                words.append({"text": _FAKE_DICT[w][target_language], "tr": None, "gloss": w})
+        return {
+            "went_well": f"[mock] You sent {len(said)} message(s).",
+            "mistakes": [{"you_said": said[0], "better": f"[mock] {said[0]}", "note": "mock note"}] if said else [],
+            "new_words": words[:2],
+        }
 
     def _material_analysis(self, text: str) -> dict[str, Any]:
         words = len(_tokenize(text))
