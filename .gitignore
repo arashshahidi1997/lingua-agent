@@ -29,3 +29,4 @@ web/.vite/
 web/*.log
 .npm/
 npm-debug.log*
+.scratch/

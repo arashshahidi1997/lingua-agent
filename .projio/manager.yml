@@ -1,0 +1,28 @@
+# Adapter keys for the project-manager skill (read by its helpers incoming.py, round.py, procs.py).
+# The prose half of the adapter is the project skill named in adapter_skill.
+prefix: "lingua-"                 # session titles start with it; the standing manager is "lingua-manager"
+adapter_skill: lingua-manager
+incoming:
+  dirs: [docs/log/inbox]          # notes routed here from persolog or another workspace
+  title_prefix: "[from "
+  body_markers: ["### Source context:"]
+  open_statuses: [open, partial, scheduled, queued]
+  cited_by:
+    globs: [docs/roadmap.md]
+    git_log: true
+handoffs:
+  dir: docs/log/handoff
+board:
+  path: .scratch/lingua-manager-board.md
+# Units are what sessions write; two sessions writing the same unit collide.
+units:
+  - {name: core, paths: [src]}
+  - {name: web, paths: [web]}
+  - {name: content, paths: [content, examples]}
+  - {name: tools, paths: [tools]}
+  - {name: docs, paths: [docs, mkdocs.yml, README.md]}       # docs/log is "notes" (longest prefix wins)
+  - {name: tests, paths: [tests]}
+  - {name: notes, paths: [docs/log]}
+  - {name: config, paths: [.projio, .claude, pyproject.toml, pixi.lock, .gitignore, .gitattributes, .github]}
+procs:
+  protect: [vscode-server, "^SCREEN", "^tmux", "ollama"]
