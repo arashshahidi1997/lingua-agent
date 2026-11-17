@@ -14,6 +14,7 @@ lessons or features; new ideas wait in "Ideas (parked)".
 - [x] Work through the audit's A (broken), B (rough) and C (guest) items; D2–D4 as decided
 - [x] Decision D1 (2026-11-17): built-in Talk switched off (`LINGUA_TALK`, default off) — the local model's Persian isn't usable and no API key yet. Role-plays now open as prompts for the learner's own chatbot (ChatGPT, Claude, Gemini; typing or voice mode)
 - [ ] Talk's own model, if it comes back: compare models on the neighbour test via OpenRouter (key is Arash's step; see infra) before choosing [core] — **user**
+- [ ] Offline-first app (agreed 2026-11-17, after the voice recordings): course, exercises, audio, progress and recordings on the phone; the laptop becomes the sync point and backup; optional Android APK (Capacitor). Write the plan first for approval [web, core]
 - [ ] Your voice for the existing course: 4 recordings from `content/recording/fa-en-a1/*.html` → Drive folder → split, match, normalise; the app prefers the native clip over Piper [content, core] — recording: **user**
 - [ ] Generated lessons ("Your lessons") are poor with `qwen2.5:7b` (see Phase 5b below); either fix or label them clearly as experimental [core]
 - [ ] Sara and Ali share one synthetic voice (only `fa_IR-amir` installed) — moot once your voice is in, except for lines not yet recorded [core]
