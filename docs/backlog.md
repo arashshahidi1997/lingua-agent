@@ -4,8 +4,9 @@ Concrete, near-term items. The phases themselves live in [roadmap.md](roadmap.md
 is [product-v2.md](product-v2.md). Tick items in small hunks, committed by path, in the same commit as the
 work. Unit in brackets (see `.projio/manager.yml`).
 
-Principle: **always complete, never finished.** Make what exists whole before adding lessons or features;
-new ideas wait in "Ideas (parked)".
+Principle: **always complete, never finished.** *Complete* = already whole: every part there and working
+together. *Finished* = no more work needed, which nothing ever is. Make what exists complete before adding
+lessons or features; new ideas wait in "Ideas (parked)".
 
 ## Complete what exists (first)
 
