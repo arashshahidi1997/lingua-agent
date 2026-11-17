@@ -18,6 +18,7 @@ class HealthResponse(BaseModel):
     version: str
     ai_provider: str
     ai_label: str = ""
+    features: dict[str, bool] = {}
 
 
 class LanguageOut(BaseModel):

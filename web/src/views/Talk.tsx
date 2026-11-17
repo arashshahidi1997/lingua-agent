@@ -3,6 +3,7 @@ import { courseApi } from '../lib/course-api'
 import { useAsync } from '../lib/hooks'
 import { languageName } from '../lib/rtl'
 import { useNav } from '../state/nav'
+import { useTalkEnabled } from '../lib/features'
 import { useSettings } from '../state/settings'
 import { ErrorNote, List, Loading, Page, PageTitle, Row, SectionLabel } from '../components/ui'
 import { Target } from '../components/Text'
@@ -10,23 +11,31 @@ import { Target } from '../components/Text'
 export default function Talk() {
   const { pair } = useSettings()
   const nav = useNav()
+  const talkOn = useTalkEnabled()
   const { data, error, loading, reload } = useAsync(`scenarios|${pair.target}|${pair.support}|${nav.dataVersion}`,
     () => courseApi.scenarios(pair.target, pair.support))
 
   return (
     <Page>
-      <PageTitle title="Talk" subtitle={`Practise ${languageName(pair.target)} in conversation. Mistakes are fine; you’ll get gentle corrections.`} />
+      <PageTitle
+        title="Talk"
+        subtitle={talkOn === false
+          ? `Role-plays to practise ${languageName(pair.target)} with the AI chatbot you use, typing or by voice. Pick one, copy its prompt, and start.`
+          : `Practise ${languageName(pair.target)} in conversation. Mistakes are fine; you’ll get gentle corrections.`}
+      />
 
-      <List>
-        <Row
-          icon={<MessagesSquare size={18} />}
-          title="Free conversation"
-          detail="Talk about anything, at your level"
-          onClick={() => nav.open({ kind: 'talk', scenarioId: null })}
-        />
-      </List>
+      {talkOn && (
+        <List>
+          <Row
+            icon={<MessagesSquare size={18} />}
+            title="Free conversation"
+            detail="Talk about anything, at your level"
+            onClick={() => nav.open({ kind: 'talk', scenarioId: null })}
+          />
+        </List>
+      )}
 
-      <SectionLabel className="mt-10">Role-play</SectionLabel>
+      <SectionLabel className={talkOn ? 'mt-10' : 'mt-2'}>Role-play</SectionLabel>
       {loading && !data && <Loading />}
       {error && !data && !error.startsWith('404') && <ErrorNote error={error} onRetry={reload} />}
       {(data?.length === 0 || error?.startsWith('404')) && (

@@ -29,6 +29,7 @@ def client(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> TestClient:
     monkeypatch.chdir(tmp_path)
     monkeypatch.setenv("LINGUA_DATA_DIR", str(tmp_path / "data"))
     monkeypatch.setenv("LINGUA_AI_PROVIDER", "mock")
+    monkeypatch.setenv("LINGUA_TALK", "on")
     monkeypatch.delenv("LINGUA_OWNER_LOGINS", raising=False)
     settings = Settings.load(cwd=tmp_path)
     settings.data_dir.mkdir(parents=True, exist_ok=True)

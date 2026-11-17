@@ -159,3 +159,63 @@ def summarize(provider: AIProvider, session: TalkSession, scenario: ScenarioDef 
         context={"target_language": session.target, "source_language": session.support,
                  "messages": [m.model_dump(mode="json") for m in session.messages]},
     )
+
+
+# ---- prompts for the learner's own chatbot ---------------------------------------------
+
+def chatbot_prompt(course: CourseDef, scenario: ScenarioDef, *, voice: bool = False) -> str:
+    """A role-play prompt to paste into any AI chatbot (ChatGPT, Claude, Gemini, …).
+
+    Written in the support language so every chatbot follows it; built from the scenario and the words of
+    its unit and the units before it, so the conversation stays at the learner's level. `voice` drops the
+    transliteration and translation lines, which a voice mode would otherwise read aloud.
+    """
+    target, support = _lang_name(course.target), _lang_name(course.support)
+    order = [u.id for u in course.units]
+    upto = order[: order.index(scenario.unit) + 1] if scenario.unit in order else order
+    words: list[str] = []
+    for unit in course.units:
+        if unit.id not in upto:
+            continue
+        for lesson in unit.lessons:
+            if lesson.kind == "script":
+                continue
+            for it in lesson.items:
+                words.append(f"{it.text} ({it.tr}) = {it.gloss}" if it.tr else f"{it.text} = {it.gloss}")
+    for p in scenario.useful:
+        line = f"{p.text} ({p.tr}) = {p.gloss}" if p.tr else f"{p.text} = {p.gloss}"
+        if line not in words:
+            words.append(line)
+    # The scenario's own unit matters most: keep its words, then the most recent earlier ones.
+    words = words[-40:]
+    hint = TRANSLIT_HINT.get(course.target, "")
+    if voice:
+        format_rules = (f"- We're talking by voice: speak only {target}, slowly and clearly. No transliteration, "
+                        f"no translations, unless I ask \"what does that mean?\".\n"
+                        f"- If I make a mistake, answer in character first, then say the better version once, "
+                        f"briefly, in {support}.")
+        opener = scenario.opener.text
+    else:
+        format_rules = (f"- Write each of your turns as three lines: the {target} sentence, its transliteration in "
+                        f"Latin letters, and the {support} meaning in brackets. {hint}\n"
+                        f"- If my message has a real mistake, reply in character first, then add one short line "
+                        f"starting with \"Better:\" giving the corrected {target}, with a few words of "
+                        f"explanation in {support}. Don't correct informal spoken forms that are fine.")
+        opener = f"{scenario.opener.text}\n{scenario.opener.tr or ''}\n({scenario.opener.gloss})".strip()
+    return (
+        f"Let's practise {target} conversation. I'm a beginner ({course.level}); my own language is {support}.\n\n"
+        f"Role-play\n"
+        f"- Setting: {scenario.setting.strip()}\n"
+        f"- You play: {scenario.persona.strip()}\n"
+        f"- My goal: {scenario.goal.strip()}\n\n"
+        f"How to talk with me\n"
+        f"- Stay in character. Use simple, natural, everyday spoken {target}: one or two short sentences per "
+        f"turn, and usually end with a simple question so I can answer.\n"
+        f"{format_rules}\n"
+        f"- Mostly use words I already know (list below). Bring in at most one new word per turn.\n"
+        f"- If I write in {support} or seem stuck, give me the {target} sentence I could say.\n"
+        f"- When I say \"end\", step out of the role and give me: what went well, up to five mistakes with "
+        f"better versions, and five useful new words with their meanings.\n\n"
+        f"Words I know\n" + "\n".join(f"- {w}" for w in words) + "\n\n"
+        f"Start now, in character, with this line:\n{opener}"
+    )

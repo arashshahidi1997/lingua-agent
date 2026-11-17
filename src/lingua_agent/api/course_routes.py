@@ -30,7 +30,7 @@ from ..course.models import (
     ScenarioDef,
     StoryDef,
 )
-from ..course.talk import TalkMessage, TalkSession, opener_turn, persona_name, summarize, take_turn
+from ..course.talk import TalkMessage, TalkSession, chatbot_prompt, opener_turn, persona_name, summarize, take_turn
 from ..ids import make_id, short_hash
 from ..materials import MaterialsError, build_provider
 from ..materials.registry import find_source
@@ -45,6 +45,11 @@ from .identity import charge_model_call, check_guest_storage, identify, require_
 from .routes import get_settings
 
 router = APIRouter(prefix="/api", tags=["lingua-agent v2"])
+
+
+def require_talk(s: Settings = Depends(get_settings)) -> None:
+    if not s.talk_enabled:
+        raise HTTPException(404, "Talk is turned off.")
 
 QUIZ_PASS = 0.7
 
@@ -666,6 +671,21 @@ def list_scenarios(target: str, support: str = "en", s: Settings = Depends(get_s
     return out
 
 
+class ChatbotPrompt(BaseModel):
+    prompt: str
+    voice: bool
+
+
+@router.get("/scenarios/{scenario_id}/prompt", response_model=ChatbotPrompt)
+def scenario_prompt(scenario_id: str, voice: bool = False, s: Settings = Depends(get_settings)) -> ChatbotPrompt:
+    """A role-play prompt for the learner's own AI chatbot (ChatGPT, Claude, Gemini, …)."""
+    found = store.find_scenario(s, scenario_id)
+    if not found:
+        raise HTTPException(404, f"scenario not found: {scenario_id}")
+    course, sc = found
+    return ChatbotPrompt(prompt=chatbot_prompt(course, sc, voice=voice), voice=voice)
+
+
 @router.get("/scenarios/{scenario_id}", response_model=ScenarioOut)
 def get_scenario(scenario_id: str, s: Settings = Depends(get_settings)) -> ScenarioOut:
     found = store.find_scenario(s, scenario_id)
@@ -695,7 +715,7 @@ def _talk_or_404(s: Settings, session_id: str) -> TalkSession:
     return sess
 
 
-@router.post("/talk/sessions", response_model=TalkSessionOut)
+@router.post("/talk/sessions", response_model=TalkSessionOut, dependencies=[Depends(require_talk)])
 def open_talk(req: OpenTalkRequest, s: Settings = Depends(get_settings)) -> TalkSessionOut:
     course_id = None
     messages: list[TalkMessage] = []
@@ -714,7 +734,7 @@ def open_talk(req: OpenTalkRequest, s: Settings = Depends(get_settings)) -> Talk
     return _talk_out(s, sess)
 
 
-@router.get("/talk/sessions/latest", response_model=TalkSessionOut)
+@router.get("/talk/sessions/latest", response_model=TalkSessionOut, dependencies=[Depends(require_talk)])
 def latest_talk(target: str, scenario_id: str | None = None, s: Settings = Depends(get_settings)) -> TalkSessionOut:
     """The most recent conversation that hasn't ended, to resume it."""
     open_ = [t for t in _talk_repo(s).list()
@@ -724,12 +744,12 @@ def latest_talk(target: str, scenario_id: str | None = None, s: Settings = Depen
     return _talk_out(s, max(open_, key=lambda t: t.updated_at))
 
 
-@router.get("/talk/sessions/{session_id}", response_model=TalkSessionOut)
+@router.get("/talk/sessions/{session_id}", response_model=TalkSessionOut, dependencies=[Depends(require_talk)])
 def get_talk(session_id: str, s: Settings = Depends(get_settings)) -> TalkSessionOut:
     return _talk_out(s, _talk_or_404(s, session_id))
 
 
-@router.post("/talk/sessions/{session_id}/messages", response_model=TalkMessage)
+@router.post("/talk/sessions/{session_id}/messages", response_model=TalkMessage, dependencies=[Depends(require_talk)])
 def say(session_id: str, req: SayRequest, request: Request, s: Settings = Depends(get_settings)) -> TalkMessage:
     sess = _talk_or_404(s, session_id)
     if sess.ended:
@@ -744,7 +764,7 @@ def say(session_id: str, req: SayRequest, request: Request, s: Settings = Depend
     return reply
 
 
-@router.post("/talk/sessions/{session_id}/end", response_model=TalkSummaryOut)
+@router.post("/talk/sessions/{session_id}/end", response_model=TalkSummaryOut, dependencies=[Depends(require_talk)])
 def end_talk(session_id: str, request: Request, s: Settings = Depends(get_settings)) -> TalkSummaryOut:
     sess = _talk_or_404(s, session_id)
     if sess.ended and sess.summary is not None:

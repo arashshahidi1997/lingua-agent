@@ -102,7 +102,7 @@ def _unit_item(unit: LessonUnit) -> S.UnitListItem:
 @router.get("/health", response_model=S.HealthResponse)
 def health(s: Settings = Depends(get_settings)) -> S.HealthResponse:
     return S.HealthResponse(status="ok", version=__version__, ai_provider=s.ai_provider,
-                            ai_label=_ai_label(s))
+                            ai_label=_ai_label(s), features={"talk": s.talk_enabled})
 
 
 def _ai_label(s: Settings) -> str:

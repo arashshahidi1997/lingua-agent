@@ -82,6 +82,7 @@ def client(tmp_path: Path, monkeypatch: pytest.MonkeyPatch, course_dir: Path) ->
     monkeypatch.chdir(tmp_path)
     monkeypatch.setenv("LINGUA_DATA_DIR", str(tmp_path / "data"))
     monkeypatch.setenv("LINGUA_AI_PROVIDER", "mock")
+    monkeypatch.setenv("LINGUA_TALK", "on")
     return TestClient(build_app(Settings.load(cwd=tmp_path)))
 
 
@@ -491,3 +492,21 @@ def test_requests_without_tailscale_header_must_be_local(tmp_path: Path, monkeyp
     assert lan.get("/api/me").status_code == 403
     assert lan.get("/api/me", headers={"Tailscale-User-Login": "x@y.z"}).json()["owner"] is False
     assert TestClient(app, client=("127.0.0.1", 50000)).get("/api/me").json()["owner"] is True
+
+
+def test_talk_switched_off_keeps_prompts(tmp_path: Path, monkeypatch: pytest.MonkeyPatch, course_dir: Path):
+    monkeypatch.chdir(tmp_path)
+    monkeypatch.setenv("LINGUA_DATA_DIR", str(tmp_path / "data"))
+    monkeypatch.setenv("LINGUA_AI_PROVIDER", "mock")
+    monkeypatch.delenv("LINGUA_TALK", raising=False)
+    c = TestClient(build_app(Settings.load(cwd=tmp_path)))
+    assert c.get("/api/health").json()["features"] == {"talk": False}
+    assert c.post("/api/talk/sessions", json={"target": "fa"}).status_code == 404
+    # Scenarios stay: they become prompts for the learner's own chatbot.
+    assert c.get("/api/today", params={"target": "fa"}).json()["scenario"]["id"] == "t1"
+    assert [x["id"] for x in c.get("/api/scenarios", params={"target": "fa"}).json()] == ["t1"]
+    text = c.get("/api/scenarios/t1/prompt").json()["prompt"]
+    assert "Maryam" in text and "سلام!" in text and "salâm" in text and "Better:" in text
+    voice = c.get("/api/scenarios/t1/prompt", params={"voice": True}).json()["prompt"]
+    assert "by voice" in voice and "Better:" not in voice
+    assert c.get("/api/scenarios/nope/prompt").status_code == 404

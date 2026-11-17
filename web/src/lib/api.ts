@@ -7,6 +7,7 @@ export interface Health {
   version: string
   ai_provider: string
   ai_label: string            // plain words, e.g. "Ollama · qwen2.5:7b, on this computer"
+  features: { talk?: boolean } // server switches; Talk is off until a good enough model is set
 }
 
 export interface Language {

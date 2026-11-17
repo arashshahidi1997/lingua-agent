@@ -30,6 +30,8 @@ class Settings:
     anthropic_api_key: str | None
     anthropic_model: str
     ollama_base_url: str
+    # Talk (AI role-play) is off until a model writes good enough Persian: LINGUA_TALK=on to enable.
+    talk_enabled: bool = False
     # Data every user shares (voices, the speech cache, extra courses). None = data_dir, i.e. the owner's.
     shared_dir: Path | None = None
 
@@ -53,6 +55,7 @@ class Settings:
             anthropic_api_key=os.environ.get("ANTHROPIC_API_KEY") or None,
             anthropic_model=os.environ.get("ANTHROPIC_MODEL", "claude-sonnet-4-6"),
             ollama_base_url=os.environ.get("OLLAMA_BASE_URL", "http://localhost:11434"),
+            talk_enabled=_bool("LINGUA_TALK", False),
         )
 
     def ensure_dirs(self) -> None:

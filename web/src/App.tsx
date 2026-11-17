@@ -20,6 +20,8 @@ import StoryReader from './views/StoryReader'
 import AudioPlayer from './views/AudioPlayer'
 import UnitReader from './views/UnitReader'
 import TalkChat from './views/TalkChat'
+import ChatbotPrompt from './views/ChatbotPrompt'
+import { useTalkEnabled } from './lib/features'
 
 const TABS: { key: Tab; label: string; icon: ReactNode }[] = [
   { key: 'today', label: 'Today', icon: <BookOpen size={22} strokeWidth={1.75} /> },
@@ -133,6 +135,7 @@ function Shell() {
 }
 
 function OverlayView({ overlay }: { overlay: Overlay }) {
+  const talkOn = useTalkEnabled()
   switch (overlay.kind) {
     case 'settings': return <Settings />
     case 'lesson-sheet': return <LessonSheet courseId={overlay.courseId} lessonId={overlay.lessonId} locked={overlay.locked} />
@@ -141,6 +144,10 @@ function OverlayView({ overlay }: { overlay: Overlay }) {
     case 'story': return <StoryReader id={overlay.id} />
     case 'audio': return <AudioPlayer id={overlay.id} />
     case 'unit': return <UnitReader id={overlay.id} />
-    case 'talk': return <TalkChat scenarioId={overlay.scenarioId} />
+    case 'talk':
+      // Built-in Talk is off until a good enough model is set: role-plays open as prompts for your own chatbot.
+      if (talkOn === null) return null
+      if (!talkOn) return overlay.scenarioId ? <ChatbotPrompt scenarioId={overlay.scenarioId} /> : null
+      return <TalkChat scenarioId={overlay.scenarioId} />
   }
 }

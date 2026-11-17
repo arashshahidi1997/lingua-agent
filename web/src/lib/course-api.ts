@@ -304,6 +304,9 @@ export const courseApi = {
   // Talk
   scenarios: (target: string, support: string) => req<ScenarioSummary[]>(`/scenarios${q({ target, support })}`),
   scenario: (id: string) => req<Scenario>(`/scenarios/${id}`),
+  // A role-play prompt to paste into the learner's own AI chatbot; voice = for a spoken voice mode.
+  scenarioPrompt: (id: string, voice = false) =>
+    req<{ prompt: string; voice: boolean }>(`/scenarios/${id}/prompt${q({ voice: voice ? 'true' : undefined })}`),
   openTalk: (body: { target: string; support: string; scenario_id?: string | null }) =>
     post<TalkSession>('/talk/sessions', body),
   // The latest conversation that hasn't ended, to resume it (404 when there is none).
