@@ -1,0 +1,993 @@
+{
+ "course": "fa-en-a1",
+ "session": "2-numbers-cafe",
+ "title": "Numbers · at the café",
+ "units": [
+  "u5",
+  "u6"
+ ],
+ "clips": [
+  {
+   "n": 1,
+   "text": "یک",
+   "tr": "yek",
+   "gloss": "one",
+   "refs": [
+    "item:yek"
+   ],
+   "section": "Numbers & time · One to eight",
+   "cue": null
+  },
+  {
+   "n": 2,
+   "text": "دو",
+   "tr": "do",
+   "gloss": "two",
+   "refs": [
+    "item:do"
+   ],
+   "section": "Numbers & time · One to eight",
+   "cue": null
+  },
+  {
+   "n": 3,
+   "text": "سه",
+   "tr": "se",
+   "gloss": "three",
+   "refs": [
+    "item:se-num"
+   ],
+   "section": "Numbers & time · One to eight",
+   "cue": null
+  },
+  {
+   "n": 4,
+   "text": "چهار",
+   "tr": "chahâr",
+   "gloss": "four",
+   "refs": [
+    "item:chahar"
+   ],
+   "section": "Numbers & time · One to eight",
+   "cue": null
+  },
+  {
+   "n": 5,
+   "text": "پنج",
+   "tr": "panj",
+   "gloss": "five",
+   "refs": [
+    "item:panj"
+   ],
+   "section": "Numbers & time · One to eight",
+   "cue": null
+  },
+  {
+   "n": 6,
+   "text": "شش",
+   "tr": "shesh",
+   "gloss": "six",
+   "refs": [
+    "item:shesh"
+   ],
+   "section": "Numbers & time · One to eight",
+   "cue": null
+  },
+  {
+   "n": 7,
+   "text": "هفت",
+   "tr": "haft",
+   "gloss": "seven",
+   "refs": [
+    "item:haft"
+   ],
+   "section": "Numbers & time · One to eight",
+   "cue": null
+  },
+  {
+   "n": 8,
+   "text": "هشت",
+   "tr": "hasht",
+   "gloss": "eight",
+   "refs": [
+    "item:hasht"
+   ],
+   "section": "Numbers & time · One to eight",
+   "cue": null
+  },
+  {
+   "n": 9,
+   "text": "صفر",
+   "tr": "sefr",
+   "gloss": "zero",
+   "refs": [
+    "item:sefr"
+   ],
+   "section": "Numbers & time · Nine to twenty",
+   "cue": null
+  },
+  {
+   "n": 10,
+   "text": "نه",
+   "tr": "noh",
+   "gloss": "nine",
+   "refs": [
+    "item:noh"
+   ],
+   "section": "Numbers & time · Nine to twenty",
+   "cue": null
+  },
+  {
+   "n": 11,
+   "text": "ده",
+   "tr": "dah",
+   "gloss": "ten",
+   "refs": [
+    "item:dah"
+   ],
+   "section": "Numbers & time · Nine to twenty",
+   "cue": null
+  },
+  {
+   "n": 12,
+   "text": "یازده",
+   "tr": "yâzdah",
+   "gloss": "eleven",
+   "refs": [
+    "item:yazdah"
+   ],
+   "section": "Numbers & time · Nine to twenty",
+   "cue": null
+  },
+  {
+   "n": 13,
+   "text": "دوازده",
+   "tr": "davâzdah",
+   "gloss": "twelve",
+   "refs": [
+    "item:davazdah"
+   ],
+   "section": "Numbers & time · Nine to twenty",
+   "cue": null
+  },
+  {
+   "n": 14,
+   "text": "سیزده",
+   "tr": "sizdah",
+   "gloss": "thirteen",
+   "refs": [
+    "item:sizdah"
+   ],
+   "section": "Numbers & time · Nine to twenty",
+   "cue": null
+  },
+  {
+   "n": 15,
+   "text": "پانزده",
+   "tr": "pânzdah",
+   "gloss": "fifteen",
+   "refs": [
+    "item:panzdah"
+   ],
+   "section": "Numbers & time · Nine to twenty",
+   "cue": null
+  },
+  {
+   "n": 16,
+   "text": "بیست",
+   "tr": "bist",
+   "gloss": "twenty",
+   "refs": [
+    "item:bist"
+   ],
+   "section": "Numbers & time · Nine to twenty",
+   "cue": null
+  },
+  {
+   "n": 17,
+   "text": "سی",
+   "tr": "si",
+   "gloss": "thirty",
+   "refs": [
+    "item:si"
+   ],
+   "section": "Numbers & time · Tens, how many, what time?",
+   "cue": null
+  },
+  {
+   "n": 18,
+   "text": "چهل",
+   "tr": "chehel",
+   "gloss": "forty",
+   "refs": [
+    "item:chehel"
+   ],
+   "section": "Numbers & time · Tens, how many, what time?",
+   "cue": null
+  },
+  {
+   "n": 19,
+   "text": "پنجاه",
+   "tr": "panjâh",
+   "gloss": "fifty",
+   "refs": [
+    "item:panjah"
+   ],
+   "section": "Numbers & time · Tens, how many, what time?",
+   "cue": null
+  },
+  {
+   "n": 20,
+   "text": "صد",
+   "tr": "sad",
+   "gloss": "a hundred",
+   "refs": [
+    "item:sad-num"
+   ],
+   "section": "Numbers & time · Tens, how many, what time?",
+   "cue": null
+  },
+  {
+   "n": 21,
+   "text": "بیست و پنج",
+   "tr": "bist-o panj",
+   "gloss": "twenty-five",
+   "refs": [
+    "item:bist-o-panj"
+   ],
+   "section": "Numbers & time · Tens, how many, what time?",
+   "cue": null
+  },
+  {
+   "n": 22,
+   "text": "چند؟",
+   "tr": "chand?",
+   "gloss": "how many?",
+   "refs": [
+    "item:chand"
+   ],
+   "section": "Numbers & time · Tens, how many, what time?",
+   "cue": null
+  },
+  {
+   "n": 23,
+   "text": "ساعت چنده؟",
+   "tr": "sâ'at chande?",
+   "gloss": "what time is it? (spoken)",
+   "refs": [
+    "item:saat-chande"
+   ],
+   "section": "Numbers & time · Tens, how many, what time?",
+   "cue": null
+  },
+  {
+   "n": 24,
+   "text": "ساعت سه و نیم است",
+   "tr": "sâ'at se-o nim ast",
+   "gloss": "it's half past three",
+   "refs": [
+    "item:se-o-nim"
+   ],
+   "section": "Numbers & time · Tens, how many, what time?",
+   "cue": null
+  },
+  {
+   "n": 25,
+   "text": "شنبه",
+   "tr": "shanbe",
+   "gloss": "Saturday",
+   "refs": [
+    "item:shanbe"
+   ],
+   "section": "Numbers & time · Days of the week",
+   "cue": null
+  },
+  {
+   "n": 26,
+   "text": "یکشنبه",
+   "tr": "yekshanbe",
+   "gloss": "Sunday",
+   "refs": [
+    "item:yekshanbe"
+   ],
+   "section": "Numbers & time · Days of the week",
+   "cue": null
+  },
+  {
+   "n": 27,
+   "text": "دوشنبه",
+   "tr": "doshanbe",
+   "gloss": "Monday",
+   "refs": [
+    "item:doshanbe"
+   ],
+   "section": "Numbers & time · Days of the week",
+   "cue": null
+  },
+  {
+   "n": 28,
+   "text": "سه‌شنبه",
+   "tr": "seshanbe",
+   "gloss": "Tuesday",
+   "refs": [
+    "item:seshanbe"
+   ],
+   "section": "Numbers & time · Days of the week",
+   "cue": null
+  },
+  {
+   "n": 29,
+   "text": "چهارشنبه",
+   "tr": "chahârshanbe",
+   "gloss": "Wednesday",
+   "refs": [
+    "item:chaharshanbe"
+   ],
+   "section": "Numbers & time · Days of the week",
+   "cue": null
+  },
+  {
+   "n": 30,
+   "text": "پنجشنبه",
+   "tr": "panjshanbe",
+   "gloss": "Thursday",
+   "refs": [
+    "item:panjshanbe"
+   ],
+   "section": "Numbers & time · Days of the week",
+   "cue": null
+  },
+  {
+   "n": 31,
+   "text": "جمعه",
+   "tr": "jom'e",
+   "gloss": "Friday",
+   "refs": [
+    "item:jome"
+   ],
+   "section": "Numbers & time · Days of the week",
+   "cue": null
+  },
+  {
+   "n": 32,
+   "text": "امروز چندشنبه است؟",
+   "tr": "emruz chandshanbe ast?",
+   "gloss": "what day is it today?",
+   "refs": [
+    "item:emruz-chandshanbe"
+   ],
+   "section": "Numbers & time · Days of the week",
+   "cue": null
+  },
+  {
+   "n": 33,
+   "text": "امروز شنبه است.",
+   "tr": "emruz shanbe ast.",
+   "gloss": "Today is Saturday.",
+   "refs": [
+    "line:s-u5-saras-week-0"
+   ],
+   "section": "Sara's week (story)",
+   "cue": "Narrator"
+  },
+  {
+   "n": 34,
+   "text": "ساعت هفت و نیم است.",
+   "tr": "sâ'at haft-o nim ast.",
+   "gloss": "It's half past seven.",
+   "refs": [
+    "line:s-u5-saras-week-1"
+   ],
+   "section": "Sara's week (story)",
+   "cue": "Narrator"
+  },
+  {
+   "n": 35,
+   "text": "سارا دانشجو است. کلاس او ساعت هشت است.",
+   "tr": "Sârâ dâneshju ast. kelâs-e u sâ'at-e hasht ast.",
+   "gloss": "Sara is a student. Her class is at eight.",
+   "refs": [
+    "line:s-u5-saras-week-2"
+   ],
+   "section": "Sara's week (story)",
+   "cue": "Narrator"
+  },
+  {
+   "n": 36,
+   "text": "در کلاس سارا بیست و پنج دانشجو هست.",
+   "tr": "dar kelâs-e Sârâ bist-o panj dâneshju hast.",
+   "gloss": "There are twenty-five students in Sara's class.",
+   "refs": [
+    "line:s-u5-saras-week-3"
+   ],
+   "section": "Sara's week (story)",
+   "cue": "Narrator"
+  },
+  {
+   "n": 37,
+   "text": "علی دکتر است. او از شنبه تا چهارشنبه سر کار است.",
+   "tr": "Ali doktor ast. u az shanbe tâ chahârshanbe sar-e kâr ast.",
+   "gloss": "Ali is a doctor. He is at work from Saturday to Wednesday.",
+   "refs": [
+    "line:s-u5-saras-week-4"
+   ],
+   "section": "Sara's week (story)",
+   "cue": "Narrator"
+  },
+  {
+   "n": 38,
+   "text": "جمعه روز تعطیل است.",
+   "tr": "jom'e ruz-e ta'til ast.",
+   "gloss": "Friday is the day off.",
+   "refs": [
+    "line:s-u5-saras-week-5"
+   ],
+   "section": "Sara's week (story)",
+   "cue": "Narrator"
+  },
+  {
+   "n": 39,
+   "text": "جمعه ساعت ده، سارا و علی و مریم در کافه هستند.",
+   "tr": "jom'e sâ'at-e dah, Sârâ va Ali va Maryam dar kâfe hastand.",
+   "gloss": "On Friday at ten, Sara, Ali and Maryam are at the café.",
+   "refs": [
+    "line:s-u5-saras-week-6"
+   ],
+   "section": "Sara's week (story)",
+   "cue": "Narrator"
+  },
+  {
+   "n": 40,
+   "text": "سه دوست، یک میز، سه چای!",
+   "tr": "se dust, yek miz, se chây!",
+   "gloss": "Three friends, one table, three teas!",
+   "refs": [
+    "line:s-u5-saras-week-7"
+   ],
+   "section": "Sara's week (story)",
+   "cue": "Narrator"
+  },
+  {
+   "n": 41,
+   "text": "سلام، مطب دکتر رضایی. بفرمایید.",
+   "tr": "salâm, matab-e doktor Rezâyi. befarmâyid.",
+   "gloss": "Hello, Dr Rezaei's surgery. How can I help?",
+   "refs": [
+    "phrase:t-u5-doctors-appointment-0"
+   ],
+   "section": "Role-play · Booking an appointment",
+   "cue": null
+  },
+  {
+   "n": 42,
+   "text": "یکشنبه خوبه؟",
+   "tr": "yekshanbe khube?",
+   "gloss": "is Sunday good?",
+   "refs": [
+    "phrase:t-u5-doctors-appointment-1"
+   ],
+   "section": "Role-play · Booking an appointment",
+   "cue": null
+  },
+  {
+   "n": 43,
+   "text": "ساعت چند؟",
+   "tr": "sâ'at-e chand?",
+   "gloss": "at what time?",
+   "refs": [
+    "phrase:t-u5-doctors-appointment-2"
+   ],
+   "section": "Role-play · Booking an appointment",
+   "cue": null
+  },
+  {
+   "n": 44,
+   "text": "ساعت ده خوبه",
+   "tr": "sâ'at-e dah khube",
+   "gloss": "ten o'clock is good",
+   "refs": [
+    "phrase:t-u5-doctors-appointment-3"
+   ],
+   "section": "Role-play · Booking an appointment",
+   "cue": null
+  },
+  {
+   "n": 45,
+   "text": "دوباره بگید، لطفاً",
+   "tr": "dobâre begid, lotfan",
+   "gloss": "please say it again",
+   "refs": [
+    "phrase:t-u5-doctors-appointment-4"
+   ],
+   "section": "Role-play · Booking an appointment",
+   "cue": null
+  },
+  {
+   "n": 46,
+   "text": "چای",
+   "tr": "chây",
+   "gloss": "tea",
+   "refs": [
+    "item:chay"
+   ],
+   "section": "At the café · Drinks and snacks",
+   "cue": null
+  },
+  {
+   "n": 47,
+   "text": "قهوه",
+   "tr": "ghahve",
+   "gloss": "coffee",
+   "refs": [
+    "item:ghahve"
+   ],
+   "section": "At the café · Drinks and snacks",
+   "cue": null
+  },
+  {
+   "n": 48,
+   "text": "آب",
+   "tr": "âb",
+   "gloss": "water",
+   "refs": [
+    "item:ab"
+   ],
+   "section": "At the café · Drinks and snacks",
+   "cue": null
+  },
+  {
+   "n": 49,
+   "text": "شیر",
+   "tr": "shir",
+   "gloss": "milk",
+   "refs": [
+    "item:shir"
+   ],
+   "section": "At the café · Drinks and snacks",
+   "cue": null
+  },
+  {
+   "n": 50,
+   "text": "شکر",
+   "tr": "shekar",
+   "gloss": "sugar",
+   "refs": [
+    "item:shekar"
+   ],
+   "section": "At the café · Drinks and snacks",
+   "cue": null
+  },
+  {
+   "n": 51,
+   "text": "کیک",
+   "tr": "kik",
+   "gloss": "cake",
+   "refs": [
+    "item:kik"
+   ],
+   "section": "At the café · Drinks and snacks",
+   "cue": null
+  },
+  {
+   "n": 52,
+   "text": "آب پرتقال",
+   "tr": "âb-porteghâl",
+   "gloss": "orange juice",
+   "refs": [
+    "item:ab-porteghal"
+   ],
+   "section": "At the café · Drinks and snacks",
+   "cue": null
+  },
+  {
+   "n": 53,
+   "text": "فنجان",
+   "tr": "fenjân",
+   "gloss": "cup",
+   "refs": [
+    "item:fenjan"
+   ],
+   "section": "At the café · Drinks and snacks",
+   "cue": null
+  },
+  {
+   "n": 54,
+   "text": "لطفاً",
+   "tr": "lotfan",
+   "gloss": "please",
+   "refs": [
+    "item:lotfan"
+   ],
+   "section": "At the café · Ordering",
+   "cue": null
+  },
+  {
+   "n": 55,
+   "text": "یه چای، لطفاً",
+   "tr": "ye chây, lotfan",
+   "gloss": "a tea, please",
+   "refs": [
+    "item:yek-chay-lotfan"
+   ],
+   "section": "At the café · Ordering",
+   "cue": null
+  },
+  {
+   "n": 56,
+   "text": "می‌خوام",
+   "tr": "mikhâm",
+   "gloss": "I want (spoken)",
+   "refs": [
+    "item:mikham"
+   ],
+   "section": "At the café · Ordering",
+   "cue": null
+  },
+  {
+   "n": 57,
+   "text": "یه قهوه می‌خوام",
+   "tr": "ye ghahve mikhâm",
+   "gloss": "I'd like a coffee (spoken)",
+   "refs": [
+    "item:ye-ghahve-mikham"
+   ],
+   "section": "At the café · Ordering",
+   "cue": null
+  },
+  {
+   "n": 58,
+   "text": "چی می‌خورید؟",
+   "tr": "chi mikhorid?",
+   "gloss": "what will you have?",
+   "refs": [
+    "item:chi-mikhorid"
+   ],
+   "section": "At the café · Ordering",
+   "cue": null
+  },
+  {
+   "n": 59,
+   "text": "با شکر",
+   "tr": "bâ shekar",
+   "gloss": "with sugar",
+   "refs": [
+    "item:ba-shekar"
+   ],
+   "section": "At the café · Ordering",
+   "cue": null
+  },
+  {
+   "n": 60,
+   "text": "بدون شکر",
+   "tr": "bedun-e shekar",
+   "gloss": "without sugar",
+   "refs": [
+    "item:bedune-shekar",
+    "phrase:t-u6-ordering-2"
+   ],
+   "section": "At the café · Ordering",
+   "cue": null
+  },
+  {
+   "n": 61,
+   "text": "دیگه چی؟",
+   "tr": "dige chi?",
+   "gloss": "anything else? (spoken)",
+   "refs": [
+    "item:dige-chi"
+   ],
+   "section": "At the café · Ordering",
+   "cue": null
+  },
+  {
+   "n": 62,
+   "text": "چای سبز",
+   "tr": "chây-e sabz",
+   "gloss": "green tea",
+   "refs": [
+    "item:chaye-sabz"
+   ],
+   "section": "At the café · Green tea, cold water",
+   "cue": null
+  },
+  {
+   "n": 63,
+   "text": "چای داغ",
+   "tr": "chây-e dâgh",
+   "gloss": "hot tea",
+   "refs": [
+    "item:chaye-dagh"
+   ],
+   "section": "At the café · Green tea, cold water",
+   "cue": null
+  },
+  {
+   "n": 64,
+   "text": "آب سرد",
+   "tr": "âb-e sard",
+   "gloss": "cold water",
+   "refs": [
+    "item:abe-sard"
+   ],
+   "section": "At the café · Green tea, cold water",
+   "cue": null
+  },
+  {
+   "n": 65,
+   "text": "قهوه‌ی ترک",
+   "tr": "ghahve-ye tork",
+   "gloss": "Turkish coffee",
+   "refs": [
+    "item:ghahveye-tork"
+   ],
+   "section": "At the café · Green tea, cold water",
+   "cue": null
+  },
+  {
+   "n": 66,
+   "text": "کیک شکلاتی",
+   "tr": "kik-e shokolâti",
+   "gloss": "chocolate cake",
+   "refs": [
+    "item:kike-shokolati"
+   ],
+   "section": "At the café · Green tea, cold water",
+   "cue": null
+  },
+  {
+   "n": 67,
+   "text": "یک فنجان چای",
+   "tr": "yek fenjân chây",
+   "gloss": "a cup of tea",
+   "refs": [
+    "item:fenjan-chay"
+   ],
+   "section": "At the café · Green tea, cold water",
+   "cue": null
+  },
+  {
+   "n": 68,
+   "text": "یک لیوان آب",
+   "tr": "yek livân âb",
+   "gloss": "a glass of water",
+   "refs": [
+    "item:livan-ab"
+   ],
+   "section": "At the café · Green tea, cold water",
+   "cue": null
+  },
+  {
+   "n": 69,
+   "text": "منوی کافه",
+   "tr": "menu-ye kâfe",
+   "gloss": "the café menu",
+   "refs": [
+    "item:menuye-kafe"
+   ],
+   "section": "At the café · Green tea, cold water",
+   "cue": null
+  },
+  {
+   "n": 70,
+   "text": "چقدر می‌شه؟",
+   "tr": "cheghadr mishe?",
+   "gloss": "how much is it? (spoken)",
+   "refs": [
+    "item:cheghadr-mishe",
+    "phrase:t-u6-ordering-3"
+   ],
+   "section": "At the café · The bill",
+   "cue": null
+  },
+  {
+   "n": 71,
+   "text": "صورت‌حساب، لطفاً",
+   "tr": "surat-hesâb, lotfan",
+   "gloss": "the bill, please",
+   "refs": [
+    "item:surat-hesab",
+    "phrase:t-u6-ordering-4"
+   ],
+   "section": "At the café · The bill",
+   "cue": null
+  },
+  {
+   "n": 72,
+   "text": "هزار",
+   "tr": "hezâr",
+   "gloss": "thousand",
+   "refs": [
+    "item:hezar"
+   ],
+   "section": "At the café · The bill",
+   "cue": null
+  },
+  {
+   "n": 73,
+   "text": "تومان",
+   "tr": "tomân",
+   "gloss": "toman (Iranian currency unit)",
+   "refs": [
+    "item:toman"
+   ],
+   "section": "At the café · The bill",
+   "cue": null
+  },
+  {
+   "n": 74,
+   "text": "پنجاه هزار تومان",
+   "tr": "panjâh hezâr tomân",
+   "gloss": "fifty thousand tomans",
+   "refs": [
+    "item:panjah-hezar-toman"
+   ],
+   "section": "At the café · The bill",
+   "cue": null
+  },
+  {
+   "n": 75,
+   "text": "کارت می‌کشم",
+   "tr": "kârt mikesham",
+   "gloss": "I'll pay by card",
+   "refs": [
+    "item:kart-mikesham"
+   ],
+   "section": "At the café · The bill",
+   "cue": null
+  },
+  {
+   "n": 76,
+   "text": "قابلی نداره",
+   "tr": "ghâbeli nadâre",
+   "gloss": "it's nothing (polite, don't take it literally)",
+   "refs": [
+    "item:ghabeli-nadare"
+   ],
+   "section": "At the café · The bill",
+   "cue": null
+  },
+  {
+   "n": 77,
+   "text": "بفرمایید",
+   "tr": "befarmâyid",
+   "gloss": "here you are / go ahead",
+   "refs": [
+    "item:befarmayid"
+   ],
+   "section": "At the café · The bill",
+   "cue": null
+  },
+  {
+   "n": 78,
+   "text": "سلام، خوش اومدید! چی می‌خورید؟",
+   "tr": "salâm, khosh umadid! chi mikhorid?",
+   "gloss": "Hello, welcome! What will you have?",
+   "refs": [
+    "line:s-u6-cafe-0"
+   ],
+   "section": "At the café (dialogue)",
+   "cue": "Reza (waiter)"
+  },
+  {
+   "n": 79,
+   "text": "یه چای سبز، لطفاً.",
+   "tr": "ye chây-e sabz, lotfan.",
+   "gloss": "A green tea, please.",
+   "refs": [
+    "line:s-u6-cafe-1"
+   ],
+   "section": "At the café (dialogue)",
+   "cue": "Maryam"
+  },
+  {
+   "n": 80,
+   "text": "من یه قهوه می‌خوام.",
+   "tr": "man ye ghahve mikhâm.",
+   "gloss": "I'd like a coffee.",
+   "refs": [
+    "line:s-u6-cafe-2"
+   ],
+   "section": "At the café (dialogue)",
+   "cue": "Sara"
+  },
+  {
+   "n": 81,
+   "text": "با شکر یا بدون شکر؟",
+   "tr": "bâ shekar yâ bedun-e shekar?",
+   "gloss": "With or without sugar?",
+   "refs": [
+    "line:s-u6-cafe-3"
+   ],
+   "section": "At the café (dialogue)",
+   "cue": "Reza (waiter)"
+  },
+  {
+   "n": 82,
+   "text": "بدون شکر. یه لیوان آب سرد هم، لطفاً.",
+   "tr": "bedun-e shekar. ye livân âb-e sard ham, lotfan.",
+   "gloss": "Without sugar. And a glass of cold water too, please.",
+   "refs": [
+    "line:s-u6-cafe-4"
+   ],
+   "section": "At the café (dialogue)",
+   "cue": "Sara"
+  },
+  {
+   "n": 83,
+   "text": "دیگه چی؟ کیک شکلاتی داریم.",
+   "tr": "dige chi? kik-e shokolâti dârim.",
+   "gloss": "Anything else? We have chocolate cake.",
+   "refs": [
+    "line:s-u6-cafe-5"
+   ],
+   "section": "At the café (dialogue)",
+   "cue": "Reza (waiter)"
+  },
+  {
+   "n": 84,
+   "text": "بله، دو تا کیک!",
+   "tr": "bale, do tâ kik!",
+   "gloss": "Yes, two pieces of cake!",
+   "refs": [
+    "line:s-u6-cafe-6"
+   ],
+   "section": "At the café (dialogue)",
+   "cue": "Maryam"
+  },
+  {
+   "n": 85,
+   "text": "ببخشید، صورت‌حساب، لطفاً.",
+   "tr": "bebakhshid, surat-hesâb, lotfan.",
+   "gloss": "Excuse me, the bill, please.",
+   "refs": [
+    "line:s-u6-cafe-7"
+   ],
+   "section": "At the café (dialogue)",
+   "cue": "Sara"
+  },
+  {
+   "n": 86,
+   "text": "می‌شه صد و پنجاه هزار تومان.",
+   "tr": "mishe sad-o panjâh hezâr tomân.",
+   "gloss": "That's 150 thousand tomans.",
+   "refs": [
+    "line:s-u6-cafe-8"
+   ],
+   "section": "At the café (dialogue)",
+   "cue": "Reza (waiter)"
+  },
+  {
+   "n": 87,
+   "text": "کارت می‌کشم. مهمون من!",
+   "tr": "kârt mikesham. mehmun-e man!",
+   "gloss": "I'll pay by card. My treat!",
+   "refs": [
+    "line:s-u6-cafe-9"
+   ],
+   "section": "At the café (dialogue)",
+   "cue": "Maryam"
+  },
+  {
+   "n": 88,
+   "text": "سلام، خوش اومدید! چی میل دارید؟",
+   "tr": "salâm, khosh umadid! chi meyl dârid?",
+   "gloss": "Hello, welcome! What would you like?",
+   "refs": [
+    "phrase:t-u6-ordering-0"
+   ],
+   "section": "Role-play · Ordering at a café",
+   "cue": null
+  },
+  {
+   "n": 89,
+   "text": "یه … می‌خوام",
+   "tr": "ye … mikhâm",
+   "gloss": "I'd like a …",
+   "refs": [
+    "phrase:t-u6-ordering-1"
+   ],
+   "section": "Role-play · Ordering at a café",
+   "cue": null
+  }
+ ]
+}

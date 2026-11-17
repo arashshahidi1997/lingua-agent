@@ -1,0 +1,984 @@
+{
+ "course": "fa-en-a1",
+ "session": "3-verbs-around",
+ "title": "Everyday verbs · getting around",
+ "units": [
+  "u7",
+  "u8"
+ ],
+ "clips": [
+  {
+   "n": 1,
+   "text": "می‌روم",
+   "tr": "miravam",
+   "gloss": "I go",
+   "refs": [
+    "item:miravam"
+   ],
+   "section": "Everyday verbs · I go, you go",
+   "cue": null
+  },
+  {
+   "n": 2,
+   "text": "می‌روی",
+   "tr": "miravi",
+   "gloss": "you go (informal)",
+   "refs": [
+    "item:miravi"
+   ],
+   "section": "Everyday verbs · I go, you go",
+   "cue": null
+  },
+  {
+   "n": 3,
+   "text": "می‌رود",
+   "tr": "miravad",
+   "gloss": "he / she goes",
+   "refs": [
+    "item:miravad"
+   ],
+   "section": "Everyday verbs · I go, you go",
+   "cue": null
+  },
+  {
+   "n": 4,
+   "text": "می‌رویم",
+   "tr": "miravim",
+   "gloss": "we go",
+   "refs": [
+    "item:miravim"
+   ],
+   "section": "Everyday verbs · I go, you go",
+   "cue": null
+  },
+  {
+   "n": 5,
+   "text": "می‌روید",
+   "tr": "miravid",
+   "gloss": "you go (polite / plural)",
+   "refs": [
+    "item:miravid"
+   ],
+   "section": "Everyday verbs · I go, you go",
+   "cue": null
+  },
+  {
+   "n": 6,
+   "text": "می‌روند",
+   "tr": "miravand",
+   "gloss": "they go",
+   "refs": [
+    "item:miravand"
+   ],
+   "section": "Everyday verbs · I go, you go",
+   "cue": null
+  },
+  {
+   "n": 7,
+   "text": "نمی‌روم",
+   "tr": "nemiravam",
+   "gloss": "I don't go",
+   "refs": [
+    "item:nemiravam"
+   ],
+   "section": "Everyday verbs · I go, you go",
+   "cue": null
+  },
+  {
+   "n": 8,
+   "text": "می‌رم",
+   "tr": "miram",
+   "gloss": "I go (spoken)",
+   "refs": [
+    "item:miram"
+   ],
+   "section": "Everyday verbs · I go, you go",
+   "cue": null
+  },
+  {
+   "n": 9,
+   "text": "می‌خورم",
+   "tr": "mikhoram",
+   "gloss": "I eat",
+   "refs": [
+    "item:mikhoram"
+   ],
+   "section": "Everyday verbs · Eat, drink, read",
+   "cue": null
+  },
+  {
+   "n": 10,
+   "text": "چای می‌خورم",
+   "tr": "chây mikhoram",
+   "gloss": "I drink tea",
+   "refs": [
+    "item:chay-mikhoram"
+   ],
+   "section": "Everyday verbs · Eat, drink, read",
+   "cue": null
+  },
+  {
+   "n": 11,
+   "text": "غذا می‌خوریم",
+   "tr": "ghazâ mikhorim",
+   "gloss": "we eat (a meal)",
+   "refs": [
+    "item:ghaza-mikhorim"
+   ],
+   "section": "Everyday verbs · Eat, drink, read",
+   "cue": null
+  },
+  {
+   "n": 12,
+   "text": "نمی‌خورم",
+   "tr": "nemikhoram",
+   "gloss": "I don't eat",
+   "refs": [
+    "item:nemikhoram"
+   ],
+   "section": "Everyday verbs · Eat, drink, read",
+   "cue": null
+  },
+  {
+   "n": 13,
+   "text": "می‌خوانم",
+   "tr": "mikhânam",
+   "gloss": "I read",
+   "refs": [
+    "item:mikhanam"
+   ],
+   "section": "Everyday verbs · Eat, drink, read",
+   "cue": null
+  },
+  {
+   "n": 14,
+   "text": "کتاب می‌خواند",
+   "tr": "ketâb mikhânad",
+   "gloss": "he / she reads a book",
+   "refs": [
+    "item:ketab-mikhanad"
+   ],
+   "section": "Everyday verbs · Eat, drink, read",
+   "cue": null
+  },
+  {
+   "n": 15,
+   "text": "فارسی می‌خوانم",
+   "tr": "fârsi mikhânam",
+   "gloss": "I study Persian",
+   "refs": [
+    "item:farsi-mikhanam",
+    "phrase:t-u7-bus-to-isfahan-2"
+   ],
+   "section": "Everyday verbs · Eat, drink, read",
+   "cue": null
+  },
+  {
+   "n": 16,
+   "text": "روزنامه می‌خوانی؟",
+   "tr": "ruznâme mikhâni?",
+   "gloss": "do you read the newspaper?",
+   "refs": [
+    "item:ruzname-mikhani"
+   ],
+   "section": "Everyday verbs · Eat, drink, read",
+   "cue": null
+  },
+  {
+   "n": 17,
+   "text": "کار می‌کنم",
+   "tr": "kâr mikonam",
+   "gloss": "I work",
+   "refs": [
+    "item:kar-mikonam"
+   ],
+   "section": "Everyday verbs · Where I live, what I do",
+   "cue": null
+  },
+  {
+   "n": 18,
+   "text": "چه کار می‌کنید؟",
+   "tr": "che kâr mikonid?",
+   "gloss": "what do you do? (job)",
+   "refs": [
+    "item:che-kar-mikonid"
+   ],
+   "section": "Everyday verbs · Where I live, what I do",
+   "cue": null
+  },
+  {
+   "n": 19,
+   "text": "کجا کار می‌کنید؟",
+   "tr": "kojâ kâr mikonid?",
+   "gloss": "where do you work?",
+   "refs": [
+    "item:koja-kar-mikonid"
+   ],
+   "section": "Everyday verbs · Where I live, what I do",
+   "cue": null
+  },
+  {
+   "n": 20,
+   "text": "در بیمارستان کار می‌کنم",
+   "tr": "dar bimârestân kâr mikonam",
+   "gloss": "I work in a hospital",
+   "refs": [
+    "item:bimarestan-kar"
+   ],
+   "section": "Everyday verbs · Where I live, what I do",
+   "cue": null
+  },
+  {
+   "n": 21,
+   "text": "زندگی می‌کنم",
+   "tr": "zendegi mikonam",
+   "gloss": "I live",
+   "refs": [
+    "item:zendegi-mikonam"
+   ],
+   "section": "Everyday verbs · Where I live, what I do",
+   "cue": null
+  },
+  {
+   "n": 22,
+   "text": "کجا زندگی می‌کنی؟",
+   "tr": "kojâ zendegi mikoni?",
+   "gloss": "where do you live? (informal)",
+   "refs": [
+    "item:koja-zendegi"
+   ],
+   "section": "Everyday verbs · Where I live, what I do",
+   "cue": null
+  },
+  {
+   "n": 23,
+   "text": "در تهران زندگی می‌کنم",
+   "tr": "dar Tehrân zendegi mikonam",
+   "gloss": "I live in Tehran",
+   "refs": [
+    "item:tehran-zendegi",
+    "phrase:t-u7-bus-to-isfahan-1"
+   ],
+   "section": "Everyday verbs · Where I live, what I do",
+   "cue": null
+  },
+  {
+   "n": 24,
+   "text": "او در شیراز زندگی می‌کند",
+   "tr": "u dar Shirâz zendegi mikonad",
+   "gloss": "he / she lives in Shiraz",
+   "refs": [
+    "item:shiraz-zendegi"
+   ],
+   "section": "Everyday verbs · Where I live, what I do",
+   "cue": null
+  },
+  {
+   "n": 25,
+   "text": "دارم",
+   "tr": "dâram",
+   "gloss": "I have",
+   "refs": [
+    "item:daram"
+   ],
+   "section": "Everyday verbs · Have and like",
+   "cue": null
+  },
+  {
+   "n": 26,
+   "text": "یک برادر دارم",
+   "tr": "yek barâdar dâram",
+   "gloss": "I have a brother",
+   "refs": [
+    "item:yek-baradar-daram"
+   ],
+   "section": "Everyday verbs · Have and like",
+   "cue": null
+  },
+  {
+   "n": 27,
+   "text": "ماشین ندارم",
+   "tr": "mâshin nadâram",
+   "gloss": "I don't have a car",
+   "refs": [
+    "item:mashin-nadaram"
+   ],
+   "section": "Everyday verbs · Have and like",
+   "cue": null
+  },
+  {
+   "n": 28,
+   "text": "دوست دارم",
+   "tr": "dust dâram",
+   "gloss": "I like / I love",
+   "refs": [
+    "item:dust-daram"
+   ],
+   "section": "Everyday verbs · Have and like",
+   "cue": null
+  },
+  {
+   "n": 29,
+   "text": "چای دوست دارم",
+   "tr": "chây dust dâram",
+   "gloss": "I like tea",
+   "refs": [
+    "item:chay-dust-daram"
+   ],
+   "section": "Everyday verbs · Have and like",
+   "cue": null
+  },
+  {
+   "n": 30,
+   "text": "قهوه دوست داری؟",
+   "tr": "ghahve dust dâri?",
+   "gloss": "do you like coffee?",
+   "refs": [
+    "item:ghahve-dust-dari"
+   ],
+   "section": "Everyday verbs · Have and like",
+   "cue": null
+  },
+  {
+   "n": 31,
+   "text": "ایران را دوست دارم",
+   "tr": "Irân râ dust dâram",
+   "gloss": "I love Iran",
+   "refs": [
+    "item:iran-dust-daram",
+    "phrase:t-u7-bus-to-isfahan-3"
+   ],
+   "section": "Everyday verbs · Have and like",
+   "cue": null
+  },
+  {
+   "n": 32,
+   "text": "دوست ندارم",
+   "tr": "dust nadâram",
+   "gloss": "I don't like it",
+   "refs": [
+    "item:dust-nadaram"
+   ],
+   "section": "Everyday verbs · Have and like",
+   "cue": null
+  },
+  {
+   "n": 33,
+   "text": "مریم در تهران زندگی می‌کند.",
+   "tr": "Maryam dar Tehrân zendegi mikonad.",
+   "gloss": "Maryam lives in Tehran.",
+   "refs": [
+    "line:s-u7-maryams-day-0"
+   ],
+   "section": "A day in Maryam's life (story)",
+   "cue": "Narrator"
+  },
+  {
+   "n": 34,
+   "text": "او معلم است و در یک مدرسه کار می‌کند.",
+   "tr": "u mo'allem ast va dar yek madrese kâr mikonad.",
+   "gloss": "She is a teacher and works at a school.",
+   "refs": [
+    "line:s-u7-maryams-day-1"
+   ],
+   "section": "A day in Maryam's life (story)",
+   "cue": "Narrator"
+  },
+  {
+   "n": 35,
+   "text": "صبح‌ها چای می‌خورد و روزنامه می‌خواند.",
+   "tr": "sobh-hâ chây mikhorad va ruznâme mikhânad.",
+   "gloss": "In the mornings she drinks tea and reads the newspaper.",
+   "refs": [
+    "line:s-u7-maryams-day-2"
+   ],
+   "section": "A day in Maryam's life (story)",
+   "cue": "Narrator"
+  },
+  {
+   "n": 36,
+   "text": "ساعت هفت و نیم به مدرسه می‌رود.",
+   "tr": "sâ'at-e haft-o nim be madrese miravad.",
+   "gloss": "At half past seven she goes to school.",
+   "refs": [
+    "line:s-u7-maryams-day-3"
+   ],
+   "section": "A day in Maryam's life (story)",
+   "cue": "Narrator"
+  },
+  {
+   "n": 37,
+   "text": "مریم یک برادر دارد. اسم او رضا است.",
+   "tr": "Maryam yek barâdar dârad. esm-e u Rezâ ast.",
+   "gloss": "Maryam has a brother. His name is Reza.",
+   "refs": [
+    "line:s-u7-maryams-day-4"
+   ],
+   "section": "A day in Maryam's life (story)",
+   "cue": "Narrator"
+  },
+  {
+   "n": 38,
+   "text": "رضا در یک کافه کار می‌کند.",
+   "tr": "Rezâ dar yek kâfe kâr mikonad.",
+   "gloss": "Reza works in a café.",
+   "refs": [
+    "line:s-u7-maryams-day-5"
+   ],
+   "section": "A day in Maryam's life (story)",
+   "cue": "Narrator"
+  },
+  {
+   "n": 39,
+   "text": "مریم قهوه دوست ندارد، ولی کیک شکلاتی را خیلی دوست دارد.",
+   "tr": "Maryam ghahve dust nadârad, vali kik-e shokolâti râ kheyli dust dârad.",
+   "gloss": "Maryam doesn't like coffee, but she loves chocolate cake.",
+   "refs": [
+    "line:s-u7-maryams-day-6"
+   ],
+   "section": "A day in Maryam's life (story)",
+   "cue": "Narrator"
+  },
+  {
+   "n": 40,
+   "text": "جمعه‌ها با سارا و علی به کافه‌ی رضا می‌رود.",
+   "tr": "jom'e-hâ bâ Sârâ va Ali be kâfe-ye Rezâ miravad.",
+   "gloss": "On Fridays she goes to Reza's café with Sara and Ali.",
+   "refs": [
+    "line:s-u7-maryams-day-7"
+   ],
+   "section": "A day in Maryam's life (story)",
+   "cue": "Narrator"
+  },
+  {
+   "n": 41,
+   "text": "سلام! شما توریست هستید یا اینجا زندگی می‌کنید؟",
+   "tr": "salâm! shomâ turist hastid yâ injâ zendegi mikonid?",
+   "gloss": "Hi! Are you a tourist or do you live here?",
+   "refs": [
+    "phrase:t-u7-bus-to-isfahan-0"
+   ],
+   "section": "Role-play · On the bus to Isfahan",
+   "cue": null
+  },
+  {
+   "n": 42,
+   "text": "شما چه کار می‌کنید؟",
+   "tr": "shomâ che kâr mikonid?",
+   "gloss": "what do you do?",
+   "refs": [
+    "phrase:t-u7-bus-to-isfahan-4"
+   ],
+   "section": "Role-play · On the bus to Isfahan",
+   "cue": null
+  },
+  {
+   "n": 43,
+   "text": "خیابان",
+   "tr": "khiyâbân",
+   "gloss": "street",
+   "refs": [
+    "item:khiyaban"
+   ],
+   "section": "Getting around · Places in town",
+   "cue": null
+  },
+  {
+   "n": 44,
+   "text": "میدان",
+   "tr": "meydân",
+   "gloss": "square",
+   "refs": [
+    "item:meydan"
+   ],
+   "section": "Getting around · Places in town",
+   "cue": null
+  },
+  {
+   "n": 45,
+   "text": "ایستگاه مترو",
+   "tr": "istgâh-e metro",
+   "gloss": "metro station",
+   "refs": [
+    "item:istgahe-metro"
+   ],
+   "section": "Getting around · Places in town",
+   "cue": null
+  },
+  {
+   "n": 46,
+   "text": "بیمارستان",
+   "tr": "bimârestân",
+   "gloss": "hospital",
+   "refs": [
+    "item:bimarestan"
+   ],
+   "section": "Getting around · Places in town",
+   "cue": null
+  },
+  {
+   "n": 47,
+   "text": "داروخانه",
+   "tr": "dârukhâne",
+   "gloss": "pharmacy",
+   "refs": [
+    "item:darukhane"
+   ],
+   "section": "Getting around · Places in town",
+   "cue": null
+  },
+  {
+   "n": 48,
+   "text": "فرودگاه",
+   "tr": "forudgâh",
+   "gloss": "airport",
+   "refs": [
+    "item:forudgah"
+   ],
+   "section": "Getting around · Places in town",
+   "cue": null
+  },
+  {
+   "n": 49,
+   "text": "بانک",
+   "tr": "bânk",
+   "gloss": "bank",
+   "refs": [
+    "item:bank"
+   ],
+   "section": "Getting around · Places in town",
+   "cue": null
+  },
+  {
+   "n": 50,
+   "text": "بازار",
+   "tr": "bâzâr",
+   "gloss": "bazaar / market",
+   "refs": [
+    "item:bazar"
+   ],
+   "section": "Getting around · Places in town",
+   "cue": null
+  },
+  {
+   "n": 51,
+   "text": "ببخشید",
+   "tr": "bebakhshid",
+   "gloss": "excuse me / sorry",
+   "refs": [
+    "item:bebakhshid"
+   ],
+   "section": "Getting around · Where is…?",
+   "cue": null
+  },
+  {
+   "n": 52,
+   "text": "ایستگاه مترو کجاست؟",
+   "tr": "istgâh-e metro kojâst?",
+   "gloss": "where is the metro station?",
+   "refs": [
+    "item:metro-kojast"
+   ],
+   "section": "Getting around · Where is…?",
+   "cue": null
+  },
+  {
+   "n": 53,
+   "text": "نزدیک",
+   "tr": "nazdik",
+   "gloss": "near",
+   "refs": [
+    "item:nazdik"
+   ],
+   "section": "Getting around · Where is…?",
+   "cue": null
+  },
+  {
+   "n": 54,
+   "text": "دور",
+   "tr": "dur",
+   "gloss": "far",
+   "refs": [
+    "item:dur"
+   ],
+   "section": "Getting around · Where is…?",
+   "cue": null
+  },
+  {
+   "n": 55,
+   "text": "مستقیم",
+   "tr": "mostaghim",
+   "gloss": "straight on",
+   "refs": [
+    "item:mostaghim"
+   ],
+   "section": "Getting around · Where is…?",
+   "cue": null
+  },
+  {
+   "n": 56,
+   "text": "دست راست",
+   "tr": "dast-e râst",
+   "gloss": "on the right",
+   "refs": [
+    "item:dast-e-rast",
+    "phrase:t-u8-taxi-ride-3"
+   ],
+   "section": "Getting around · Where is…?",
+   "cue": null
+  },
+  {
+   "n": 57,
+   "text": "دست چپ",
+   "tr": "dast-e chap",
+   "gloss": "on the left",
+   "refs": [
+    "item:dast-e-chap"
+   ],
+   "section": "Getting around · Where is…?",
+   "cue": null
+  },
+  {
+   "n": 58,
+   "text": "به چپ بپیچید",
+   "tr": "be chap bepichid",
+   "gloss": "turn left",
+   "refs": [
+    "item:be-chap-bepichid"
+   ],
+   "section": "Getting around · Where is…?",
+   "cue": null
+  },
+  {
+   "n": 59,
+   "text": "تاکسی",
+   "tr": "tâksi",
+   "gloss": "taxi",
+   "refs": [
+    "item:taksi"
+   ],
+   "section": "Getting around · In a taxi",
+   "cue": null
+  },
+  {
+   "n": 60,
+   "text": "دربست",
+   "tr": "darbast",
+   "gloss": "private hire (the whole taxi)",
+   "refs": [
+    "item:darbast"
+   ],
+   "section": "Getting around · In a taxi",
+   "cue": null
+  },
+  {
+   "n": 61,
+   "text": "آقا، فرودگاه؟",
+   "tr": "âghâ, forudgâh?",
+   "gloss": "sir, going to the airport?",
+   "refs": [
+    "item:agha-forudgah"
+   ],
+   "section": "Getting around · In a taxi",
+   "cue": null
+  },
+  {
+   "n": 62,
+   "text": "به فرودگاه می‌رم",
+   "tr": "be forudgâh miram",
+   "gloss": "I'm going to the airport (spoken)",
+   "refs": [
+    "item:be-forudgah-miram"
+   ],
+   "section": "Getting around · In a taxi",
+   "cue": null
+  },
+  {
+   "n": 63,
+   "text": "اینجا نگه دارید",
+   "tr": "injâ negah dârid",
+   "gloss": "stop here (polite)",
+   "refs": [
+    "item:inja-negah-darid"
+   ],
+   "section": "Getting around · In a taxi",
+   "cue": null
+  },
+  {
+   "n": 64,
+   "text": "کرایه چقدر می‌شه؟",
+   "tr": "kerâye cheghadr mishe?",
+   "gloss": "how much is the fare?",
+   "refs": [
+    "item:keraye-cheghadr",
+    "phrase:t-u8-taxi-ride-5"
+   ],
+   "section": "Getting around · In a taxi",
+   "cue": null
+  },
+  {
+   "n": 65,
+   "text": "پیاده می‌شم",
+   "tr": "piyâde misham",
+   "gloss": "I'll get out here (spoken)",
+   "refs": [
+    "item:piyade-misham"
+   ],
+   "section": "Getting around · In a taxi",
+   "cue": null
+  },
+  {
+   "n": 66,
+   "text": "خیلی ممنون",
+   "tr": "kheyli mamnun",
+   "gloss": "thanks a lot",
+   "refs": [
+    "item:kheyli-mamnun"
+   ],
+   "section": "Getting around · In a taxi",
+   "cue": null
+  },
+  {
+   "n": 67,
+   "text": "رفتم",
+   "tr": "raftam",
+   "gloss": "I went",
+   "refs": [
+    "item:raftam"
+   ],
+   "section": "Getting around · Where did you go?",
+   "cue": null
+  },
+  {
+   "n": 68,
+   "text": "نرفتم",
+   "tr": "naraftam",
+   "gloss": "I didn't go",
+   "refs": [
+    "item:naraftam"
+   ],
+   "section": "Getting around · Where did you go?",
+   "cue": null
+  },
+  {
+   "n": 69,
+   "text": "خوردم",
+   "tr": "khordam",
+   "gloss": "I ate / I drank",
+   "refs": [
+    "item:khordam"
+   ],
+   "section": "Getting around · Where did you go?",
+   "cue": null
+  },
+  {
+   "n": 70,
+   "text": "دیروز",
+   "tr": "diruz",
+   "gloss": "yesterday",
+   "refs": [
+    "item:diruz"
+   ],
+   "section": "Getting around · Where did you go?",
+   "cue": null
+  },
+  {
+   "n": 71,
+   "text": "دیروز به بازار رفتم",
+   "tr": "diruz be bâzâr raftam",
+   "gloss": "yesterday I went to the bazaar",
+   "refs": [
+    "item:diruz-bazar"
+   ],
+   "section": "Getting around · Where did you go?",
+   "cue": null
+  },
+  {
+   "n": 72,
+   "text": "کجا رفتید؟",
+   "tr": "kojâ raftid?",
+   "gloss": "where did you go? (polite)",
+   "refs": [
+    "item:koja-raftid"
+   ],
+   "section": "Getting around · Where did you go?",
+   "cue": null
+  },
+  {
+   "n": 73,
+   "text": "ناهار خوردی؟",
+   "tr": "nâhâr khordi?",
+   "gloss": "have you had lunch?",
+   "refs": [
+    "item:nahar-khordi"
+   ],
+   "section": "Getting around · Where did you go?",
+   "cue": null
+  },
+  {
+   "n": 74,
+   "text": "رسیدم",
+   "tr": "residam",
+   "gloss": "I've arrived",
+   "refs": [
+    "item:residam"
+   ],
+   "section": "Getting around · Where did you go?",
+   "cue": null
+  },
+  {
+   "n": 75,
+   "text": "آقا، میدان آزادی؟",
+   "tr": "âghâ, meydân-e Âzâdi?",
+   "gloss": "Sir, Azadi Square?",
+   "refs": [
+    "line:s-u8-taxi-0"
+   ],
+   "section": "A taxi to Azadi Square (dialogue)",
+   "cue": "Sara"
+  },
+  {
+   "n": 76,
+   "text": "بله، بفرمایید.",
+   "tr": "bale, befarmâyid.",
+   "gloss": "Yes, get in.",
+   "refs": [
+    "line:s-u8-taxi-1"
+   ],
+   "section": "A taxi to Azadi Square (dialogue)",
+   "cue": "Taxi driver"
+  },
+  {
+   "n": 77,
+   "text": "شما ایرانی نیستید؟ فارسی‌تون خوبه!",
+   "tr": "shomâ irâni nistid? fârsi-tun khube!",
+   "gloss": "You're not Iranian? Your Persian is good!",
+   "refs": [
+    "line:s-u8-taxi-2"
+   ],
+   "section": "A taxi to Azadi Square (dialogue)",
+   "cue": "Taxi driver"
+  },
+  {
+   "n": 78,
+   "text": "مرسی! من انگلیسی هستم. تهران زندگی می‌کنم.",
+   "tr": "mersi! man engelisi hastam. Tehrân zendegi mikonam.",
+   "gloss": "Thanks! I'm English. I live in Tehran.",
+   "refs": [
+    "line:s-u8-taxi-3"
+   ],
+   "section": "A taxi to Azadi Square (dialogue)",
+   "cue": "Sara"
+  },
+  {
+   "n": 79,
+   "text": "تهران رو دوست دارید؟",
+   "tr": "Tehrân ro dust dârid?",
+   "gloss": "Do you like Tehran?",
+   "refs": [
+    "line:s-u8-taxi-4"
+   ],
+   "section": "A taxi to Azadi Square (dialogue)",
+   "cue": "Taxi driver"
+  },
+  {
+   "n": 80,
+   "text": "خیلی! دیروز به بازار رفتم. خیلی قشنگ بود.",
+   "tr": "kheyli! diruz be bâzâr raftam. kheyli ghashang bud.",
+   "gloss": "A lot! Yesterday I went to the bazaar. It was beautiful.",
+   "refs": [
+    "line:s-u8-taxi-5"
+   ],
+   "section": "A taxi to Azadi Square (dialogue)",
+   "cue": "Sara"
+  },
+  {
+   "n": 81,
+   "text": "رسیدیم. میدان آزادی.",
+   "tr": "residim. meydân-e Âzâdi.",
+   "gloss": "Here we are. Azadi Square.",
+   "refs": [
+    "line:s-u8-taxi-6"
+   ],
+   "section": "A taxi to Azadi Square (dialogue)",
+   "cue": "Taxi driver"
+  },
+  {
+   "n": 82,
+   "text": "اینجا نگه دارید، لطفاً. کرایه چقدر می‌شه؟",
+   "tr": "injâ negah dârid, lotfan. kerâye cheghadr mishe?",
+   "gloss": "Stop here, please. How much is the fare?",
+   "refs": [
+    "line:s-u8-taxi-7"
+   ],
+   "section": "A taxi to Azadi Square (dialogue)",
+   "cue": "Sara"
+  },
+  {
+   "n": 83,
+   "text": "قابلی نداره.",
+   "tr": "ghâbeli nadâre.",
+   "gloss": "It's nothing. (polite)",
+   "refs": [
+    "line:s-u8-taxi-8"
+   ],
+   "section": "A taxi to Azadi Square (dialogue)",
+   "cue": "Taxi driver"
+  },
+  {
+   "n": 84,
+   "text": "نه، خواهش می‌کنم! بفرمایید.",
+   "tr": "na, khâhesh mikonam! befarmâyid.",
+   "gloss": "No, please! Here you are.",
+   "refs": [
+    "line:s-u8-taxi-9"
+   ],
+   "section": "A taxi to Azadi Square (dialogue)",
+   "cue": "Sara"
+  },
+  {
+   "n": 85,
+   "text": "سلام، بفرمایید. کجا می‌رید؟",
+   "tr": "salâm, befarmâyid. kojâ mirid?",
+   "gloss": "Hello, get in. Where are you going?",
+   "refs": [
+    "phrase:t-u8-taxi-ride-0"
+   ],
+   "section": "Role-play · Taking a taxi",
+   "cue": null
+  },
+  {
+   "n": 86,
+   "text": "به ایستگاه مترو تجریش می‌رم",
+   "tr": "be istgâh-e metro-ye Tajrish miram",
+   "gloss": "I'm going to Tajrish metro station",
+   "refs": [
+    "phrase:t-u8-taxi-ride-1"
+   ],
+   "section": "Role-play · Taking a taxi",
+   "cue": null
+  },
+  {
+   "n": 87,
+   "text": "مستقیم برید",
+   "tr": "mostaghim berid",
+   "gloss": "go straight on",
+   "refs": [
+    "phrase:t-u8-taxi-ride-2"
+   ],
+   "section": "Role-play · Taking a taxi",
+   "cue": null
+  },
+  {
+   "n": 88,
+   "text": "اینجا نگه دارید، لطفاً",
+   "tr": "injâ negah dârid, lotfan",
+   "gloss": "stop here, please",
+   "refs": [
+    "phrase:t-u8-taxi-ride-4"
+   ],
+   "section": "Role-play · Taking a taxi",
+   "cue": null
+  }
+ ]
+}

@@ -1,0 +1,827 @@
+{
+ "course": "fa-en-a1",
+ "session": "1-hello",
+ "title": "Hello · who's who",
+ "units": [
+  "u1",
+  "u4"
+ ],
+ "clips": [
+  {
+   "n": 1,
+   "text": "سلام",
+   "tr": "salâm",
+   "gloss": "hello",
+   "refs": [
+    "item:salam"
+   ],
+   "section": "Hello · First greetings",
+   "cue": null
+  },
+  {
+   "n": 2,
+   "text": "خداحافظ",
+   "tr": "khodâhâfez",
+   "gloss": "goodbye",
+   "refs": [
+    "item:khodahafez"
+   ],
+   "section": "Hello · First greetings",
+   "cue": null
+  },
+  {
+   "n": 3,
+   "text": "مرسی",
+   "tr": "mersi",
+   "gloss": "thanks",
+   "refs": [
+    "item:merci"
+   ],
+   "section": "Hello · First greetings",
+   "cue": null
+  },
+  {
+   "n": 4,
+   "text": "ممنون",
+   "tr": "mamnun",
+   "gloss": "thank you",
+   "refs": [
+    "item:mamnun"
+   ],
+   "section": "Hello · First greetings",
+   "cue": null
+  },
+  {
+   "n": 5,
+   "text": "بله",
+   "tr": "bale",
+   "gloss": "yes",
+   "refs": [
+    "item:bale",
+    "phrase:t-u1-new-neighbour-1"
+   ],
+   "section": "Hello · First greetings",
+   "cue": null
+  },
+  {
+   "n": 6,
+   "text": "نه",
+   "tr": "na",
+   "gloss": "no",
+   "refs": [
+    "item:na"
+   ],
+   "section": "Hello · First greetings",
+   "cue": null
+  },
+  {
+   "n": 7,
+   "text": "حالت چطوره؟",
+   "tr": "hâlet chetore?",
+   "gloss": "how are you? (informal)",
+   "refs": [
+    "item:halet-chetore"
+   ],
+   "section": "Hello · How are you?",
+   "cue": null
+  },
+  {
+   "n": 8,
+   "text": "حال شما چطور است؟",
+   "tr": "hâl-e shomâ chetor ast?",
+   "gloss": "how are you? (polite)",
+   "refs": [
+    "item:hale-shoma"
+   ],
+   "section": "Hello · How are you?",
+   "cue": null
+  },
+  {
+   "n": 9,
+   "text": "خوبم",
+   "tr": "khubam",
+   "gloss": "I'm fine",
+   "refs": [
+    "item:khubam"
+   ],
+   "section": "Hello · How are you?",
+   "cue": null
+  },
+  {
+   "n": 10,
+   "text": "خیلی خوب",
+   "tr": "kheyli khub",
+   "gloss": "very good",
+   "refs": [
+    "item:kheyli-khub"
+   ],
+   "section": "Hello · How are you?",
+   "cue": null
+  },
+  {
+   "n": 11,
+   "text": "تو چطوری؟",
+   "tr": "to chetori?",
+   "gloss": "how about you? (informal)",
+   "refs": [
+    "item:to-chetori"
+   ],
+   "section": "Hello · How are you?",
+   "cue": null
+  },
+  {
+   "n": 12,
+   "text": "بد نیستم",
+   "tr": "bad nistam",
+   "gloss": "I'm not bad",
+   "refs": [
+    "item:bad-nistam"
+   ],
+   "section": "Hello · How are you?",
+   "cue": null
+  },
+  {
+   "n": 13,
+   "text": "اسم من سارا است",
+   "tr": "esm-e man Sârâ ast",
+   "gloss": "my name is Sara",
+   "refs": [
+    "item:esme-man"
+   ],
+   "section": "Hello · My name is…",
+   "cue": null
+  },
+  {
+   "n": 14,
+   "text": "اسمت چیه؟",
+   "tr": "esmet chiye?",
+   "gloss": "what's your name? (informal)",
+   "refs": [
+    "item:esmet-chie"
+   ],
+   "section": "Hello · My name is…",
+   "cue": null
+  },
+  {
+   "n": 15,
+   "text": "اسم شما چیست؟",
+   "tr": "esm-e shomâ chist?",
+   "gloss": "what is your name? (polite)",
+   "refs": [
+    "item:esme-shoma"
+   ],
+   "section": "Hello · My name is…",
+   "cue": null
+  },
+  {
+   "n": 16,
+   "text": "خوشبختم",
+   "tr": "khoshbakhtam",
+   "gloss": "nice to meet you",
+   "refs": [
+    "item:khoshbakhtam",
+    "phrase:t-u1-new-neighbour-3"
+   ],
+   "section": "Hello · My name is…",
+   "cue": null
+  },
+  {
+   "n": 17,
+   "text": "من",
+   "tr": "man",
+   "gloss": "I / me",
+   "refs": [
+    "item:man"
+   ],
+   "section": "Hello · My name is…",
+   "cue": null
+  },
+  {
+   "n": 18,
+   "text": "شما",
+   "tr": "shomâ",
+   "gloss": "you (polite / plural)",
+   "refs": [
+    "item:shoma"
+   ],
+   "section": "Hello · My name is…",
+   "cue": null
+  },
+  {
+   "n": 19,
+   "text": "تو",
+   "tr": "to",
+   "gloss": "you (informal)",
+   "refs": [
+    "item:to"
+   ],
+   "section": "Hello · My name is…",
+   "cue": null
+  },
+  {
+   "n": 20,
+   "text": "سلام!",
+   "tr": "salâm!",
+   "gloss": "Hello!",
+   "refs": [
+    "line:s-u1-meeting-0"
+   ],
+   "section": "Hi, I'm Sara (dialogue)",
+   "cue": "Sara"
+  },
+  {
+   "n": 21,
+   "text": "سلام! حالت چطوره؟",
+   "tr": "salâm! hâlet chetore?",
+   "gloss": "Hi! How are you?",
+   "refs": [
+    "line:s-u1-meeting-1"
+   ],
+   "section": "Hi, I'm Sara (dialogue)",
+   "cue": "Ali"
+  },
+  {
+   "n": 22,
+   "text": "خوبم، مرسی. تو چطوری؟",
+   "tr": "khubam, mersi. to chetori?",
+   "gloss": "I'm fine, thanks. How about you?",
+   "refs": [
+    "line:s-u1-meeting-2"
+   ],
+   "section": "Hi, I'm Sara (dialogue)",
+   "cue": "Sara"
+  },
+  {
+   "n": 23,
+   "text": "بد نیستم. اسمت چیه؟",
+   "tr": "bad nistam. esmet chiye?",
+   "gloss": "Not bad. What's your name?",
+   "refs": [
+    "line:s-u1-meeting-3"
+   ],
+   "section": "Hi, I'm Sara (dialogue)",
+   "cue": "Ali"
+  },
+  {
+   "n": 24,
+   "text": "اسم من ساراست. اسم تو چیه؟",
+   "tr": "esm-e man Sârâst. esm-e to chiye?",
+   "gloss": "My name is Sara. What's your name?",
+   "refs": [
+    "line:s-u1-meeting-4"
+   ],
+   "section": "Hi, I'm Sara (dialogue)",
+   "cue": "Sara"
+  },
+  {
+   "n": 25,
+   "text": "من علی هستم. خوشبختم!",
+   "tr": "man Ali hastam. khoshbakhtam!",
+   "gloss": "I'm Ali. Nice to meet you!",
+   "refs": [
+    "line:s-u1-meeting-5"
+   ],
+   "section": "Hi, I'm Sara (dialogue)",
+   "cue": "Ali"
+  },
+  {
+   "n": 26,
+   "text": "منم خوشبختم. خداحافظ!",
+   "tr": "manam khoshbakhtam. khodâhâfez!",
+   "gloss": "Nice to meet you too. Goodbye!",
+   "refs": [
+    "line:s-u1-meeting-6"
+   ],
+   "section": "Hi, I'm Sara (dialogue)",
+   "cue": "Sara"
+  },
+  {
+   "n": 27,
+   "text": "سلام! شما همسایه‌ی جدید هستید؟",
+   "tr": "salâm! shomâ hamsâye-ye jadid hastid?",
+   "gloss": "Hi! Are you the new neighbour?",
+   "refs": [
+    "phrase:t-u1-new-neighbour-0"
+   ],
+   "section": "Role-play · Your new neighbour",
+   "cue": null
+  },
+  {
+   "n": 28,
+   "text": "اسم من … است",
+   "tr": "esm-e man … ast",
+   "gloss": "my name is …",
+   "refs": [
+    "phrase:t-u1-new-neighbour-2"
+   ],
+   "section": "Role-play · Your new neighbour",
+   "cue": null
+  },
+  {
+   "n": 29,
+   "text": "او",
+   "tr": "u",
+   "gloss": "he / she",
+   "refs": [
+    "item:u"
+   ],
+   "section": "To be & who's who · He, she, we, they",
+   "cue": null
+  },
+  {
+   "n": 30,
+   "text": "ایشان",
+   "tr": "ishân",
+   "gloss": "he / she (very polite)",
+   "refs": [
+    "item:ishan"
+   ],
+   "section": "To be & who's who · He, she, we, they",
+   "cue": null
+  },
+  {
+   "n": 31,
+   "text": "ما",
+   "tr": "mâ",
+   "gloss": "we",
+   "refs": [
+    "item:ma"
+   ],
+   "section": "To be & who's who · He, she, we, they",
+   "cue": null
+  },
+  {
+   "n": 32,
+   "text": "آنها",
+   "tr": "ânhâ",
+   "gloss": "they",
+   "refs": [
+    "item:anha"
+   ],
+   "section": "To be & who's who · He, she, we, they",
+   "cue": null
+  },
+  {
+   "n": 33,
+   "text": "این",
+   "tr": "in",
+   "gloss": "this",
+   "refs": [
+    "item:in"
+   ],
+   "section": "To be & who's who · He, she, we, they",
+   "cue": null
+  },
+  {
+   "n": 34,
+   "text": "آن",
+   "tr": "ân",
+   "gloss": "that",
+   "refs": [
+    "item:an"
+   ],
+   "section": "To be & who's who · He, she, we, they",
+   "cue": null
+  },
+  {
+   "n": 35,
+   "text": "کی؟",
+   "tr": "ki?",
+   "gloss": "who? (spoken)",
+   "refs": [
+    "item:ki"
+   ],
+   "section": "To be & who's who · He, she, we, they",
+   "cue": null
+  },
+  {
+   "n": 36,
+   "text": "این کیه؟",
+   "tr": "in kiye?",
+   "gloss": "who is this? (spoken)",
+   "refs": [
+    "item:in-kiye"
+   ],
+   "section": "To be & who's who · He, she, we, they",
+   "cue": null
+  },
+  {
+   "n": 37,
+   "text": "من خسته هستم",
+   "tr": "man khaste hastam",
+   "gloss": "I am tired",
+   "refs": [
+    "item:khaste-hastam"
+   ],
+   "section": "To be & who's who · I am, you are",
+   "cue": null
+  },
+  {
+   "n": 38,
+   "text": "تو خسته هستی؟",
+   "tr": "to khaste hasti?",
+   "gloss": "are you tired? (informal)",
+   "refs": [
+    "item:khaste-hasti"
+   ],
+   "section": "To be & who's who · I am, you are",
+   "cue": null
+  },
+  {
+   "n": 39,
+   "text": "او معلم است",
+   "tr": "u mo'allem ast",
+   "gloss": "he / she is a teacher",
+   "refs": [
+    "item:moallem-ast"
+   ],
+   "section": "To be & who's who · I am, you are",
+   "cue": null
+  },
+  {
+   "n": 40,
+   "text": "ما دانشجو هستیم",
+   "tr": "mâ dâneshju hastim",
+   "gloss": "we are students",
+   "refs": [
+    "item:daneshju-hastim"
+   ],
+   "section": "To be & who's who · I am, you are",
+   "cue": null
+  },
+  {
+   "n": 41,
+   "text": "شما ایرانی هستید؟",
+   "tr": "shomâ irâni hastid?",
+   "gloss": "are you Iranian? (polite)",
+   "refs": [
+    "item:irani-hastid"
+   ],
+   "section": "To be & who's who · I am, you are",
+   "cue": null
+  },
+  {
+   "n": 42,
+   "text": "آنها اینجا هستند",
+   "tr": "ânhâ injâ hastand",
+   "gloss": "they are here",
+   "refs": [
+    "item:inja-hastand"
+   ],
+   "section": "To be & who's who · I am, you are",
+   "cue": null
+  },
+  {
+   "n": 43,
+   "text": "من خسته نیستم",
+   "tr": "man khaste nistam",
+   "gloss": "I'm not tired",
+   "refs": [
+    "item:khaste-nistam"
+   ],
+   "section": "To be & who's who · I am, you are",
+   "cue": null
+  },
+  {
+   "n": 44,
+   "text": "او اینجا نیست",
+   "tr": "u injâ nist",
+   "gloss": "he / she isn't here",
+   "refs": [
+    "item:inja-nist"
+   ],
+   "section": "To be & who's who · I am, you are",
+   "cue": null
+  },
+  {
+   "n": 45,
+   "text": "من انگلیسی هستم",
+   "tr": "man engelisi hastam",
+   "gloss": "I'm English",
+   "refs": [
+    "item:engelisi-hastam"
+   ],
+   "section": "To be & who's who · Where are you from? What do you do?",
+   "cue": null
+  },
+  {
+   "n": 46,
+   "text": "من آمریکایی هستم",
+   "tr": "man âmrikâyi hastam",
+   "gloss": "I'm American",
+   "refs": [
+    "item:amrikayi-hastam"
+   ],
+   "section": "To be & who's who · Where are you from? What do you do?",
+   "cue": null
+  },
+  {
+   "n": 47,
+   "text": "اهل کجا هستید؟",
+   "tr": "ahl-e kojâ hastid?",
+   "gloss": "where are you from? (polite)",
+   "refs": [
+    "item:ahle-koja"
+   ],
+   "section": "To be & who's who · Where are you from? What do you do?",
+   "cue": null
+  },
+  {
+   "n": 48,
+   "text": "من اهل لندن هستم",
+   "tr": "man ahl-e Landan hastam",
+   "gloss": "I'm from London",
+   "refs": [
+    "item:ahle-landan"
+   ],
+   "section": "To be & who's who · Where are you from? What do you do?",
+   "cue": null
+  },
+  {
+   "n": 49,
+   "text": "معلم",
+   "tr": "mo'allem",
+   "gloss": "teacher",
+   "refs": [
+    "item:moallem"
+   ],
+   "section": "To be & who's who · Where are you from? What do you do?",
+   "cue": null
+  },
+  {
+   "n": 50,
+   "text": "دکتر",
+   "tr": "doktor",
+   "gloss": "doctor",
+   "refs": [
+    "item:doktor"
+   ],
+   "section": "To be & who's who · Where are you from? What do you do?",
+   "cue": null
+  },
+  {
+   "n": 51,
+   "text": "دانشجو",
+   "tr": "dâneshju",
+   "gloss": "university student",
+   "refs": [
+    "item:daneshju"
+   ],
+   "section": "To be & who's who · Where are you from? What do you do?",
+   "cue": null
+  },
+  {
+   "n": 52,
+   "text": "مهندس",
+   "tr": "mohandes",
+   "gloss": "engineer",
+   "refs": [
+    "item:mohandes"
+   ],
+   "section": "To be & who's who · Where are you from? What do you do?",
+   "cue": null
+  },
+  {
+   "n": 53,
+   "text": "خانواده",
+   "tr": "khânevâde",
+   "gloss": "family",
+   "refs": [
+    "item:khanevade"
+   ],
+   "section": "To be & who's who · My family",
+   "cue": null
+  },
+  {
+   "n": 54,
+   "text": "پدر",
+   "tr": "pedar",
+   "gloss": "father",
+   "refs": [
+    "item:pedar"
+   ],
+   "section": "To be & who's who · My family",
+   "cue": null
+  },
+  {
+   "n": 55,
+   "text": "مادر",
+   "tr": "mâdar",
+   "gloss": "mother",
+   "refs": [
+    "item:madar"
+   ],
+   "section": "To be & who's who · My family",
+   "cue": null
+  },
+  {
+   "n": 56,
+   "text": "برادر",
+   "tr": "barâdar",
+   "gloss": "brother",
+   "refs": [
+    "item:baradar"
+   ],
+   "section": "To be & who's who · My family",
+   "cue": null
+  },
+  {
+   "n": 57,
+   "text": "خواهر",
+   "tr": "khâhar",
+   "gloss": "sister",
+   "refs": [
+    "item:khahar"
+   ],
+   "section": "To be & who's who · My family",
+   "cue": null
+  },
+  {
+   "n": 58,
+   "text": "پسر",
+   "tr": "pesar",
+   "gloss": "son / boy",
+   "refs": [
+    "item:pesar"
+   ],
+   "section": "To be & who's who · My family",
+   "cue": null
+  },
+  {
+   "n": 59,
+   "text": "دختر",
+   "tr": "dokhtar",
+   "gloss": "daughter / girl",
+   "refs": [
+    "item:dokhtar"
+   ],
+   "section": "To be & who's who · My family",
+   "cue": null
+  },
+  {
+   "n": 60,
+   "text": "این مادر من است",
+   "tr": "in mâdar-e man ast",
+   "gloss": "this is my mother",
+   "refs": [
+    "item:in-madare-man"
+   ],
+   "section": "To be & who's who · My family",
+   "cue": null
+  },
+  {
+   "n": 61,
+   "text": "علی، این مریمه. همسایه‌ی منه.",
+   "tr": "Ali, in Maryame. hamsâye-ye mane.",
+   "gloss": "Ali, this is Maryam. She's my neighbour.",
+   "refs": [
+    "line:s-u4-who-is-this-0"
+   ],
+   "section": "Who's this? (dialogue)",
+   "cue": "Sara"
+  },
+  {
+   "n": 62,
+   "text": "سلام مریم خانم! خوشبختم.",
+   "tr": "salâm Maryam khânom! khoshbakhtam.",
+   "gloss": "Hello Maryam! Nice to meet you.",
+   "refs": [
+    "line:s-u4-who-is-this-1"
+   ],
+   "section": "Who's this? (dialogue)",
+   "cue": "Ali"
+  },
+  {
+   "n": 63,
+   "text": "منم خوشبختم. شما ایرانی هستید؟",
+   "tr": "manam khoshbakhtam. shomâ irâni hastid?",
+   "gloss": "Nice to meet you too. Are you Iranian?",
+   "refs": [
+    "line:s-u4-who-is-this-2"
+   ],
+   "section": "Who's this? (dialogue)",
+   "cue": "Maryam"
+  },
+  {
+   "n": 64,
+   "text": "بله، اهل شیرازم. شما چی؟",
+   "tr": "bale, ahl-e Shirâzam. shomâ chi?",
+   "gloss": "Yes, I'm from Shiraz. And you?",
+   "refs": [
+    "line:s-u4-who-is-this-3"
+   ],
+   "section": "Who's this? (dialogue)",
+   "cue": "Ali"
+  },
+  {
+   "n": 65,
+   "text": "من اهل تهرانم. معلمم.",
+   "tr": "man ahl-e Tehrânam. mo'allemam.",
+   "gloss": "I'm from Tehran. I'm a teacher.",
+   "refs": [
+    "line:s-u4-who-is-this-4"
+   ],
+   "section": "Who's this? (dialogue)",
+   "cue": "Maryam"
+  },
+  {
+   "n": 66,
+   "text": "سارا انگلیسیه.",
+   "tr": "Sârâ engelisiye.",
+   "gloss": "Sara is English.",
+   "refs": [
+    "line:s-u4-who-is-this-5"
+   ],
+   "section": "Who's this? (dialogue)",
+   "cue": "Ali"
+  },
+  {
+   "n": 67,
+   "text": "سارا، تو دانشجو هستی؟",
+   "tr": "Sârâ, to dâneshju hasti?",
+   "gloss": "Sara, are you a student?",
+   "refs": [
+    "line:s-u4-who-is-this-6"
+   ],
+   "section": "Who's this? (dialogue)",
+   "cue": "Maryam"
+  },
+  {
+   "n": 68,
+   "text": "بله، دانشجو هستم. علی دکتره.",
+   "tr": "bale, dâneshju hastam. Ali doktore.",
+   "gloss": "Yes, I'm a student. Ali is a doctor.",
+   "refs": [
+    "line:s-u4-who-is-this-7"
+   ],
+   "section": "Who's this? (dialogue)",
+   "cue": "Sara"
+  },
+  {
+   "n": 69,
+   "text": "به به! خیلی خوب.",
+   "tr": "bah bah! kheyli khub.",
+   "gloss": "How lovely! Very good.",
+   "refs": [
+    "line:s-u4-who-is-this-8"
+   ],
+   "section": "Who's this? (dialogue)",
+   "cue": "Maryam"
+  },
+  {
+   "n": 70,
+   "text": "سلام عزیزم! شما اهل کجا هستید؟",
+   "tr": "salâm azizam! shomâ ahl-e kojâ hastid?",
+   "gloss": "Hello dear! Where are you from?",
+   "refs": [
+    "phrase:t-u4-family-gathering-0"
+   ],
+   "section": "Role-play · A family gathering",
+   "cue": null
+  },
+  {
+   "n": 71,
+   "text": "من اهل … هستم",
+   "tr": "man ahl-e … hastam",
+   "gloss": "I'm from …",
+   "refs": [
+    "phrase:t-u4-family-gathering-1"
+   ],
+   "section": "Role-play · A family gathering",
+   "cue": null
+  },
+  {
+   "n": 72,
+   "text": "من دانشجو هستم",
+   "tr": "man dâneshju hastam",
+   "gloss": "I'm a student",
+   "refs": [
+    "phrase:t-u4-family-gathering-2"
+   ],
+   "section": "Role-play · A family gathering",
+   "cue": null
+  },
+  {
+   "n": 73,
+   "text": "من یک برادر و یک خواهر دارم",
+   "tr": "man yek barâdar va yek khâhar dâram",
+   "gloss": "I have a brother and a sister",
+   "refs": [
+    "phrase:t-u4-family-gathering-3"
+   ],
+   "section": "Role-play · A family gathering",
+   "cue": null
+  },
+  {
+   "n": 74,
+   "text": "شما چی؟",
+   "tr": "shomâ chi?",
+   "gloss": "and you?",
+   "refs": [
+    "phrase:t-u4-family-gathering-4"
+   ],
+   "section": "Role-play · A family gathering",
+   "cue": null
+  }
+ ]
+}

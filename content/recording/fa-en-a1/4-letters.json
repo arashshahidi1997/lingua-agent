@@ -1,0 +1,1001 @@
+{
+ "course": "fa-en-a1",
+ "session": "4-letters",
+ "title": "The alphabet",
+ "units": [
+  "u2",
+  "u3"
+ ],
+ "clips": [
+  {
+   "n": 1,
+   "text": "ا",
+   "tr": "â",
+   "gloss": "alef — long a, as in father",
+   "refs": [
+    "item:alef"
+   ],
+   "section": "The alphabet I · Alef, be, pe, te",
+   "cue": "alef"
+  },
+  {
+   "n": 2,
+   "text": "آ",
+   "tr": "â",
+   "gloss": "alef madd — â at the start of a word",
+   "refs": [
+    "item:alef-madd"
+   ],
+   "section": "The alphabet I · Alef, be, pe, te",
+   "cue": "alef madd"
+  },
+  {
+   "n": 3,
+   "text": "ب",
+   "tr": "b",
+   "gloss": "be — b (one dot below)",
+   "refs": [
+    "item:be"
+   ],
+   "section": "The alphabet I · Alef, be, pe, te",
+   "cue": "be"
+  },
+  {
+   "n": 4,
+   "text": "پ",
+   "tr": "p",
+   "gloss": "pe — p (three dots below)",
+   "refs": [
+    "item:pe"
+   ],
+   "section": "The alphabet I · Alef, be, pe, te",
+   "cue": "pe"
+  },
+  {
+   "n": 5,
+   "text": "ت",
+   "tr": "t",
+   "gloss": "te — t (two dots above)",
+   "refs": [
+    "item:te"
+   ],
+   "section": "The alphabet I · Alef, be, pe, te",
+   "cue": "te"
+  },
+  {
+   "n": 6,
+   "text": "آب",
+   "tr": "âb",
+   "gloss": "water",
+   "refs": [
+    "item:read-ab"
+   ],
+   "section": "The alphabet I · Alef, be, pe, te",
+   "cue": "water"
+  },
+  {
+   "n": 7,
+   "text": "بابا",
+   "tr": "bâbâ",
+   "gloss": "dad",
+   "refs": [
+    "item:read-baba"
+   ],
+   "section": "The alphabet I · Alef, be, pe, te",
+   "cue": null
+  },
+  {
+   "n": 8,
+   "text": "پا",
+   "tr": "pâ",
+   "gloss": "foot / leg",
+   "refs": [
+    "item:read-pa"
+   ],
+   "section": "The alphabet I · Alef, be, pe, te",
+   "cue": "foot / leg"
+  },
+  {
+   "n": 9,
+   "text": "د",
+   "tr": "d",
+   "gloss": "dal — d",
+   "refs": [
+    "item:dal"
+   ],
+   "section": "The alphabet I · Dal, re, ze, vav",
+   "cue": "dal"
+  },
+  {
+   "n": 10,
+   "text": "ر",
+   "tr": "r",
+   "gloss": "re — r (rolled)",
+   "refs": [
+    "item:re"
+   ],
+   "section": "The alphabet I · Dal, re, ze, vav",
+   "cue": "re"
+  },
+  {
+   "n": 11,
+   "text": "ز",
+   "tr": "z",
+   "gloss": "ze — z",
+   "refs": [
+    "item:ze"
+   ],
+   "section": "The alphabet I · Dal, re, ze, vav",
+   "cue": "ze"
+  },
+  {
+   "n": 12,
+   "text": "و",
+   "tr": "v / u / o",
+   "gloss": "vav — v, u or o",
+   "refs": [
+    "item:vav"
+   ],
+   "section": "The alphabet I · Dal, re, ze, vav",
+   "cue": "vav"
+  },
+  {
+   "n": 13,
+   "text": "باد",
+   "tr": "bâd",
+   "gloss": "wind",
+   "refs": [
+    "item:read-bad"
+   ],
+   "section": "The alphabet I · Dal, re, ze, vav",
+   "cue": null
+  },
+  {
+   "n": 14,
+   "text": "روز",
+   "tr": "ruz",
+   "gloss": "day",
+   "refs": [
+    "item:read-ruz"
+   ],
+   "section": "The alphabet I · Dal, re, ze, vav",
+   "cue": null
+  },
+  {
+   "n": 15,
+   "text": "دارو",
+   "tr": "dâru",
+   "gloss": "medicine",
+   "refs": [
+    "item:read-daru"
+   ],
+   "section": "The alphabet I · Dal, re, ze, vav",
+   "cue": null
+  },
+  {
+   "n": 16,
+   "text": "تو",
+   "tr": "to",
+   "gloss": "you (informal)",
+   "refs": [
+    "item:read-to"
+   ],
+   "section": "The alphabet I · Dal, re, ze, vav",
+   "cue": "you (informal)"
+  },
+  {
+   "n": 17,
+   "text": "س",
+   "tr": "s",
+   "gloss": "sin — s",
+   "refs": [
+    "item:sin"
+   ],
+   "section": "The alphabet I · Sin, shin, mim, nun, ye",
+   "cue": "sin"
+  },
+  {
+   "n": 18,
+   "text": "ش",
+   "tr": "sh",
+   "gloss": "shin — sh",
+   "refs": [
+    "item:shin"
+   ],
+   "section": "The alphabet I · Sin, shin, mim, nun, ye",
+   "cue": "shin"
+  },
+  {
+   "n": 19,
+   "text": "م",
+   "tr": "m",
+   "gloss": "mim — m",
+   "refs": [
+    "item:mim"
+   ],
+   "section": "The alphabet I · Sin, shin, mim, nun, ye",
+   "cue": "mim"
+  },
+  {
+   "n": 20,
+   "text": "ن",
+   "tr": "n",
+   "gloss": "nun — n",
+   "refs": [
+    "item:nun"
+   ],
+   "section": "The alphabet I · Sin, shin, mim, nun, ye",
+   "cue": "nun"
+  },
+  {
+   "n": 21,
+   "text": "ی",
+   "tr": "y / i",
+   "gloss": "ye — y or i",
+   "refs": [
+    "item:ye"
+   ],
+   "section": "The alphabet I · Sin, shin, mim, nun, ye",
+   "cue": "ye"
+  },
+  {
+   "n": 22,
+   "text": "نان",
+   "tr": "nân",
+   "gloss": "bread",
+   "refs": [
+    "item:read-nan"
+   ],
+   "section": "The alphabet I · Sin, shin, mim, nun, ye",
+   "cue": null
+  },
+  {
+   "n": 23,
+   "text": "سیب",
+   "tr": "sib",
+   "gloss": "apple",
+   "refs": [
+    "item:read-sib"
+   ],
+   "section": "The alphabet I · Sin, shin, mim, nun, ye",
+   "cue": null
+  },
+  {
+   "n": 24,
+   "text": "ماست",
+   "tr": "mâst",
+   "gloss": "yogurt",
+   "refs": [
+    "item:read-mast"
+   ],
+   "section": "The alphabet I · Sin, shin, mim, nun, ye",
+   "cue": null
+  },
+  {
+   "n": 25,
+   "text": "بَ",
+   "tr": "ba",
+   "gloss": "zebar — short a (mark above)",
+   "refs": [
+    "item:zebar"
+   ],
+   "section": "The alphabet I · Short vowels",
+   "cue": "zebar"
+  },
+  {
+   "n": 26,
+   "text": "بِ",
+   "tr": "be",
+   "gloss": "zir — short e (mark below)",
+   "refs": [
+    "item:zir"
+   ],
+   "section": "The alphabet I · Short vowels",
+   "cue": "zir"
+  },
+  {
+   "n": 27,
+   "text": "بُ",
+   "tr": "bo",
+   "gloss": "pish — short o (little vav above)",
+   "refs": [
+    "item:pish"
+   ],
+   "section": "The alphabet I · Short vowels",
+   "cue": "pish"
+  },
+  {
+   "n": 28,
+   "text": "شب",
+   "tr": "shab",
+   "gloss": "night",
+   "refs": [
+    "item:read-shab"
+   ],
+   "section": "The alphabet I · Short vowels",
+   "cue": "night"
+  },
+  {
+   "n": 29,
+   "text": "دست",
+   "tr": "dast",
+   "gloss": "hand",
+   "refs": [
+    "item:read-dast"
+   ],
+   "section": "The alphabet I · Short vowels",
+   "cue": null
+  },
+  {
+   "n": 30,
+   "text": "سر",
+   "tr": "sar",
+   "gloss": "head",
+   "refs": [
+    "item:read-sar"
+   ],
+   "section": "The alphabet I · Short vowels",
+   "cue": "head"
+  },
+  {
+   "n": 31,
+   "text": "دوست",
+   "tr": "dust",
+   "gloss": "friend",
+   "refs": [
+    "item:read-dust"
+   ],
+   "section": "The alphabet I · Short vowels",
+   "cue": null
+  },
+  {
+   "n": 32,
+   "text": "بستنی",
+   "tr": "bastani",
+   "gloss": "ice cream",
+   "refs": [
+    "item:read-bastani"
+   ],
+   "section": "The alphabet I · Short vowels",
+   "cue": null
+  },
+  {
+   "n": 33,
+   "text": "شب است.",
+   "tr": "shab ast.",
+   "gloss": "It is night.",
+   "refs": [
+    "line:s-u2-bread-0"
+   ],
+   "section": "Bread and yogurt (story)",
+   "cue": "Narrator"
+  },
+  {
+   "n": 34,
+   "text": "بابا نان دارد.",
+   "tr": "bâbâ nân dârad.",
+   "gloss": "Dad has bread.",
+   "refs": [
+    "line:s-u2-bread-1"
+   ],
+   "section": "Bread and yogurt (story)",
+   "cue": "Narrator"
+  },
+  {
+   "n": 35,
+   "text": "مامان ماست دارد.",
+   "tr": "mâmân mâst dârad.",
+   "gloss": "Mum has yogurt.",
+   "refs": [
+    "line:s-u2-bread-2"
+   ],
+   "section": "Bread and yogurt (story)",
+   "cue": "Narrator"
+  },
+  {
+   "n": 36,
+   "text": "سارا سیب دارد.",
+   "tr": "Sârâ sib dârad.",
+   "gloss": "Sara has an apple.",
+   "refs": [
+    "line:s-u2-bread-3"
+   ],
+   "section": "Bread and yogurt (story)",
+   "cue": "Narrator"
+  },
+  {
+   "n": 37,
+   "text": "من آب دارم.",
+   "tr": "man âb dâram.",
+   "gloss": "I have water.",
+   "refs": [
+    "line:s-u2-bread-4"
+   ],
+   "section": "Bread and yogurt (story)",
+   "cue": "Narrator"
+  },
+  {
+   "n": 38,
+   "text": "سارا نان ندارد.",
+   "tr": "Sârâ nân nadârad.",
+   "gloss": "Sara doesn't have bread.",
+   "refs": [
+    "line:s-u2-bread-5"
+   ],
+   "section": "Bread and yogurt (story)",
+   "cue": "Narrator"
+  },
+  {
+   "n": 39,
+   "text": "«بابا، نان داری؟»",
+   "tr": "«bâbâ, nân dâri?»",
+   "gloss": "Dad, do you have bread?",
+   "refs": [
+    "line:s-u2-bread-6"
+   ],
+   "section": "Bread and yogurt (story)",
+   "cue": "Narrator"
+  },
+  {
+   "n": 40,
+   "text": "«بیا، نان و ماست!»",
+   "tr": "«biyâ, nân-o mâst!»",
+   "gloss": "Come, here's bread and yogurt!",
+   "refs": [
+    "line:s-u2-bread-7"
+   ],
+   "section": "Bread and yogurt (story)",
+   "cue": "Narrator"
+  },
+  {
+   "n": 41,
+   "text": "این چیه؟ بخون!",
+   "tr": "in chiye? bekhun!",
+   "gloss": "What's this? Read it!",
+   "refs": [
+    "phrase:t-u2-reading-with-sina-0"
+   ],
+   "section": "Role-play · Reading with Sina",
+   "cue": null
+  },
+  {
+   "n": 42,
+   "text": "این … است",
+   "tr": "in … ast",
+   "gloss": "this is …",
+   "refs": [
+    "phrase:t-u2-reading-with-sina-1"
+   ],
+   "section": "Role-play · Reading with Sina",
+   "cue": null
+  },
+  {
+   "n": 43,
+   "text": "نمی‌دونم",
+   "tr": "nemidunam",
+   "gloss": "I don't know (spoken)",
+   "refs": [
+    "phrase:t-u2-reading-with-sina-2"
+   ],
+   "section": "Role-play · Reading with Sina",
+   "cue": null
+  },
+  {
+   "n": 44,
+   "text": "دوباره بگو",
+   "tr": "dobâre begu",
+   "gloss": "say it again",
+   "refs": [
+    "phrase:t-u2-reading-with-sina-3"
+   ],
+   "section": "Role-play · Reading with Sina",
+   "cue": null
+  },
+  {
+   "n": 45,
+   "text": "مرسی، سینا!",
+   "tr": "mersi, Sinâ!",
+   "gloss": "thanks, Sina!",
+   "refs": [
+    "phrase:t-u2-reading-with-sina-4"
+   ],
+   "section": "Role-play · Reading with Sina",
+   "cue": null
+  },
+  {
+   "n": 46,
+   "text": "ک",
+   "tr": "k",
+   "gloss": "kaf — k",
+   "refs": [
+    "item:kaf"
+   ],
+   "section": "The alphabet II · Kaf, gaf, lam, fe",
+   "cue": "kaf"
+  },
+  {
+   "n": 47,
+   "text": "گ",
+   "tr": "g",
+   "gloss": "gaf — g (as in go)",
+   "refs": [
+    "item:gaf"
+   ],
+   "section": "The alphabet II · Kaf, gaf, lam, fe",
+   "cue": "gaf"
+  },
+  {
+   "n": 48,
+   "text": "ل",
+   "tr": "l",
+   "gloss": "lam — l",
+   "refs": [
+    "item:lam"
+   ],
+   "section": "The alphabet II · Kaf, gaf, lam, fe",
+   "cue": "lam"
+  },
+  {
+   "n": 49,
+   "text": "ف",
+   "tr": "f",
+   "gloss": "fe — f",
+   "refs": [
+    "item:fe"
+   ],
+   "section": "The alphabet II · Kaf, gaf, lam, fe",
+   "cue": "fe"
+  },
+  {
+   "n": 50,
+   "text": "کتاب",
+   "tr": "ketâb",
+   "gloss": "book",
+   "refs": [
+    "item:read-ketab"
+   ],
+   "section": "The alphabet II · Kaf, gaf, lam, fe",
+   "cue": null
+  },
+  {
+   "n": 51,
+   "text": "گل",
+   "tr": "gol",
+   "gloss": "flower",
+   "refs": [
+    "item:read-gol"
+   ],
+   "section": "The alphabet II · Kaf, gaf, lam, fe",
+   "cue": "flower"
+  },
+  {
+   "n": 52,
+   "text": "سگ",
+   "tr": "sag",
+   "gloss": "dog",
+   "refs": [
+    "item:read-sag"
+   ],
+   "section": "The alphabet II · Kaf, gaf, lam, fe",
+   "cue": "dog"
+  },
+  {
+   "n": 53,
+   "text": "برف",
+   "tr": "barf",
+   "gloss": "snow",
+   "refs": [
+    "item:read-barf"
+   ],
+   "section": "The alphabet II · Kaf, gaf, lam, fe",
+   "cue": null
+  },
+  {
+   "n": 54,
+   "text": "ج",
+   "tr": "j",
+   "gloss": "jim — j",
+   "refs": [
+    "item:jim"
+   ],
+   "section": "The alphabet II · Jim, che, khe and the two h's",
+   "cue": "jim"
+  },
+  {
+   "n": 55,
+   "text": "چ",
+   "tr": "ch",
+   "gloss": "che — ch",
+   "refs": [
+    "item:che"
+   ],
+   "section": "The alphabet II · Jim, che, khe and the two h's",
+   "cue": "che"
+  },
+  {
+   "n": 56,
+   "text": "ح",
+   "tr": "h",
+   "gloss": "he (jimi) — h, dot-free",
+   "refs": [
+    "item:he-jimi"
+   ],
+   "section": "The alphabet II · Jim, che, khe and the two h's",
+   "cue": "he (jimi)"
+  },
+  {
+   "n": 57,
+   "text": "خ",
+   "tr": "kh",
+   "gloss": "khe — kh, as in Scottish loch",
+   "refs": [
+    "item:khe"
+   ],
+   "section": "The alphabet II · Jim, che, khe and the two h's",
+   "cue": "khe"
+  },
+  {
+   "n": 58,
+   "text": "ه",
+   "tr": "h / e",
+   "gloss": "he (do-cheshm) — h, or e at word end",
+   "refs": [
+    "item:he-docheshm"
+   ],
+   "section": "The alphabet II · Jim, che, khe and the two h's",
+   "cue": "he (do-cheshm)"
+  },
+  {
+   "n": 59,
+   "text": "چای",
+   "tr": "chây",
+   "gloss": "tea",
+   "refs": [
+    "item:read-chay"
+   ],
+   "section": "The alphabet II · Jim, che, khe and the two h's",
+   "cue": null
+  },
+  {
+   "n": 60,
+   "text": "خانه",
+   "tr": "khâne",
+   "gloss": "house / home",
+   "refs": [
+    "item:read-khane"
+   ],
+   "section": "The alphabet II · Jim, che, khe and the two h's",
+   "cue": null
+  },
+  {
+   "n": 61,
+   "text": "جوجه",
+   "tr": "juje",
+   "gloss": "chick",
+   "refs": [
+    "item:read-juje"
+   ],
+   "section": "The alphabet II · Jim, che, khe and the two h's",
+   "cue": null
+  },
+  {
+   "n": 62,
+   "text": "ع",
+   "tr": "'",
+   "gloss": "ein — glottal stop or silent",
+   "refs": [
+    "item:ein"
+   ],
+   "section": "The alphabet II · Ein, gheyn, ghaf, zhe",
+   "cue": "ein"
+  },
+  {
+   "n": 63,
+   "text": "غ",
+   "tr": "gh",
+   "gloss": "gheyn — gh (dot above)",
+   "refs": [
+    "item:gheyn"
+   ],
+   "section": "The alphabet II · Ein, gheyn, ghaf, zhe",
+   "cue": "gheyn"
+  },
+  {
+   "n": 64,
+   "text": "ق",
+   "tr": "gh",
+   "gloss": "ghaf — gh (two dots above)",
+   "refs": [
+    "item:ghaf"
+   ],
+   "section": "The alphabet II · Ein, gheyn, ghaf, zhe",
+   "cue": "ghaf"
+  },
+  {
+   "n": 65,
+   "text": "ژ",
+   "tr": "zh",
+   "gloss": "zhe — zh, as in measure",
+   "refs": [
+    "item:zhe"
+   ],
+   "section": "The alphabet II · Ein, gheyn, ghaf, zhe",
+   "cue": "zhe"
+  },
+  {
+   "n": 66,
+   "text": "عینک",
+   "tr": "eynak",
+   "gloss": "glasses",
+   "refs": [
+    "item:read-eynak"
+   ],
+   "section": "The alphabet II · Ein, gheyn, ghaf, zhe",
+   "cue": null
+  },
+  {
+   "n": 67,
+   "text": "باغ",
+   "tr": "bâgh",
+   "gloss": "garden",
+   "refs": [
+    "item:read-bagh"
+   ],
+   "section": "The alphabet II · Ein, gheyn, ghaf, zhe",
+   "cue": null
+  },
+  {
+   "n": 68,
+   "text": "قند",
+   "tr": "ghand",
+   "gloss": "sugar cube",
+   "refs": [
+    "item:read-ghand"
+   ],
+   "section": "The alphabet II · Ein, gheyn, ghaf, zhe",
+   "cue": null
+  },
+  {
+   "n": 69,
+   "text": "ژاکت",
+   "tr": "zhâket",
+   "gloss": "cardigan",
+   "refs": [
+    "item:read-zhaket"
+   ],
+   "section": "The alphabet II · Ein, gheyn, ghaf, zhe",
+   "cue": null
+  },
+  {
+   "n": 70,
+   "text": "ث",
+   "tr": "s",
+   "gloss": "se — s (three dots)",
+   "refs": [
+    "item:se"
+   ],
+   "section": "The alphabet II · Arabic look-alikes",
+   "cue": "se"
+  },
+  {
+   "n": 71,
+   "text": "ص",
+   "tr": "s",
+   "gloss": "sad — s (loop shape)",
+   "refs": [
+    "item:sad"
+   ],
+   "section": "The alphabet II · Arabic look-alikes",
+   "cue": "sad"
+  },
+  {
+   "n": 72,
+   "text": "ذ",
+   "tr": "z",
+   "gloss": "zal — z (dal with a dot)",
+   "refs": [
+    "item:zal"
+   ],
+   "section": "The alphabet II · Arabic look-alikes",
+   "cue": "zal"
+  },
+  {
+   "n": 73,
+   "text": "ض",
+   "tr": "z",
+   "gloss": "zad — z (sad with a dot)",
+   "refs": [
+    "item:zad"
+   ],
+   "section": "The alphabet II · Arabic look-alikes",
+   "cue": "zad"
+  },
+  {
+   "n": 74,
+   "text": "ط",
+   "tr": "t",
+   "gloss": "ta — t (tall stroke)",
+   "refs": [
+    "item:ta"
+   ],
+   "section": "The alphabet II · Arabic look-alikes",
+   "cue": "ta"
+  },
+  {
+   "n": 75,
+   "text": "ظ",
+   "tr": "z",
+   "gloss": "za — z (ta with a dot)",
+   "refs": [
+    "item:za"
+   ],
+   "section": "The alphabet II · Arabic look-alikes",
+   "cue": "za"
+  },
+  {
+   "n": 76,
+   "text": "صبح",
+   "tr": "sobh",
+   "gloss": "morning",
+   "refs": [
+    "item:read-sobh"
+   ],
+   "section": "The alphabet II · Arabic look-alikes",
+   "cue": null
+  },
+  {
+   "n": 77,
+   "text": "ظهر",
+   "tr": "zohr",
+   "gloss": "noon",
+   "refs": [
+    "item:read-zohr"
+   ],
+   "section": "The alphabet II · Arabic look-alikes",
+   "cue": null
+  },
+  {
+   "n": 78,
+   "text": "صبح است.",
+   "tr": "sobh ast.",
+   "gloss": "It is morning.",
+   "refs": [
+    "line:s-u3-snowy-morning-0"
+   ],
+   "section": "Morning at home (story)",
+   "cue": "Narrator"
+  },
+  {
+   "n": 79,
+   "text": "برف می‌آید.",
+   "tr": "barf miâyad.",
+   "gloss": "It is snowing.",
+   "refs": [
+    "line:s-u3-snowy-morning-1"
+   ],
+   "section": "Morning at home (story)",
+   "cue": "Narrator"
+  },
+  {
+   "n": 80,
+   "text": "علی در خانه است.",
+   "tr": "Ali dar khâne ast.",
+   "gloss": "Ali is at home.",
+   "refs": [
+    "line:s-u3-snowy-morning-2"
+   ],
+   "section": "Morning at home (story)",
+   "cue": "Narrator"
+  },
+  {
+   "n": 81,
+   "text": "علی چای و قند دارد.",
+   "tr": "Ali chây-o ghand dârad.",
+   "gloss": "Ali has tea and sugar cubes.",
+   "refs": [
+    "line:s-u3-snowy-morning-3"
+   ],
+   "section": "Morning at home (story)",
+   "cue": "Narrator"
+  },
+  {
+   "n": 82,
+   "text": "او عینک و کتاب دارد.",
+   "tr": "u eynak-o ketâb dârad.",
+   "gloss": "He has his glasses and a book.",
+   "refs": [
+    "line:s-u3-snowy-morning-4"
+   ],
+   "section": "Morning at home (story)",
+   "cue": "Narrator"
+  },
+  {
+   "n": 83,
+   "text": "سگ علی در باغ است.",
+   "tr": "sag-e Ali dar bâgh ast.",
+   "gloss": "Ali's dog is in the garden.",
+   "refs": [
+    "line:s-u3-snowy-morning-5"
+   ],
+   "section": "Morning at home (story)",
+   "cue": "Narrator"
+  },
+  {
+   "n": 84,
+   "text": "در باغ گل نیست.",
+   "tr": "dar bâgh gol nist.",
+   "gloss": "There are no flowers in the garden.",
+   "refs": [
+    "line:s-u3-snowy-morning-6"
+   ],
+   "section": "Morning at home (story)",
+   "cue": "Narrator"
+  },
+  {
+   "n": 85,
+   "text": "سگ ژاکت دارد!",
+   "tr": "sag zhâket dârad!",
+   "gloss": "The dog has a cardigan!",
+   "refs": [
+    "line:s-u3-snowy-morning-7"
+   ],
+   "section": "Morning at home (story)",
+   "cue": "Narrator"
+  },
+  {
+   "n": 86,
+   "text": "سلام، بفرمایید. چه کتابی می‌خواید؟",
+   "tr": "salâm, befarmâyid. che ketâbi mikhâyd?",
+   "gloss": "Hello, welcome. What kind of book do you want?",
+   "refs": [
+    "phrase:t-u3-bookshop-0"
+   ],
+   "section": "Role-play · At the bookshop",
+   "cue": null
+  },
+  {
+   "n": 87,
+   "text": "این چیه؟",
+   "tr": "in chiye?",
+   "gloss": "what's this?",
+   "refs": [
+    "phrase:t-u3-bookshop-1"
+   ],
+   "section": "Role-play · At the bookshop",
+   "cue": null
+  },
+  {
+   "n": 88,
+   "text": "یه کتاب فارسی",
+   "tr": "ye ketâb-e fârsi",
+   "gloss": "a Persian book",
+   "refs": [
+    "phrase:t-u3-bookshop-2"
+   ],
+   "section": "Role-play · At the bookshop",
+   "cue": null
+  },
+  {
+   "n": 89,
+   "text": "این کتاب خوبه؟",
+   "tr": "in ketâb khube?",
+   "gloss": "is this book good?",
+   "refs": [
+    "phrase:t-u3-bookshop-3"
+   ],
+   "section": "Role-play · At the bookshop",
+   "cue": null
+  },
+  {
+   "n": 90,
+   "text": "ممنون",
+   "tr": "mamnun",
+   "gloss": "thank you",
+   "refs": [
+    "phrase:t-u3-bookshop-4"
+   ],
+   "section": "Role-play · At the bookshop",
+   "cue": null
+  }
+ ]
+}
