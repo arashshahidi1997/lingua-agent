@@ -3,6 +3,10 @@ import { FileAudio, Mic, Square, Trash2, Upload } from 'lucide-react'
 import { courseApi, type Recording } from '../lib/course-api'
 import { errorMessage, formatElapsed, formatTime, useAsync, useElapsed } from '../lib/hooks'
 import { canRecord, useRecorder } from '../lib/recorder'
+import { api } from '../lib/api'
+import { useMe } from '../lib/me'
+import { logActivity } from '../lib/offline'
+import { languageName } from '../lib/rtl'
 import { useNav } from '../state/nav'
 import { useSettings } from '../state/settings'
 import { Button, Empty, ErrorNote, Field, IconButton, List, Loading, Panel, Row, SectionLabel, inputCls } from '../components/ui'
@@ -26,7 +30,7 @@ export default function AudioSection() {
 
 function Recordings() {
   const { pair } = useSettings()
-  const { data, error, loading, reload } = useAsync('recordings', () => courseApi.recordings())
+  const { data, error, loading, reload } = useAsync(`recordings|${pair.target}`, () => courseApi.recordings(undefined, undefined, pair.target))
   const rec = useRecorder()
   const elapsed = useElapsed(rec.recording)
   const [saving, setSaving] = useState(false)
@@ -40,6 +44,8 @@ function Recordings() {
     setSaving(true)
     try {
       await courseApi.addRecording(take.blob, 'diary', pair.target, take.seconds)
+      // Speaking counts toward the daily goal.
+      logActivity(take.seconds, 'other')
       reload()
     } catch (e) {
       setErr(errorMessage(e))
@@ -49,13 +55,14 @@ function Recordings() {
     }
   }
 
-  const remove = async (id: string) => {
+  const remove = async (r: Recording) => {
+    if (!window.confirm(`Delete this recording (${recordingLabel(r).toLowerCase()})? This can’t be undone.`)) return
     setErr(null)
     try {
-      await courseApi.deleteRecording(id)
+      await courseApi.deleteRecording(r.id)
       reload()
     } catch (e) {
-      setErr(errorMessage(e))
+      setErr(`Couldn’t delete the recording. ${errorMessage(e)}`)
     }
   }
 
@@ -92,7 +99,7 @@ function Recordings() {
               trailing={
                 <span className="flex items-center gap-1">
                   <PlayButton url={r.url} size="sm" label={`Play ${recordingLabel(r)}`} />
-                  <IconButton label="Delete recording" size="sm" onClick={() => remove(r.id)}><Trash2 size={16} /></IconButton>
+                  <IconButton label="Delete recording" size="sm" onClick={() => remove(r)}><Trash2 size={16} /></IconButton>
                 </span>
               }
             />
@@ -106,7 +113,7 @@ function Recordings() {
 function Imported() {
   const { pair } = useSettings()
   const nav = useNav()
-  const { data, error, loading, reload } = useAsync('audio', () => courseApi.audio())
+  const { data, error, loading, reload } = useAsync(`audio|${pair.target}`, () => courseApi.audio(pair.target))
   const [showForm, setShowForm] = useState(false)
 
   return (
@@ -121,7 +128,7 @@ function Imported() {
       {loading && !data && <Loading />}
       {error && !data && (error.startsWith('404') ? null : <ErrorNote error={error} onRetry={reload} />)}
       {data && data.length === 0 && !showForm && (
-        <Empty title="No audio yet">
+        <Empty title={`No ${languageName(pair.target)} audio yet`}>
           Upload a podcast episode or a lesson recording you own, with a transcript if you have one.
         </Empty>
       )}
@@ -142,7 +149,11 @@ function Imported() {
   )
 }
 
-function UploadForm({ lang, onDone, onCancel }: { lang: string; onDone: () => void; onCancel: () => void }) {
+function UploadForm({ lang: defaultLang, onDone, onCancel }: { lang: string; onDone: () => void; onCancel: () => void }) {
+  const { pair } = useSettings()
+  const me = useMe()
+  const langs = useAsync('languages', () => api.languages())
+  const [lang, setLang] = useState(defaultLang)
   const [file, setFile] = useState<File | null>(null)
   const [transcript, setTranscript] = useState<File | null>(null)
   const [title, setTitle] = useState('')
@@ -171,6 +182,13 @@ function UploadForm({ lang, onDone, onCancel }: { lang: string; onDone: () => vo
         <Field label="Audio file">
           <input type="file" accept="audio/*,video/mp4" className={fileCls} onChange={(e) => setFile(e.target.files?.[0] ?? null)} required />
         </Field>
+        <Field label="Language" hint={lang !== pair.target ? `It will be listed under ${languageName(lang)}, not ${languageName(pair.target)}.` : undefined}>
+          <select className={inputCls} value={lang} onChange={(e) => setLang(e.target.value)}>
+            {(langs.data ?? [...new Set([pair.target, pair.source, pair.support])].map((code) => ({ code, name: languageName(code) }))).map((l) => (
+              <option key={l.code} value={l.code}>{l.name}</option>
+            ))}
+          </select>
+        </Field>
         <Field label="Title" hint="Optional. The file name is used otherwise.">
           <input className={inputCls} value={title} onChange={(e) => setTitle(e.target.value)} />
         </Field>
@@ -182,7 +200,9 @@ function UploadForm({ lang, onDone, onCancel }: { lang: string; onDone: () => vo
           <Button type="submit" disabled={!file || busy}>{busy ? 'Uploading' : 'Upload'}</Button>
           <Button variant="ghost" onClick={onCancel}>Cancel</Button>
         </div>
-        <p className="text-[13px] text-ink-3">Your files stay on your own server and are never shared.</p>
+        <p className="text-[13px] text-ink-3">
+          {me?.owner ? 'Your files stay on your own server and are never shared.' : 'Your files are kept with your own data and aren’t shown to anyone else.'}
+        </p>
       </form>
     </Panel>
   )

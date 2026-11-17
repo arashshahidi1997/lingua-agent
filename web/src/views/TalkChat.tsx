@@ -3,14 +3,14 @@ import { ChevronDown, Mic, Plus, SendHorizontal, Square } from 'lucide-react'
 import {
   courseApi, type Item, type Scenario, type TalkMessage, type TalkSession, type TalkSummary,
 } from '../lib/course-api'
-import { errorMessage, formatElapsed, useAsync, useElapsed } from '../lib/hooks'
+import { errorMessage, formatElapsed, isStatus, useAsync, useElapsed } from '../lib/hooks'
 import { useDictation } from '../lib/dictation'
 import { dirOf, languageName } from '../lib/rtl'
 import { speak, stopSpeech } from '../lib/speech'
 import { useNav } from '../state/nav'
 import { useSettings } from '../state/settings'
 import { Button, ErrorNote, IconButton, Loading, Screen, SectionLabel, Sheet } from '../components/ui'
-import { ItemText, Tgt } from '../components/Text'
+import { ItemText, Target } from '../components/Text'
 import { PlayButton } from '../components/PlayButton'
 
 export default function TalkChat({ scenarioId }: { scenarioId: string | null }) {
@@ -19,7 +19,7 @@ export default function TalkChat({ scenarioId }: { scenarioId: string | null }) 
   const opening = useRef<Promise<TalkSession> | null>(null)
   const { data, error, reload } = useAsync(`talk|${scenarioId}|${pair.target}|${pair.support}`, () => {
     // Guard against StrictMode's double effect opening two sessions.
-    opening.current ??= courseApi.openTalk({ target: pair.target, support: pair.support, scenario_id: scenarioId })
+    opening.current ??= resumeOrOpen(pair.target, pair.support, scenarioId)
     const p = opening.current
     p.catch(() => { opening.current = null })
     return p
@@ -38,6 +38,19 @@ export default function TalkChat({ scenarioId }: { scenarioId: string | null }) 
   return <Chat session={data} />
 }
 
+/** The latest conversation for this scenario that hasn't ended, or a new one. */
+async function resumeOrOpen(target: string, support: string, scenarioId: string | null): Promise<TalkSession> {
+  try {
+    const s = await courseApi.latestTalk(target, scenarioId)
+    if (!s.ended && (s.scenario?.id ?? null) === scenarioId && s.support === support) return s
+  } catch (e) {
+    if (!isStatus(e, 404)) throw e
+  }
+  return courseApi.openTalk({ target, support, scenario_id: scenarioId })
+}
+
+const lastIsUser = (ms: TalkMessage[]) => ms.length > 0 && ms[ms.length - 1].role === 'user'
+
 function Chat({ session }: { session: TalkSession }) {
   const nav = useNav()
   const { pair } = useSettings()
@@ -48,9 +61,16 @@ function Chat({ session }: { session: TalkSession }) {
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [failed, setFailed] = useState<string | null>(null)
-  const [summary, setSummary] = useState<TalkSummary | null>(null)
+  // Reopening an ended conversation shows its stored summary.
+  const [summary, setSummary] = useState<TalkSummary | null>(session.ended ? session.summary : null)
+  const [summaryOpen, setSummaryOpen] = useState(session.ended && !!session.summary)
+  const [ended, setEnded] = useState(session.ended)
   const [ending, setEnding] = useState(false)
-  const elapsed = useElapsed(busy)
+  // A reply that was still being written when the learner left: the server keeps working on it, so
+  // check back until it arrives.
+  const [awaiting, setAwaiting] = useState(() => !session.ended && lastIsUser(session.messages))
+  const elapsed = useElapsed(busy || awaiting)
+  const endElapsed = useElapsed(ending)
   const endRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLTextAreaElement>(null)
   const dictation = useDictation(lang, setInput)
@@ -60,9 +80,26 @@ function Chat({ session }: { session: TalkSession }) {
     endRef.current?.scrollIntoView({ block: 'end', behavior: reduce ? 'auto' : 'smooth' })
   }, [messages.length, busy])
 
+  useEffect(() => {
+    if (!awaiting) return
+    const t0 = Date.now()
+    const id = window.setInterval(() => {
+      courseApi.talk(session.id).then((fresh) => {
+        if (!lastIsUser(fresh.messages)) {
+          setMessages(fresh.messages)
+          setAwaiting(false)
+        } else if (Date.now() - t0 > 4 * 60_000) {
+          setAwaiting(false)
+          setError('No reply came. Send your message again, or end the conversation.')
+        }
+      }, () => { /* try again on the next tick */ })
+    }, 4000)
+    return () => window.clearInterval(id)
+  }, [awaiting, session.id])
+
   const send = async (content: string) => {
     const text = content.trim()
-    if (!text || busy) return
+    if (!text || busy || awaiting || ended) return
     if (dictation.listening) dictation.stop()
     setError(null); setFailed(null); setInput('')
     setMessages((m) => [...m, { role: 'user', content: text, turn: null, created_at: new Date().toISOString() }])
@@ -81,9 +118,12 @@ function Chat({ session }: { session: TalkSession }) {
   }
 
   const end = async () => {
+    if (summary) { setSummaryOpen(true); return }
     setEnding(true); setError(null)
     try {
       setSummary(await courseApi.endTalk(session.id))
+      setSummaryOpen(true)
+      setEnded(true)
       nav.bumpData()
     } catch (e) {
       setError(errorMessage(e))
@@ -105,11 +145,17 @@ function Chat({ session }: { session: TalkSession }) {
       title={sc ? sc.title : 'Free conversation'}
       onBack={nav.close}
       actions={
-        <Button size="sm" variant="secondary" onClick={end} disabled={ending || busy || messages.length === 0}>
-          {ending ? 'Ending' : 'End'}
+        <Button size="sm" variant="secondary" onClick={end} disabled={ending || busy || awaiting || messages.length === 0}>
+          {summary ? 'Summary' : ending ? 'Ending' : 'End'}
         </Button>
       }
       footer={
+        ended ? (
+          <div className="mx-auto flex w-full max-w-2xl items-center justify-between gap-3 px-4 py-3">
+            <p className="text-sm text-ink-3">This conversation has ended.</p>
+            {summary && <Button size="sm" variant="secondary" onClick={() => setSummaryOpen(true)}>See summary</Button>}
+          </div>
+        ) : (
         <div className="mx-auto w-full max-w-2xl px-3 py-3 sm:px-4">
           {sc && sc.useful.length > 0 && <Useful items={sc.useful} lang={lang} onInsert={insert} />}
           <ErrorNote error={dictation.error ?? error} onRetry={failed ? () => send(failed) : undefined} />
@@ -142,11 +188,12 @@ function Chat({ session }: { session: TalkSession }) {
                 {dictation.listening ? <Square size={16} fill="currentColor" /> : <Mic size={20} />}
               </IconButton>
             )}
-            <IconButton type="submit" label="Send" tone="solid" disabled={!input.trim() || busy} className="h-11 w-11">
+            <IconButton type="submit" label="Send" tone="solid" disabled={!input.trim() || busy || awaiting} className="h-11 w-11">
               <SendHorizontal size={18} className="rtl:rotate-180" />
             </IconButton>
           </form>
         </div>
+        )
       }
     >
       <div className="mx-auto w-full max-w-2xl px-4 pb-6 pt-4">
@@ -176,7 +223,7 @@ function Chat({ session }: { session: TalkSession }) {
                     {nextTurn.better && (
                       <p>
                         <span className="text-ink-3">Better: </span>
-                        <Tgt lang={lang} className="text-[15px] text-ink">{nextTurn.better}</Tgt>
+                        <Target text={nextTurn.better} lang={lang} className="text-[15px] text-ink" />
                       </p>
                     )}
                     {nextTurn.correction && <p className="text-ink-3">{nextTurn.correction}</p>}
@@ -185,16 +232,8 @@ function Chat({ session }: { session: TalkSession }) {
               </li>
             )
           })}
-          {busy && (
-            <li className="flex items-center gap-3 text-ink-3" role="status">
-              <span className="dot-pulse inline-flex gap-1" aria-hidden>
-                <span className="h-1.5 w-1.5 rounded-full bg-current" />
-                <span className="h-1.5 w-1.5 rounded-full bg-current" />
-                <span className="h-1.5 w-1.5 rounded-full bg-current" />
-              </span>
-              <span className="text-sm">Thinking · {formatElapsed(elapsed)}</span>
-            </li>
-          )}
+          {(busy || awaiting) && <Working label={`Thinking · ${formatElapsed(elapsed)}`} />}
+          {ending && <Working label={`Writing your summary · ${formatElapsed(endElapsed)}`} />}
         </ol>
         {messages.length === 0 && !sc && (
           <p className="pt-6 text-center text-sm text-ink-3">Say hello, or ask about anything you’d like to practise.</p>
@@ -202,8 +241,23 @@ function Chat({ session }: { session: TalkSession }) {
         <div ref={endRef} />
       </div>
 
-      {summary && <SummarySheet summary={summary} lang={lang} support={session.support} onClose={nav.close} />}
+      {summary && summaryOpen && (
+        <SummarySheet summary={summary} lang={lang} support={session.support} onClose={nav.close} onBack={() => setSummaryOpen(false)} />
+      )}
     </Screen>
+  )
+}
+
+function Working({ label }: { label: string }) {
+  return (
+    <li className="flex items-center gap-3 text-ink-3" role="status">
+      <span className="dot-pulse inline-flex gap-1" aria-hidden>
+        <span className="h-1.5 w-1.5 rounded-full bg-current" />
+        <span className="h-1.5 w-1.5 rounded-full bg-current" />
+        <span className="h-1.5 w-1.5 rounded-full bg-current" />
+      </span>
+      <span className="text-sm">{label}</span>
+    </li>
   )
 }
 
@@ -276,7 +330,7 @@ function Useful({ items, lang, onInsert }: { items: Item[]; lang: string; onInse
               onContextMenu={(e) => e.preventDefault()}
               className="py-1.5 ps-3 pe-1 text-start"
             >
-              <span lang={lang} dir={dir} className="block text-[15px] leading-tight text-ink">{it.text}</span>
+              <Target text={it.text} tr={it.tr} lang={lang} stack className="block text-[15px] leading-tight text-ink" trClassName="text-[11px] text-ink-3" />
               <span dir="ltr" className="block text-[11px] leading-tight text-ink-3">{it.gloss}</span>
             </button>
             <IconButton label={`Use “${it.text}”`} size="sm" onClick={() => onInsert(it.text)}><Plus size={14} /></IconButton>
@@ -287,9 +341,24 @@ function Useful({ items, lang, onInsert }: { items: Item[]; lang: string; onInse
   )
 }
 
-function SummarySheet({ summary, lang, support, onClose }: { summary: TalkSummary; lang: string; support: string; onClose: () => void }) {
+function SummarySheet({ summary, lang, support, onClose, onBack }: {
+  summary: TalkSummary
+  lang: string
+  support: string
+  onClose: () => void
+  onBack: () => void
+}) {
   return (
-    <Sheet label="Conversation summary" onClose={onClose} footer={<Button block size="lg" onClick={onClose}>Done</Button>}>
+    <Sheet
+      label="Conversation summary"
+      onClose={onBack}
+      footer={
+        <div className="flex gap-2">
+          <Button variant="secondary" size="lg" onClick={onBack}>Transcript</Button>
+          <Button block size="lg" onClick={onClose}>Done</Button>
+        </div>
+      }
+    >
       <h2 className="text-[1.4rem] font-semibold tracking-tight">Nice conversation</h2>
       {summary.went_well && (
         <section className="mt-5">
@@ -303,9 +372,9 @@ function SummarySheet({ summary, lang, support, onClose }: { summary: TalkSummar
           <ul className="divide-y divide-line">
             {summary.mistakes.map((m, i) => (
               <li key={i} className="py-3">
-                <p className="text-[13px] text-ink-3">You said <Tgt lang={lang} className="text-[15px] text-ink-2 line-through decoration-ink-3/50">{m.you_said}</Tgt></p>
+                <p className="text-[13px] text-ink-3">You said <Target text={m.you_said} lang={lang} className="text-[15px] text-ink-2 line-through decoration-ink-3/50" /></p>
                 <p className="mt-0.5 flex items-center gap-2">
-                  <Tgt lang={lang} className="text-lg text-ink">{m.better}</Tgt>
+                  <Target text={m.better} lang={lang} className="text-lg text-ink" />
                   <PlayButton text={m.better} lang={lang} size="sm" />
                 </p>
                 {m.note && <p className="text-[13px] text-ink-2">{m.note}</p>}

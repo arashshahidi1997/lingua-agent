@@ -69,6 +69,20 @@ web/
 Navigation has no router: `state/nav.ts` holds the active tab plus a stack of overlays (player, readers,
 chat, settings). Opening an overlay pushes a history entry, so the Android back button closes it.
 
+A few cross-cutting pieces:
+
+- **Script display** (Both / Script only / Transliteration): every piece of target-language text goes
+  through `components/Text.tsx` (`Target` for short strings, `ItemText` for text + transliteration + gloss);
+  the rule itself is `lib/script.ts`.
+- **Offline queue** (`lib/offline.ts`): lesson, quiz and practice completions, card reviews and activity
+  time carry an `event_id`; when the network is down they are kept in localStorage and replayed in order
+  on the `online` event and at app start. Review falls back to the due cards last fetched on this device.
+- **Who's signed in** (`lib/me.ts`): owner or guest, from `GET /api/me`; owner-only copy and settings
+  check it.
+- **Carpet border** (`components/Carpet.tsx`, styles and colours at the end of the tokens in
+  `index.css`, `--carpet-*`): a decorative Persian-carpet band in the page margins at `lg` and wider,
+  and a slim band at the top of Today on narrower screens.
+
 ## Stack choices and why
 
 - **React 19 + TypeScript** — most AI tools (Claude, Copilot, Cursor) generate React better than any other framework due to training-data volume; that matters more for solo + AI-assisted dev than the small Svelte advantages. See `decisions.md` D-frontend.

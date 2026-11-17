@@ -7,9 +7,11 @@ export function errorMessage(e: unknown): string {
 
 /** Friendly error: hides HTTP noise for the common cases. */
 export function friendlyError(error: string): string {
-  if (error.startsWith('404')) return 'This isn’t available yet.'
-  if (error.startsWith('501')) return 'This isn’t set up on the server yet.'
-  if (/failed to fetch|networkerror|load failed/i.test(error)) return 'Can’t reach the server. Check that lingua-agent is running.'
+  if (error.startsWith('404')) return 'Not found — it may have been deleted.'
+  if (error.startsWith('501')) return 'This isn’t set up yet.'
+  if (/failed to fetch|networkerror|load failed|network error/i.test(error)) {
+    return 'Can’t reach the app — check your connection and that Tailscale is on.'
+  }
   return error.replace(/^\d{3}\s+/, '')
 }
 
@@ -63,6 +65,17 @@ export function useElapsed(running: boolean): number {
   }, [running])
   if (!running || start === null) return 0
   return Math.max(0, Math.round((now - start) / 1000))
+}
+
+/** Seconds since the timestamp `t0` (ms), ticking each second; 0 when null. */
+export function useSecondsSince(t0: number | null): number {
+  const [now, setNow] = useState(() => Date.now())
+  useEffect(() => {
+    if (t0 === null) return
+    const id = window.setInterval(() => setNow(Date.now()), 1000)
+    return () => window.clearInterval(id)
+  }, [t0])
+  return t0 === null ? 0 : Math.max(0, Math.round((now - t0) / 1000))
 }
 
 export function formatElapsed(s: number): string {

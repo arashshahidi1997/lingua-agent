@@ -1,11 +1,12 @@
-import { BookText, Layers, MessageCircle, Play, Plus, Sparkles } from 'lucide-react'
+import { BookText, Flag, Layers, MessageCircle, Play, Plus, Sparkles } from 'lucide-react'
 import { courseApi } from '../lib/course-api'
 import { useAsync } from '../lib/hooks'
 import { languageName } from '../lib/rtl'
 import { useNav } from '../state/nav'
 import { useSettings } from '../state/settings'
 import { Button, Empty, ErrorNote, List, Loading, Page, ProgressLine, Row } from '../components/ui'
-import { Tgt } from '../components/Text'
+import { Target } from '../components/Text'
+import { CarpetBand } from '../components/Carpet'
 
 function greeting(d: Date): string {
   const h = d.getHours()
@@ -28,6 +29,7 @@ export default function Today() {
 
   return (
     <Page>
+      <CarpetBand className="lg:hidden" />
       <div className="mb-8 pt-4">
         <p className="text-sm text-ink-3">{day}</p>
         <h1 className="mt-1 text-[1.75rem] font-semibold tracking-tight">{greeting(now)}</h1>
@@ -45,9 +47,9 @@ export default function Today() {
           {data.next_lesson ? (
             <button
               type="button"
+              // Through the lesson sheet: its note (grammar, culture) comes before the exercises.
               onClick={() => nav.open({
-                kind: 'player',
-                source: { type: 'lesson', courseId: data.course!.id, lessonId: data.next_lesson!.lesson_id, title: data.next_lesson!.title },
+                kind: 'lesson-sheet', courseId: data.course!.id, lessonId: data.next_lesson!.lesson_id, locked: false,
               })}
               className="group flex w-full items-center gap-4 rounded-3xl bg-accent p-5 text-start text-accent-ink transition-colors hover:bg-accent-strong sm:p-6"
             >
@@ -64,9 +66,9 @@ export default function Today() {
             <div className="rounded-3xl border border-line bg-surface p-6">
               <p className="text-[13px] text-ink-3">{data.course.title}</p>
               <p className="mt-1 text-lg font-medium">You’ve finished every lesson in this course.</p>
-              <p className="mt-1 text-sm text-ink-2">A quick quiz keeps it fresh.</p>
+              <p className="mt-1 text-sm text-ink-2">A little practice keeps it fresh.</p>
               <Button className="mt-4" onClick={() => nav.open({ kind: 'player', source: { type: 'practice', courseId: data.course!.id } })}>
-                Start a quiz
+                Practice
               </Button>
             </div>
           )}
@@ -85,23 +87,38 @@ export default function Today() {
           </div>
 
           <List>
-            <Row
-              icon={<Layers size={18} />}
-              title={data.due_count > 0 ? `${data.due_count} word${data.due_count === 1 ? '' : 's'} to review` : 'No words due'}
-              detail={data.due_count > 0 ? 'Flashcards, a few minutes' : `${data.learned_count} learned so far`}
-              onClick={() => nav.open({ kind: 'review' })}
-            />
+            {data.checkpoint && (
+              <Row
+                icon={<Flag size={18} />}
+                title={`Checkpoint · ${data.checkpoint.unit_title}`}
+                detail="The lessons are done. Pass the quiz to finish the unit."
+                onClick={() => nav.open({
+                  kind: 'player',
+                  source: { type: 'quiz', courseId: data.course!.id, unitId: data.checkpoint!.unit_id, title: data.checkpoint!.unit_title },
+                })}
+              />
+            )}
+            {data.due_count > 0 ? (
+              <Row
+                icon={<Layers size={18} />}
+                title={`${data.due_count} word${data.due_count === 1 ? '' : 's'} to review`}
+                detail="Flashcards, a few minutes"
+                onClick={() => nav.open({ kind: 'review' })}
+              />
+            ) : (
+              <Row icon={<Layers size={18} />} title="No words due" detail={`${data.learned_count} learned so far`} />
+            )}
             <Row
               icon={<Sparkles size={18} />}
-              title="Quick quiz"
-              detail="Mixed practice from what you’ve learned"
+              title="Practice"
+              detail={data.learned_count === 0 ? 'After your first lesson' : 'Mixed exercises from what you’ve learned'}
               onClick={() => nav.open({ kind: 'player', source: { type: 'practice', courseId: data.course!.id } })}
               disabled={data.learned_count === 0}
             />
             {data.story && (
               <Row
                 icon={<BookText size={18} />}
-                title={<>Story · <Tgt lang={pair.target}>{data.story.title}</Tgt></>}
+                title={<>Story · <Target text={data.story.title} lang={pair.target} /></>}
                 detail={data.story.title_gloss}
                 onClick={() => nav.open({ kind: 'story', id: data.story!.id })}
               />

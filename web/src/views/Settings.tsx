@@ -1,8 +1,8 @@
-import { useEffect, useState, type ReactNode } from 'react'
+import { useEffect, useState, type MouseEvent, type ReactNode } from 'react'
 import { Download, HardDrive } from 'lucide-react'
 import { api, type Language } from '../lib/api'
-import { courseApi } from '../lib/course-api'
-import { useAsync } from '../lib/hooks'
+import { errorMessage, useAsync } from '../lib/hooks'
+import { getMe, useMe } from '../lib/me'
 import { hasVoice } from '../lib/speech'
 import { languageName } from '../lib/rtl'
 import { useNav } from '../state/nav'
@@ -20,16 +20,17 @@ export default function Settings() {
   const { settings, update, pair, setPair } = useSettings()
   const langs = useAsync('languages', () => api.languages())
   const health = useAsync('health', () => api.health())
-  const me = useAsync('me', () => courseApi.me())
+  const me = useMe()
+  const owner = me?.owner === true
   // Material sources are the owner's SSD and Drive; guests don't see them (the API answers 403).
-  const sources = useAsync('materials', async () => ((await courseApi.me()).owner ? api.materialsSources() : null))
+  const sources = useAsync('materials', async () => ((await getMe())?.owner ? api.materialsSources() : null))
 
   return (
     <Screen title="Settings" onBack={nav.close}>
       <div className="mx-auto w-full max-w-2xl space-y-10 px-4 pb-20 pt-6">
-        {me.data && !me.data.owner && (
+        {me && !me.owner && (
           <p className="rounded-2xl bg-surface-2 px-4 py-3 text-[15px] text-ink">
-            Signed in as {me.data.name}. <span className="text-ink-2">Your progress, cards and recordings are your own.</span>
+            Signed in as {me.name}. <span className="text-ink-2">Your progress, cards and recordings are your own.</span>
           </p>
         )}
         <Group title="Languages">
@@ -88,7 +89,7 @@ export default function Settings() {
               options={[{ value: '0.75', label: 'Slower' }, { value: '1', label: 'Normal' }]}
             />
           </div>
-          <VoiceCheck lang={pair.target} voice={settings.voice} />
+          <VoiceCheck lang={pair.target} voice={settings.voice} owner={owner} />
         </Group>
 
         <Group title="Goals">
@@ -104,21 +105,23 @@ export default function Settings() {
           <Toggle label="Show streak" description="Days in a row with some practice." checked={settings.showStreak} onChange={(v) => update({ showStreak: v })} />
         </Group>
 
-        <Group title="AI provider">
-          {health.loading && !health.data && <Loading />}
-          {health.error && <ErrorNote error={health.error} onRetry={health.reload} />}
-          {health.data && (
-            <p className="text-[15px] text-ink">
-              {health.data.ai_provider} <span className="text-ink-3">· lingua-agent {health.data.version}</span>
-            </p>
-          )}
-          <p className="mt-1 text-[13px] text-ink-3">Configured with environment variables on the server. See docs/providers.md.</p>
-        </Group>
+        {owner && (
+          <Group title="AI model">
+            {health.loading && !health.data && <Loading />}
+            {health.error && <ErrorNote error={health.error} onRetry={health.reload} />}
+            {health.data && (
+              <p className="text-[15px] text-ink">
+                {health.data.ai_label || health.data.ai_provider} <span className="text-ink-3">· version {health.data.version}</span>
+              </p>
+            )}
+            <p className="mt-1 text-[13px] text-ink-3">Set on the server.</p>
+          </Group>
+        )}
 
         {sources.data !== null && <Group title="Material sources">
           {sources.loading && !sources.data && <Loading />}
           {sources.error && <ErrorNote error={sources.error} onRetry={sources.reload} />}
-          {sources.data?.length === 0 && <p className="text-sm text-ink-3">No sources configured. Add one with <code className="text-[13px]">lingua-agent materials add</code>.</p>}
+          {sources.data?.length === 0 && <p className="text-sm text-ink-3">No sources set up yet.</p>}
           {sources.data && sources.data.length > 0 && (
             <ul className="divide-y divide-line border-y border-line">
               {sources.data.map((s) => (
@@ -139,12 +142,7 @@ export default function Settings() {
         </Group>}
 
         <Group title="Your data">
-          <a
-            href={api.exportAnkiUrl(pair.target)}
-            className="inline-flex h-11 items-center gap-2 rounded-xl border border-line-strong bg-surface px-4 text-[15px] text-ink hover:bg-surface-2"
-          >
-            <Download size={18} aria-hidden /> Export {languageName(pair.target)} cards for Anki
-          </a>
+          <AnkiExport target={pair.target} />
           <p className="mt-2 text-[13px] text-ink-3">Settings are stored in this browser.</p>
         </Group>
       </div>
@@ -181,7 +179,57 @@ function LangSelect({ label, value, langs, onChange }: {
   )
 }
 
-function VoiceCheck({ lang, voice }: { lang: string; voice: S['voice'] }) {
+/**
+ * A real download link (the service worker leaves /api/ navigations alone). Clicking fetches the file first,
+ * so "no cards yet" can be said in words instead of opening a raw error.
+ */
+function AnkiExport({ target }: { target: string }) {
+  const [state, setState] = useState<{ target: string; status: 'idle' | 'busy' | 'none' | 'error'; error?: string }>({ target, status: 'idle' })
+  const status = state.target === target ? state.status : 'idle'
+  const url = api.exportAnkiUrl(target)
+  const filename = `lingua-${target}.csv`
+
+  const onClick = async (e: MouseEvent<HTMLAnchorElement>) => {
+    e.preventDefault()
+    setState({ target, status: 'busy' })
+    try {
+      const res = await fetch(url, { cache: 'no-store' })
+      if (res.status === 404) { setState({ target, status: 'none' }); return }
+      if (!res.ok) throw new Error(`${res.status} ${res.statusText}`)
+      const blobUrl = URL.createObjectURL(await res.blob())
+      const a = document.createElement('a')
+      a.href = blobUrl
+      a.download = filename
+      document.body.appendChild(a)
+      a.click()
+      a.remove()
+      window.setTimeout(() => URL.revokeObjectURL(blobUrl), 10_000)
+      setState({ target, status: 'idle' })
+    } catch (err) {
+      setState({ target, status: 'error', error: errorMessage(err) })
+    }
+  }
+
+  if (status === 'none') {
+    return <p className="text-[15px] text-ink-2">No {languageName(target)} cards to export yet. They’re made as you finish lessons.</p>
+  }
+  return (
+    <div className="space-y-3">
+      <a
+        href={url}
+        download={filename}
+        onClick={onClick}
+        aria-busy={status === 'busy'}
+        className="inline-flex h-11 items-center gap-2 rounded-xl border border-line-strong bg-surface px-4 text-[15px] text-ink hover:bg-surface-2"
+      >
+        <Download size={18} aria-hidden /> {status === 'busy' ? 'Preparing the file' : `Export ${languageName(target)} cards for Anki`}
+      </a>
+      {status === 'error' && <ErrorNote error={state.error} />}
+    </div>
+  )
+}
+
+function VoiceCheck({ lang, voice, owner }: { lang: string; voice: S['voice']; owner: boolean }) {
   const [ok, setOk] = useState<boolean | null>(null)
   useEffect(() => {
     let alive = true
@@ -194,7 +242,7 @@ function VoiceCheck({ lang, voice }: { lang: string; voice: S['voice'] }) {
       <p className="text-[13px] text-ink-2">
         {ok === null ? 'Checking voices' : ok
           ? `A ${languageName(lang)} voice is available.`
-          : `No ${languageName(lang)} voice found. Install one in your system’s text-to-speech settings, or set up a server voice.`}
+          : `No ${languageName(lang)} voice found. Install one in your system’s text-to-speech settings${owner ? ', or set up a server voice' : ''}.`}
       </p>
       {ok && <PlayButton text={SAMPLE[lang] ?? 'Hello'} lang={lang} label="Play a sample" />}
     </div>

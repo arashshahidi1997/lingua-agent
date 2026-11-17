@@ -12,6 +12,7 @@
 
 import { courseApi, type SpeechInfo } from './course-api'
 import { bcp47, languageName } from './rtl'
+import { knownOwner } from './me'
 
 export type VoiceMode = 'auto' | 'browser' | 'off'
 
@@ -90,7 +91,7 @@ export function onSpeechHint(fn: HintListener): () => void {
 function hintNoVoice(lang: string) {
   if (hinted.has(lang)) return
   hinted.add(lang)
-  const msg = `No voice for ${languageName(lang)} on this device. You can add one in your system settings, or set up a server voice.`
+  const msg = `No voice for ${languageName(lang)} on this device. You can add one in your system settings${knownOwner() ? ', or set up a server voice' : ''}.`
   hintListeners.forEach((fn) => fn(msg))
 }
 

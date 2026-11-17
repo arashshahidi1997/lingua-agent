@@ -6,6 +6,7 @@ export interface Health {
   status: string
   version: string
   ai_provider: string
+  ai_label: string            // plain words, e.g. "Ollama · qwen2.5:7b, on this computer"
 }
 
 export interface Language {
@@ -132,6 +133,10 @@ export interface Card {
   lapses: number
   needs_extra_review: boolean
   due_at: string
+  // Course and Talk cards: the target-language side split out, so it can be spoken and shown per the
+  // script-display setting. null for cards made from your own texts (use `back`).
+  text: string | null
+  tr: string | null
 }
 
 export interface ReviewResponse {
@@ -139,23 +144,6 @@ export interface ReviewResponse {
   interval_after: number
   ease_after: number
   repetitions_after: number
-}
-
-export interface SessionMessage {
-  role: 'system' | 'user' | 'assistant' | 'tool'
-  content: string
-  name?: string | null
-  created_at: string
-}
-
-export interface TutorSession {
-  id: string
-  source_language: string
-  target_language: string
-  support_language: string | null
-  messages: SessionMessage[]
-  created_at: string
-  updated_at: string
 }
 
 export interface MaterialsSource {
@@ -189,10 +177,16 @@ export const api = {
   unitDetail: (id: string) => request<UnitDetail>(`/units/${id}/detail`),
   cardsDue: (target?: string, limit = 50) =>
     request<Card[]>(`/cards/due?${new URLSearchParams({ ...(target ? { target } : {}), limit: String(limit) })}`),
-  reviewCard: (id: string, rating: number) =>
+  // event_id makes the call idempotent, so an offline queue can replay it safely.
+  reviewCard: (id: string, rating: number, eventId?: string, seconds?: number) =>
     request<ReviewResponse>(`/cards/${id}/review`, {
-      method: 'POST', body: JSON.stringify({ rating }),
+      method: 'POST', body: JSON.stringify({ rating, event_id: eventId ?? null, seconds: seconds ?? 0 }),
     }),
+  deleteUnit: (id: string) => fetch(`/api/units/${id}`, { method: 'DELETE' }).then((r) => {
+    if (!r.ok) throw new Error(`${r.status} ${r.statusText}`)
+  }),
+  // source_language is the language the pasted text is written in: the learner's own language (the lesson
+  // translates it into the target) or the target language itself (native material, explained in support).
   ingestText: (body: {
     text: string
     title: string
@@ -202,13 +196,6 @@ export const api = {
     cefr_level?: string | null
     tags?: string[]
   }) => request<IngestSummary>('/ingest/text', { method: 'POST', body: JSON.stringify(body) }),
-  openSession: (body: { source_language: string; target_language: string; support_language?: string | null }) =>
-    request<TutorSession>('/tutor/sessions', { method: 'POST', body: JSON.stringify(body) }),
-  getSession: (id: string) => request<TutorSession>(`/tutor/sessions/${id}`),
-  sendMessage: (id: string, content: string) =>
-    request<{ role: string; content: string; created_at: string }>(
-      `/tutor/sessions/${id}/messages`, { method: 'POST', body: JSON.stringify({ content }) },
-    ),
   materialsSources: () => request<MaterialsSource[]>('/materials/sources'),
   exportAnkiUrl: (target: string) => `/api/export/anki?target=${encodeURIComponent(target)}`,
 }

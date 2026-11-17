@@ -2,11 +2,12 @@ import { BookText, FileText, Lock, MessagesSquare, Plus } from 'lucide-react'
 import { api } from '../lib/api'
 import { courseApi } from '../lib/course-api'
 import { useAsync } from '../lib/hooks'
+import { useIngestJob } from '../lib/pending-ingest'
 import { languageName } from '../lib/rtl'
 import { useNav, type LibrarySection } from '../state/nav'
 import { useSettings } from '../state/settings'
-import { Button, Empty, ErrorNote, List, Loading, Page, PageTitle, Row, Segmented } from '../components/ui'
-import { Tgt } from '../components/Text'
+import { Button, Empty, ErrorNote, List, Loading, Page, PageTitle, Row, Segmented, Spinner } from '../components/ui'
+import { Target } from '../components/Text'
 import AudioSection from './AudioSection'
 import AddText from './AddText'
 
@@ -65,7 +66,7 @@ function Stories() {
         <Row
           key={s.id}
           icon={s.unlocked ? (s.kind === 'dialogue' ? <MessagesSquare size={18} /> : <BookText size={18} />) : <Lock size={16} />}
-          title={<span className={s.unlocked ? '' : 'text-ink-3'}><Tgt lang={pair.target}>{s.title}</Tgt></span>}
+          title={<span className={s.unlocked ? '' : 'text-ink-3'}><Target text={s.title} lang={pair.target} /></span>}
           detail={`${s.title_gloss} · ${s.kind} · ${s.line_count} lines${s.unlocked ? '' : ' · locked'}`}
           onClick={s.unlocked ? () => nav.open({ kind: 'story', id: s.id }) : undefined}
           trailing={s.unlocked ? undefined : <span />}
@@ -79,20 +80,32 @@ function YourLessons() {
   const { pair } = useSettings()
   const nav = useNav()
   const { data, error, loading, reload } = useAsync(`units|${pair.target}|${nav.dataVersion}`, () => api.units(pair.target))
+  const job = useIngestJob()
+  const making = job && !job.done ? (
+    <button type="button" onClick={() => nav.setLibrarySection('add')} className="mb-4 flex w-full items-center justify-between gap-3 rounded-xl bg-surface-2 px-4 py-3 text-start text-sm text-ink">
+      <span className="min-w-0 truncate">“{job.title}” is still being made</span>
+      <Spinner label="Working" />
+    </button>
+  ) : null
 
-  if (loading && !data) return <Loading />
+  if (loading && !data) return <>{making}<Loading /></>
   if (error && !data) return <ErrorNote error={error} onRetry={reload} />
   if (!data?.length) {
     return (
+      <>
+      {making}
       <Empty
         title="No lessons of your own yet"
         action={<Button variant="secondary" onClick={() => nav.setLibrarySection('add')}><Plus size={16} aria-hidden /> Add a text</Button>}
       >
         Paste any {languageName(pair.target)} text and it becomes a lesson with vocabulary, grammar notes and cards.
       </Empty>
+      </>
     )
   }
   return (
+    <>
+    {making}
     <List>
       {data.map((u) => (
         <Row
@@ -104,5 +117,6 @@ function YourLessons() {
         />
       ))}
     </List>
+    </>
   )
 }

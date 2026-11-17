@@ -5,7 +5,7 @@ import { languageName } from '../lib/rtl'
 import { useNav } from '../state/nav'
 import { useSettings } from '../state/settings'
 import { ErrorNote, List, Loading, Page, PageTitle, Row, SectionLabel } from '../components/ui'
-import { Tgt } from '../components/Text'
+import { Target } from '../components/Text'
 
 export default function Talk() {
   const { pair } = useSettings()
@@ -40,7 +40,7 @@ export default function Talk() {
               icon={s.unlocked ? <MessageCircle size={18} /> : <Lock size={16} />}
               title={
                 <span className={s.unlocked ? '' : 'text-ink-3'}>
-                  {s.title} <span className="text-ink-3">· <Tgt lang={pair.target}>{s.title_target}</Tgt></span>
+                  {s.title} <span className="text-ink-3">· <Target text={s.title_target} lang={pair.target} /></span>
                 </span>
               }
               detail={s.unlocked ? s.goal : `Locked · ${s.goal}`}

@@ -1,5 +1,7 @@
-import type { ReactNode } from 'react'
-import { BookOpen, Library as LibraryIcon, MessageCircle, Route, Settings as SettingsIcon } from 'lucide-react'
+import { useCallback, useEffect, useRef, useSyncExternalStore, type ReactNode } from 'react'
+import { BookOpen, CloudOff, Library as LibraryIcon, MessageCircle, Route, Settings as SettingsIcon } from 'lucide-react'
+import { onSynced, pendingCount, startOfflineSync, subscribeQueue } from './lib/offline'
+import { CarpetMargins } from './components/Carpet'
 import { SettingsProvider } from './state/SettingsProvider'
 import { NavProvider } from './state/NavProvider'
 import { useNav, type Overlay, type Tab } from './state/nav'
@@ -37,10 +39,26 @@ export default function App() {
 }
 
 function Shell() {
-  const { tab, setTab, stack, open } = useNav()
+  const { tab, setTab, stack, open, bumpData } = useNav()
+  const mainRef = useRef<HTMLElement>(null)
+  const pending = useSyncExternalStore(subscribeQueue, pendingCount)
+
+  // Progress saved offline goes up when the connection is back; refetch once it has.
+  useEffect(() => {
+    startOfflineSync()
+    return onSynced(bumpData)
+  }, [bumpData])
+
+  // After switching tabs, focus moves to the page (not left on the tab button), so screen readers land on
+  // the new content and a key press doesn't light up the rail.
+  const go = useCallback((t: Tab) => {
+    setTab(t)
+    mainRef.current?.focus({ preventScroll: true })
+  }, [setTab])
 
   return (
     <div className="min-h-dvh bg-canvas text-ink">
+      <CarpetMargins />
       {/* Rail on ≥ md */}
       <nav aria-label="Main" className="fixed inset-y-0 start-0 z-30 hidden w-20 flex-col items-center gap-1 border-e border-line bg-canvas pt-6 md:flex">
         <div className="mb-6 text-[13px] font-semibold tracking-tight text-accent" aria-hidden>lingua</div>
@@ -48,10 +66,10 @@ function Shell() {
           <button
             key={t.key}
             type="button"
-            onClick={() => setTab(t.key)}
+            onClick={() => go(t.key)}
             aria-current={tab === t.key ? 'page' : undefined}
-            className={`flex w-16 flex-col items-center gap-1 rounded-2xl py-2.5 text-[11px] transition-colors ${
-              tab === t.key ? 'bg-accent-soft font-medium text-accent' : 'text-ink-3 hover:bg-surface-2 hover:text-ink'
+            className={`flex w-16 flex-col items-center gap-1 rounded-2xl py-2.5 text-[11px] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-accent ${
+              tab === t.key ? 'bg-accent-soft font-medium text-accent' : 'text-ink-3 hover:bg-hover hover:text-ink'
             }`}
           >
             {t.icon}
@@ -65,6 +83,13 @@ function Shell() {
           <div className="mx-auto flex h-14 max-w-3xl items-center justify-between gap-3 px-4 sm:px-6">
             <span className="text-[15px] font-semibold tracking-tight text-ink md:invisible">lingua</span>
             <div className="flex items-center gap-1.5">
+              {pending > 0 && (
+                <span role="status" title="Saved offline — will sync" className="inline-flex items-center gap-1.5 text-[12px] text-ink-3">
+                  <CloudOff size={16} aria-hidden />
+                  <span className="hidden sm:inline">Saved offline — will sync</span>
+                  <span className="sr-only sm:hidden">Saved offline — will sync</span>
+                </span>
+              )}
               <PairChip />
               <IconButton label="Settings" onClick={() => open({ kind: 'settings' })}>
                 <SettingsIcon size={20} strokeWidth={1.75} />
@@ -73,7 +98,7 @@ function Shell() {
           </div>
         </header>
 
-        <main className="pb-28 pt-4 md:pb-16">
+        <main ref={mainRef} tabIndex={-1} aria-label={TABS.find((t) => t.key === tab)?.label} className="relative pb-28 pt-4 outline-none md:pb-16">
           {tab === 'today' && <Today />}
           {tab === 'path' && <PathView />}
           {tab === 'library' && <Library />}
@@ -88,7 +113,7 @@ function Shell() {
             <button
               key={t.key}
               type="button"
-              onClick={() => setTab(t.key)}
+              onClick={() => go(t.key)}
               aria-current={tab === t.key ? 'page' : undefined}
               className={`flex flex-col items-center gap-0.5 pb-2 pt-2.5 text-[11px] transition-colors ${
                 tab === t.key ? 'font-medium text-accent' : 'text-ink-3'

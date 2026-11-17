@@ -11,12 +11,12 @@ lessons or features; new ideas wait in "Ideas (parked)".
 ## Complete what exists (first)
 
 - [x] Completeness audit: [audit/2026-11-17-completeness.md](audit/2026-11-17-completeness.md) — 4 decisions, 14 broken, 15 rough, 3 guest items, leftovers
-- [ ] Work through the audit's A (broken), B (rough) and C (guest) items [web, core]
-- [ ] Decisions D1–D4 in the audit (Talk's model, Add-text language, offline review, v1 leftovers) — **user**
+- [x] Work through the audit's A (broken), B (rough) and C (guest) items; D2–D4 as decided
+- [ ] Decision D1: Talk's model (local qwen2.5:7b writes wrong Persian; Claude Max, an OpenAI API key, or the Claude API) — **user**
 - [ ] Your voice for the existing course: 4 recordings from `content/recording/fa-en-a1/*.html` → Drive folder → split, match, normalise; the app prefers the native clip over Piper [content, core] — recording: **user**
 - [ ] Generated lessons ("Your lessons") are poor with `qwen2.5:7b` (see Phase 5b below); either fix or label them clearly as experimental [core]
 - [ ] Sara and Ali share one synthetic voice (only `fa_IR-amir` installed) — moot once your voice is in, except for lines not yet recorded [core]
-- [ ] Docs out of date with Product v2: architecture.md, clients.md, playground.md, roadmap order; README status line still says "MVP" [docs]
+- [ ] Roadmap order still pre-v2 (architecture, clients, playground, README updated 2026-11-17) [docs]
 
 ## Now
 

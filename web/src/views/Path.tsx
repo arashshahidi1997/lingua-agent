@@ -51,7 +51,7 @@ function NoCourse() {
         title={`No course for ${languageName(pair.target)} yet`}
         action={<Button variant="secondary" onClick={() => { nav.setLibrarySection('add'); nav.setTab('library') }}>Add your own text</Button>}
       >
-        Courses are built from a syllabus on the server. Meanwhile, your own texts become lessons in Library.
+        There’s no ready-made course for this language yet. Meanwhile, any text you add in Library becomes a lesson.
       </Empty>
     </div>
   )
@@ -59,6 +59,8 @@ function NoCourse() {
 
 function UnitSection({ course, unit, index }: { course: Course; unit: UnitSummary; index: number }) {
   const nav = useNav()
+  // The quiz opens as soon as the unit is reached; before its lessons are done it is a test-out.
+  const testOut = unit.quiz_state === 'current' && !unit.done
 
   return (
     <section aria-labelledby={`unit-${unit.id}`}>
@@ -95,13 +97,19 @@ function UnitSection({ course, unit, index }: { course: Course; unit: UnitSummar
           />
         )}
         <Node
-          state={unit.quiz_state}
+          state={testOut ? 'open' : unit.quiz_state}
           icon={<Flag size={18} />}
-          title="Checkpoint quiz"
-          detail={unit.quiz_state === 'locked' ? 'After the lessons' : unit.quiz_state === 'done' ? 'Passed' : 'Ready'}
+          title={testOut ? 'Test out' : 'Checkpoint quiz'}
+          detail={
+            unit.quiz_state === 'locked' ? 'Opens when you reach this unit' :
+            unit.quiz_state === 'done' ? 'Passed' :
+            testOut ? 'Already know this? Passing marks the unit’s lessons done.' :
+            'Pass it to finish the unit.'
+          }
           last
           onClick={unit.quiz_state === 'locked' ? undefined : () => nav.open({
-            kind: 'player', source: { type: 'quiz', courseId: course.id, unitId: unit.id, title: `${unit.title} · checkpoint` },
+            kind: 'player',
+            source: { type: 'quiz', courseId: course.id, unitId: unit.id, title: `${unit.title} · checkpoint`, testOut },
           })}
         />
       </ol>
@@ -144,7 +152,7 @@ function Node({ state, title, detail, icon, onClick, last }: {
         <span className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-full ${circle}`}>{glyph}</span>
         <span className="min-w-0 flex-1">
           <span className={`block truncate text-[15px] ${muted ? 'text-ink-3' : state === 'current' ? 'font-medium text-ink' : 'text-ink'}`}>{title}</span>
-          {detail && <span className="block truncate text-[13px] text-ink-3">{detail}</span>}
+          {detail && <span className="block text-[13px] text-ink-3">{detail}</span>}
         </span>
       </button>
       {!last && <div className="h-3" />}

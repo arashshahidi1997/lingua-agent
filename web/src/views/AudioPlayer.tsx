@@ -3,23 +3,29 @@ import { Pause, Play, Repeat, RotateCcw, Trash2 } from 'lucide-react'
 import { courseApi, type AudioTrackDetail } from '../lib/course-api'
 import { errorMessage, formatTime, isStatus, useAsync } from '../lib/hooks'
 import { dirOf } from '../lib/rtl'
+import { useActivityClock } from '../lib/activity'
+import { useMe } from '../lib/me'
 import { stopSpeech } from '../lib/speech'
 import { useNav } from '../state/nav'
 import { useSettings } from '../state/settings'
-import { Button, Empty, ErrorNote, IconButton, Loading, Screen, Segmented } from '../components/ui'
+import { Button, Empty, ErrorNote, IconButton, Loading, Screen, Segmented, Toggle } from '../components/ui'
+import { Target } from '../components/Text'
 
 /** Imported audio with a cue list synced to playback. */
 export default function AudioPlayer({ id }: { id: string }) {
   const nav = useNav()
   const { data, error, reload, setData } = useAsync(`audio/${id}`, () => courseApi.audioTrack(id))
+  const [delError, setDelError] = useState<string | null>(null)
 
   const remove = async () => {
-    if (!window.confirm('Delete this audio from your library? The file is removed from the server.')) return
+    if (!window.confirm('Delete this audio from your library? The file is removed and this can’t be undone.')) return
+    setDelError(null)
     try {
       await courseApi.deleteAudio(id)
+      nav.bumpData()
       nav.close()
-    } catch {
-      // stay; the list will still show it
+    } catch (e) {
+      setDelError(`Couldn’t delete the audio. ${errorMessage(e)}`)
     }
   }
 
@@ -32,6 +38,7 @@ export default function AudioPlayer({ id }: { id: string }) {
       <div className="mx-auto w-full max-w-2xl px-4 pb-16 pt-4">
         {!data && !error && <Loading />}
         <ErrorNote error={error} onRetry={reload} />
+        {delError && <div className="mb-4"><ErrorNote error={delError} /></div>}
         {data && <Track track={data} onTranscribed={setData} />}
       </div>
     </Screen>
@@ -49,6 +56,10 @@ function Track({ track, onTranscribed }: { track: AudioTrackDetail; onTranscribe
   const [loop, setLoop] = useState(false)
   const [transcribing, setTranscribing] = useState(false)
   const [tErr, setTErr] = useState<string | null>(null)
+  const [showGloss, setShowGloss] = useState(settings.showGloss)
+  const me = useMe()
+  const clock = useActivityClock('audio')
+  const hasGloss = track.cues.some((c) => c.gloss)
 
   const cues = track.cues
   const current = cues.findIndex((c) => time >= c.start && time < c.end)
@@ -96,7 +107,7 @@ function Track({ track, onTranscribed }: { track: AudioTrackDetail; onTranscribe
       onTranscribed(await courseApi.transcribeAudio(track.id))
     } catch (e) {
       setTErr(isStatus(e, 501)
-        ? 'Transcription isn’t installed on this server yet. You can upload a transcript (.srt, .vtt or .txt) with the audio instead.'
+        ? 'Transcription isn’t set up yet. You can upload a transcript (.srt, .vtt or .txt) with the audio instead.'
         : errorMessage(e))
     } finally {
       setTranscribing(false)
@@ -113,9 +124,9 @@ function Track({ track, onTranscribed }: { track: AudioTrackDetail; onTranscribe
         preload="metadata"
         onTimeUpdate={onTime}
         onLoadedMetadata={(e) => { setDuration(e.currentTarget.duration); e.currentTarget.playbackRate = Number(rate) }}
-        onPlay={() => setPlaying(true)}
-        onPause={() => setPlaying(false)}
-        onEnded={() => setPlaying(false)}
+        onPlay={() => { setPlaying(true); clock.start() }}
+        onPause={() => { setPlaying(false); clock.stop() }}
+        onEnded={() => { setPlaying(false); clock.stop() }}
       />
 
       {/* transport */}
@@ -153,17 +164,24 @@ function Track({ track, onTranscribed }: { track: AudioTrackDetail; onTranscribe
             <Repeat size={16} aria-hidden /> Loop line
           </button>
           <IconButton label="Back 5 seconds" onClick={() => seek(Math.max(0, time - 5))}><RotateCcw size={18} /></IconButton>
+          {hasGloss && (
+            <div className="ms-auto min-w-[13rem]"><Toggle label="Show translations" checked={showGloss} onChange={setShowGloss} /></div>
+          )}
         </div>
       </div>
 
       {cues.length === 0 ? (
         <div className="pt-6">
-          <Empty
-            title="No transcript yet"
-            action={<Button variant="secondary" onClick={transcribe} disabled={transcribing}>{transcribing ? 'Transcribing. This can take a while.' : 'Transcribe'}</Button>}
-          >
-            Make one on the server to follow along line by line.
-          </Empty>
+          {me?.owner ? (
+            <Empty
+              title="No transcript yet"
+              action={<Button variant="secondary" onClick={transcribe} disabled={transcribing}>{transcribing ? 'Transcribing. This can take a while.' : 'Transcribe'}</Button>}
+            >
+              Make one to follow along line by line.
+            </Empty>
+          ) : (
+            <Empty title="No transcript yet">Upload the audio again with a transcript (.srt, .vtt or .txt) to follow along line by line.</Empty>
+          )}
           <div className="mt-4"><ErrorNote error={tErr} /></div>
         </div>
       ) : (
@@ -180,11 +198,12 @@ function Track({ track, onTranscribed }: { track: AudioTrackDetail; onTranscribe
                 >
                   <span className="w-10 shrink-0 pt-1 text-[12px] tabular-nums text-ink-3">{formatTime(c.start)}</span>
                   <span className="min-w-0 flex-1">
-                    <span lang={track.language} dir={dir} className={`block ${dir === 'rtl' ? 'text-xl' : 'font-serif text-lg'} ${active ? 'text-ink' : 'text-ink-2'}`}>
-                      {c.text}
+                    <span dir={dir} className="block">
+                      <Target text={c.text} tr={c.tr} lang={track.language} stack
+                        className={`${dir === 'rtl' ? 'text-xl' : 'font-serif text-lg'} ${active ? 'text-ink' : 'text-ink-2'}`}
+                        trClassName="mt-0.5 text-[13px] text-ink-3" />
                     </span>
-                    {c.tr && settings.script !== 'script' && <span dir="ltr" className="mt-0.5 block text-[13px] text-ink-3">{c.tr}</span>}
-                    {c.gloss && settings.showGloss && <span className="mt-0.5 block text-[13px] text-ink-2">{c.gloss}</span>}
+                    {c.gloss && showGloss && <span className="mt-0.5 block text-[13px] text-ink-2">{c.gloss}</span>}
                   </span>
                 </button>
               </li>

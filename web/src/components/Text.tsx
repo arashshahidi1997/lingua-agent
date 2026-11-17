@@ -1,13 +1,40 @@
 // Target-language text, rendered with the right lang/dir/font and the
 // learner's display settings (script / transliteration / gloss).
 
-import { useState, type ReactNode } from 'react'
+import { useState } from 'react'
 import { dirOf } from '../lib/rtl'
+import { scriptView } from '../lib/script'
 import { useSettings } from '../state/settings'
 
-/** Inline target-language text with lang + dir set (Persian picks up Vazirmatn via [lang]). */
-export function Tgt({ lang, children, className = '' }: { lang: string; children: ReactNode; className?: string }) {
-  return <span lang={lang} dir={dirOf(lang)} className={className}>{children}</span>
+/**
+ * Any short piece of target-language text (a choice, a tile, a title, a correction): lang + dir set, and
+ * the learner's script-display setting applied. Without `tr` it shows the script whatever the setting.
+ * `stack` puts the transliteration on its own line under the script; otherwise it follows inline.
+ */
+export function Target({ text, tr, lang, className = '', trClassName = 'text-[0.8em] text-ink-3', stack = false, hideTr = false }: {
+  text: string
+  tr?: string | null
+  lang: string
+  className?: string
+  trClassName?: string
+  stack?: boolean
+  hideTr?: boolean
+}) {
+  const { settings } = useSettings()
+  const v = scriptView(settings.script, tr, hideTr)
+  const dir = dirOf(lang)
+  if (v.trIsMain) return <span dir="ltr" className={`${className} [unicode-bidi:isolate]`}>{tr}</span>
+  const script = <span lang={lang} dir={dir} className={`${className} [unicode-bidi:isolate]`}>{text}</span>
+  if (!v.showTr) return script
+  if (stack) {
+    return (
+      <span className="inline-flex flex-col">
+        {script}
+        <span dir="ltr" className={`${trClassName} leading-snug`}>{tr}</span>
+      </span>
+    )
+  }
+  return <>{script}<span className={trClassName}> · <span dir="ltr" className="[unicode-bidi:isolate]">{tr}</span></span></>
 }
 
 const SIZES = {
@@ -45,10 +72,8 @@ export function ItemText({
   const sz = SIZES[size]
   const scriptCls = dir === 'rtl' ? sz.fa : `${sz.text} ${serif ? 'font-serif' : ''}`
 
-  const mode = settings.script
-  const showScript = mode !== 'tr' || !tr
-  const showTr = !!tr && !hideTr && mode !== 'script'
-  const trIsMain = mode === 'tr' && !!tr
+  // A question that hides the transliteration tests reading the script, so the script always shows.
+  const { showScript, showTr, trIsMain } = scriptView(settings.script, tr, hideTr)
 
   const glossVisible = glossMode === 'show' || (glossMode === 'reveal' && (showGloss ?? settings.showGloss)) || revealed
   const alignCls = align === 'center' ? 'text-center' : ''

@@ -4,11 +4,12 @@ import { courseApi, type Recording, type Story } from '../lib/course-api'
 import { errorMessage, useAsync } from '../lib/hooks'
 import { canRecord, useRecorder } from '../lib/recorder'
 import { dirOf } from '../lib/rtl'
+import { useActivityClock } from '../lib/activity'
 import { playUrl, speak, stopSpeech } from '../lib/speech'
 import { useNav } from '../state/nav'
 import { useSettings } from '../state/settings'
 import { Button, ErrorNote, IconButton, Loading, Screen, Toggle } from '../components/ui'
-import { ItemText } from '../components/Text'
+import { ItemText, Target } from '../components/Text'
 import { PlayButton } from '../components/PlayButton'
 
 export default function StoryReader({ id }: { id: string }) {
@@ -42,6 +43,8 @@ function Reader({ story }: { story: Story }) {
   const recs = useAsync(`recs/${story.id}`, () => courseApi.recordings(undefined, prefix))
   const mine = recs.data ?? []
   const lineRefs = useRef<(HTMLLIElement | null)[]>([])
+  // Listening (Play all, shadowing) counts toward the daily goal, logged once when the story closes.
+  const clock = useActivityClock('story')
 
   const pitchOf = (speaker: string) => {
     const v = story.speakers[speaker]?.voice
@@ -52,6 +55,7 @@ function Reader({ story }: { story: Story }) {
     if (playingAll) { cancel.current = true; stopSpeech(); return }
     cancel.current = false
     setPlayingAll(true)
+    clock.start()
     const start = current ?? 0
     for (let i = start; i < story.lines.length; i++) {
       if (cancel.current) break
@@ -63,6 +67,7 @@ function Reader({ story }: { story: Story }) {
       await new Promise((r) => window.setTimeout(r, 450))
     }
     setPlayingAll(false)
+    clock.stop()
     if (!cancel.current) setCurrent(null)
   }
 
@@ -74,9 +79,10 @@ function Reader({ story }: { story: Story }) {
     setShadowErr(null)
     setCurrent(i)
     setShadow({ line: i, phase: 'listen' })
+    clock.start()
     await speak(story.lines[i].text, lang, { pitch: pitchOf(story.lines[i].speaker) })
     const ok = await rec.start()
-    if (!ok) { setShadow(null); return }
+    if (!ok) { setShadow(null); clock.stop(); return }
     setShadow({ line: i, phase: 'record' })
   }
 
@@ -84,7 +90,7 @@ function Reader({ story }: { story: Story }) {
     if (!shadow) return
     const i = shadow.line
     const take = await rec.stop()
-    if (!take) { setShadow(null); return }
+    if (!take) { setShadow(null); clock.stop(); return }
     setShadow({ line: i, phase: 'compare' })
     await speak(story.lines[i].text, lang, { pitch: pitchOf(story.lines[i].speaker) })
     try { await playUrl(take.url) } catch { /* ignore */ }
@@ -97,11 +103,14 @@ function Reader({ story }: { story: Story }) {
     } finally {
       URL.revokeObjectURL(take.url)
       setShadow(null)
+      clock.stop()
     }
   }
 
-  const removeRec = async (r: Recording) => {
-    try { await courseApi.deleteRecording(r.id); recs.reload() } catch (e) { setShadowErr(errorMessage(e)) }
+  const removeRec = async (r: Recording, n: number) => {
+    if (!window.confirm(`Delete your recording ${n}? This can’t be undone.`)) return
+    setShadowErr(null)
+    try { await courseApi.deleteRecording(r.id); recs.reload() } catch (e) { setShadowErr(`Couldn’t delete the recording. ${errorMessage(e)}`) }
   }
 
   const dir = dirOf(lang)
@@ -111,8 +120,8 @@ function Reader({ story }: { story: Story }) {
     <article>
       <header className="mb-8">
         <div dir={dir}>
-        <h1 lang={lang} dir={dir} className={`${latin ? 'font-serif text-[1.9rem]' : 'text-[2rem]'} font-semibold leading-snug tracking-tight`}>
-          {story.title}
+        <h1 className="font-semibold leading-snug tracking-tight">
+          <Target text={story.title} lang={lang} className={latin ? 'font-serif text-[1.9rem]' : 'text-[2rem]'} />
         </h1>
         <p lang={pair.support} className="mt-1 text-[15px] text-ink-2">{story.title_gloss}</p>
         </div>
@@ -178,7 +187,7 @@ function Reader({ story }: { story: Story }) {
                     <li key={r.id} className="flex items-center rounded-full border border-line ps-3 text-[13px] text-ink-2">
                       You {k + 1}
                       <PlayButton url={r.url} size="sm" label={`Play your recording ${k + 1}`} tone="plain" />
-                      <IconButton label="Delete recording" size="sm" onClick={() => removeRec(r)}><Trash2 size={14} /></IconButton>
+                      <IconButton label="Delete recording" size="sm" onClick={() => removeRec(r, k + 1)}><Trash2 size={14} /></IconButton>
                     </li>
                   ))}
                 </ul>

@@ -19,6 +19,13 @@
   --danger: #b42318;
   --danger-soft: #fdf0ee;
   --focus: #0f766e;
+  --hover: #f0efed;
+  /* Carpet border (components/Carpet.tsx): muted madder, indigo, ivory and saffron, drawn faint. */
+  --carpet-red: #a4574a;
+  --carpet-indigo: #45567a;
+  --carpet-ivory: #f3ece0;
+  --carpet-saffron: #c99a4a;
+  --carpet-opacity: 0.32;
   color-scheme: light;
 }
 
@@ -39,6 +46,12 @@
     --danger: #f08b80;
     --danger-soft: #2e1714;
     --focus: #3cc7b4;
+    --hover: #2e2a27;
+    --carpet-red: #6b2f27;
+    --carpet-indigo: #2b3858;
+    --carpet-ivory: #3a332b;
+    --carpet-saffron: #8a6a2e;
+    --carpet-opacity: 0.45;
     color-scheme: dark;
   }
 }
@@ -58,6 +71,7 @@
   --color-accent-soft: var(--accent-soft);
   --color-danger: var(--danger);
   --color-danger-soft: var(--danger-soft);
+  --color-hover: var(--hover);
 }
 
 @theme {
@@ -91,12 +105,32 @@ body {
   text-align: right;
 }
 
-/* Visible, consistent focus ring for keyboard users. */
-:where(button, a, input, select, textarea, [tabindex]):focus-visible {
-  outline: 2px solid var(--focus);
-  outline-offset: 2px;
-  border-radius: 8px;
+/* Visible, consistent focus ring for keyboard users. In the base layer, so a component's own
+ * focus style (a utility) wins; no radius, so round buttons keep their shape. */
+@layer base {
+  :where(button, a, input, select, textarea, [tabindex]):focus-visible {
+    outline: 2px solid var(--focus);
+    outline-offset: 2px;
+  }
 }
+
+/* Persian-carpet border in the page margins (components/Carpet.tsx). Fixed, behind everything,
+ * never wider than the margin it sits in. */
+.carpet .cp-rd { fill: var(--carpet-red); }
+.carpet .cp-in { fill: var(--carpet-indigo); }
+.carpet .cp-iv { fill: var(--carpet-ivory); }
+.carpet .cp-sf { fill: var(--carpet-saffron); }
+.carpet { opacity: var(--carpet-opacity); }
+.carpet-side {
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  width: 48px;
+  z-index: 0;
+}
+/* 5rem is the rail; the gap keeps the band off it and off the window edge. */
+.carpet-start { left: calc(5rem + 28px); }
+.carpet-end { right: 28px; }
 
 /* Safe-area helpers for the installed PWA. */
 .pt-safe { padding-top: env(safe-area-inset-top); }

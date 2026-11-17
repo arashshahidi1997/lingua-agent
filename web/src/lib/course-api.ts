@@ -37,8 +37,8 @@ export interface UnitSummary {
   scenario_id: string | null
   story_unlocked: boolean     // the unit is the first one, or has a lesson done
   scenario_unlocked: boolean
-  quiz_state: LessonState     // checkpoint quiz; 'current' once all lessons are done
-  done: boolean
+  quiz_state: LessonState     // 'current' once the unit is reached: before its lessons are done it's a test-out
+  done: boolean               // all lessons done
 }
 
 export interface CourseSummary {
@@ -108,6 +108,7 @@ export interface ItemResult { item_id: string; correct: boolean }
 export interface CompleteRequest {
   results: ItemResult[]
   seconds: number             // time spent, for the daily goal
+  event_id?: string | null    // makes the call idempotent (offline queue replays)
 }
 
 export interface CompleteResponse {
@@ -129,6 +130,7 @@ export interface Today {
   streak_days: number         // consecutive days with activity (shown only if the user enables it)
   story: StorySummary | null      // suggested story (current unit, or latest unlocked)
   scenario: ScenarioSummary | null
+  checkpoint: { unit_id: string; unit_title: string } | null   // a unit whose lessons are done, quiz not passed
 }
 
 // ---- stories & dialogues ----------------------------------------------------
@@ -196,6 +198,7 @@ export interface TalkSession {
   support: string
   messages: TalkMessage[]
   ended: boolean
+  summary: TalkSummary | null // set once ended; ending again returns the same summary
 }
 
 export interface TalkSummary {
@@ -303,6 +306,9 @@ export const courseApi = {
   scenario: (id: string) => req<Scenario>(`/scenarios/${id}`),
   openTalk: (body: { target: string; support: string; scenario_id?: string | null }) =>
     post<TalkSession>('/talk/sessions', body),
+  // The latest conversation that hasn't ended, to resume it (404 when there is none).
+  latestTalk: (target: string, scenarioId?: string | null) =>
+    req<TalkSession>(`/talk/sessions/latest${q({ target, scenario_id: scenarioId })}`),
   talk: (id: string) => req<TalkSession>(`/talk/sessions/${id}`),
   sayTalk: (id: string, content: string) => post<TalkMessage>(`/talk/sessions/${id}/messages`, { content }),
   endTalk: (id: string) => post<TalkSummary>(`/talk/sessions/${id}/end`),
@@ -312,8 +318,8 @@ export const courseApi = {
   ttsUrl: (text: string, lang: string) => `/api/tts${q({ lang, text })}`,
 
   // recordings (the learner's own voice)
-  recordings: (ref?: string, refPrefix?: string) =>
-    req<Recording[]>(`/recordings${q({ ref, ref_prefix: refPrefix })}`),
+  recordings: (ref?: string, refPrefix?: string, language?: string) =>
+    req<Recording[]>(`/recordings${q({ ref, ref_prefix: refPrefix, language })}`),
   addRecording: (blob: Blob, ref: string, language: string, seconds?: number) => {
     const f = new FormData()
     f.append('file', blob, 'recording.webm')
@@ -325,7 +331,7 @@ export const courseApi = {
   deleteRecording: (id: string) => req<void>(`/recordings/${id}`, { method: 'DELETE' }),
 
   // audio from sources (uploads, or files from a materials source)
-  audio: () => req<AudioTrack[]>('/audio'),
+  audio: (language?: string) => req<AudioTrack[]>(`/audio${q({ language })}`),
   audioTrack: (id: string) => req<AudioTrackDetail>(`/audio/${id}`),
   uploadAudio: (file: File, opts: { title?: string; language: string; transcript?: File | null }) => {
     const f = new FormData()
@@ -339,6 +345,10 @@ export const courseApi = {
     post<AudioTrack>('/audio/from-materials', body),
   transcribeAudio: (id: string) => post<AudioTrackDetail>(`/audio/${id}/transcribe`),  // 501 if no STT installed
   deleteAudio: (id: string) => req<void>(`/audio/${id}`, { method: 'DELETE' }),
+
+  // Time spent outside lessons (stories, audio, diary) toward the daily goal.
+  logActivity: (seconds: number, kind: 'story' | 'audio' | 'review' | 'other', eventId?: string) =>
+    post<void>('/activity', { seconds, kind, event_id: eventId ?? null }),
 }
 
 export type { Card }

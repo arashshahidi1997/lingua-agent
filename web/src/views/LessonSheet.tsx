@@ -1,6 +1,7 @@
 import { courseApi } from '../lib/course-api'
 import { useAsync } from '../lib/hooks'
 import { Markdown } from '../lib/markdown'
+import { dirOf } from '../lib/rtl'
 import { useNav } from '../state/nav'
 import { useSettings } from '../state/settings'
 import { Button, ErrorNote, Loading, Sheet } from '../components/ui'
@@ -36,7 +37,7 @@ export default function LessonSheet({ courseId, lessonId, locked }: { courseId: 
         <div>
           <p className="text-[13px] uppercase tracking-[0.08em] text-ink-3">{data.kind}</p>
           <h2 className="mt-0.5 text-[1.4rem] font-semibold tracking-tight">{data.title}</h2>
-          {data.note && <Markdown text={data.note} className="mt-3 text-[15px] leading-relaxed text-ink-2" />}
+          {data.note && <Markdown text={data.note} rtlLang={dirOf(pair.target) === 'rtl' ? pair.target : 'fa'} className="mt-3 text-[15px] leading-relaxed text-ink-2" />}
 
           <ul className="mt-6 divide-y divide-line border-t border-line">
             {data.items.map((it) => (

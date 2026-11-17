@@ -5,7 +5,7 @@ export type LibrarySection = 'stories' | 'audio' | 'lessons' | 'add'
 
 export type PlayerSource =
   | { type: 'lesson'; courseId: string; lessonId: string; title?: string }
-  | { type: 'quiz'; courseId: string; unitId: string; title?: string }
+  | { type: 'quiz'; courseId: string; unitId: string; title?: string; testOut?: boolean }
   | { type: 'practice'; courseId: string }
 
 /** Screens stacked over the tabs. Each one gets a history entry, so the Android back button closes it. */

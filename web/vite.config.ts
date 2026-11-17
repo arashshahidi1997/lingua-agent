@@ -15,9 +15,9 @@ export default defineConfig({
         'apple-touch-icon.png',
       ],
       manifest: {
-        name: 'lingua-agent',
-        short_name: 'lingua-agent',
-        description: 'Agentic AI language-learning platform — any A → B.',
+        name: 'lingua',
+        short_name: 'lingua',
+        description: 'Learn languages your way',
         theme_color: '#fafaf9',
         background_color: '#fafaf9',
         display: 'standalone',
@@ -33,6 +33,8 @@ export default defineConfig({
       workbox: {
         // Don't precache the API responses; they're handled at runtime below.
         globPatterns: ['**/*.{js,css,html,png,svg,ico,woff2}'],
+        // Navigations to /api/ (the Anki export link) must reach the server, not get the app shell.
+        navigateFallbackDenylist: [/^\/api\//],
         runtimeCaching: [
           {
             // Audio (TTS, recordings, imported tracks) streams with range
