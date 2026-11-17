@@ -13,12 +13,15 @@ Numbers are stable ids for commits and the backlog. Status: [ ] open, [x] done, 
   (چطوره → چطور است, خداحافظ → خداحافظی). Not usable as a partner, least of all for a beginner. Options:
   Claude through the Claude Max subscription (provider exists), Claude API (paid, per use), or take Talk out
   until a good model is available.
-- D2. **"Add your own text": which language is the text in?** The page says Persian; the request says it's
+  *Asked 2026-11-17: would ChatGPT Plus work? No — Plus has no API access; options are Claude Max (existing
+  provider), an OpenAI API key, or the Claude API. Open.*
+- D2. **"Add your own text": which language is the text in?** *Decided: both, chosen per text.* The page says Persian; the request says it's
   your own language (English) and the pipeline translates it into Persian. Pick one (reading native Persian
   material is the more useful one) and align copy, field and pipeline.
-- D3. **Offline review.** The PWA promises review on the train, but ratings can't be saved offline. Build a
+- D3. **Offline review.** *Decided: queue and sync later.* The PWA promises review on the train, but ratings can't be saved offline. Build a
   queue that syncs later, or drop the promise.
-- D4. **v1 leftovers:** `/api/tutor/*` and its client calls (replaced by Talk), the Streamlit playground, the
+- D4. **v1 leftovers:** *Decided: remove what Talk replaced (tutor API and client calls); keep the CLI and
+  playground as developer tools, documented as such.* `/api/tutor/*` and its client calls (replaced by Talk), the Streamlit playground, the
   v1 CLI commands (`unit`, `review`, `tutor`). Keep, fold into v2, or remove.
 
 ## A. Broken
