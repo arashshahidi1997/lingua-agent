@@ -318,7 +318,8 @@ export const courseApi = {
 
   // speech. ttsUrl returns 404 when no server voice is installed: fall back to speechSynthesis.
   speech: () => req<SpeechInfo>('/speech'),
-  ttsUrl: (text: string, lang: string) => `/api/tts${q({ lang, text })}`,
+  // v: bumped when cached speech must be refetched (2 = native takes may replace synthetic speech).
+  ttsUrl: (text: string, lang: string) => `/api/tts${q({ lang, text, v: 2 })}`,
 
   // recordings (the learner's own voice)
   recordings: (ref?: string, refPrefix?: string, language?: string) =>

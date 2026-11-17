@@ -155,5 +155,8 @@ def transcribe_cues(path: Path, *, language: str | None = None, model_size: str 
     except ImportError as exc:
         raise SpeechError("faster-whisper is not installed (pip install faster-whisper)") from exc
     model = WhisperModel(model_size, device="cpu", compute_type="int8")
-    segments, _info = model.transcribe(str(path), language=language, vad_filter=True)
-    return [{"start": round(s.start, 2), "end": round(s.end, 2), "text": s.text.strip()} for s in segments]
+    try:
+        segments, _info = model.transcribe(str(path), language=language, vad_filter=True)
+        return [{"start": round(s.start, 2), "end": round(s.end, 2), "text": s.text.strip()} for s in segments]
+    except Exception as exc:  # undecodable or corrupt audio
+        raise SpeechError(f"couldn't read this audio ({type(exc).__name__})") from exc

@@ -352,7 +352,8 @@ def test_audio_upload_with_transcript(client: TestClient):
     detail = client.get(f"/api/audio/{track['id']}").json()
     assert detail["cues"] == [{"start": 0.5, "end": 1.5, "text": "سلام", "tr": None, "gloss": None}]
     assert client.get(track["url"]).content == b"ID3fake"
-    assert client.post(f"/api/audio/{track['id']}/transcribe").status_code in (200, 501)
+    # 501 without faster-whisper; with it, this fake file can't be decoded → 422 (never a crash).
+    assert client.post(f"/api/audio/{track['id']}/transcribe").status_code in (501, 422)
     assert client.delete(f"/api/audio/{track['id']}").status_code == 204
     assert client.get("/api/audio").json() == []
 
@@ -510,3 +511,21 @@ def test_talk_switched_off_keeps_prompts(tmp_path: Path, monkeypatch: pytest.Mon
     voice = c.get("/api/scenarios/t1/prompt", params={"voice": True}).json()["prompt"]
     assert "by voice" in voice and "Better:" not in voice
     assert c.get("/api/scenarios/nope/prompt").status_code == 404
+
+
+def test_native_takes_replace_synthetic_speech(client: TestClient, tmp_path: Path):
+    import json as _json
+    root = tmp_path / "data" / "native_audio"
+    (root / "arash").mkdir(parents=True)
+    for n in (1, 2, 3):
+        (root / "arash" / f"x-{n}.m4a").write_bytes(f"take{n}".encode())
+    (root / "index.json").write_text(_json.dumps({"سلام": [
+        {"file": f"arash/x-{n}.m4a", "speaker": "Arash"} for n in (1, 2, 3)]}), "utf-8")
+    seen = set()
+    for _ in range(30):
+        r = client.get("/api/tts", params={"lang": "fa", "text": " سلام ", "v": 2})
+        assert r.status_code == 200 and r.headers["x-voice"] == "Arash"
+        assert r.headers["cache-control"] == "no-store"
+        seen.add(r.content)
+    assert seen == {b"take1", b"take2", b"take3"}  # every take gets played
+    assert client.get("/api/speech").json()["native_texts"] == 1

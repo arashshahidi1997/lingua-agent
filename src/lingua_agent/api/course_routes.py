@@ -40,6 +40,7 @@ from ..models.srs import CardDirection, CardType
 from ..srs import SM2Scheduler
 from ..storage import JsonRepository
 from ..voice import piper
+from ..voice.native import native_count, pick_take
 from ..voice.subtitles import parse_transcript
 from .identity import charge_model_call, check_guest_storage, identify, require_owner
 from .routes import get_settings
@@ -214,6 +215,7 @@ class TalkSummaryOut(BaseModel):
 class SpeechInfo(BaseModel):
     server_tts: dict[str, bool]
     stt: bool
+    native_texts: int = 0  # texts with a native speaker's recorded takes
 
 
 class RecordingMeta(BaseModel):
@@ -838,14 +840,22 @@ def me(request: Request) -> WhoAmI:
 @router.get("/speech", response_model=SpeechInfo)
 def speech_info(s: Settings = Depends(get_settings)) -> SpeechInfo:
     langs = sorted(set(piper.DEFAULT_VOICES) | {p.name for p in piper.voices_dir(s).glob("*") if p.is_dir()})
-    return SpeechInfo(server_tts={lang: piper.tts_available(s, lang) for lang in langs},
-                      stt=piper.stt_available())
+    native = native_count(s)
+    return SpeechInfo(server_tts={lang: piper.tts_available(s, lang) or (lang == "fa" and native > 0) for lang in langs},
+                      stt=piper.stt_available(), native_texts=native)
 
 
 @router.get("/tts")
 def tts(lang: str, text: str, request: Request, s: Settings = Depends(get_settings)) -> FileResponse:
     if not re.fullmatch(r"[a-z]{2,3}", lang):
         raise HTTPException(400, "bad language code")
+    # A native speaker's take wins when one exists: a random one of the takes each time, so learners hear
+    # natural variation. Not cacheable for that reason.
+    native = pick_take(s, text)
+    if native is not None:
+        path, take = native
+        return FileResponse(path, media_type="audio/mp4",
+                            headers={"Cache-Control": "no-store", "X-Voice": take.get("speaker", "native")})
     if not piper.tts_available(s, lang):
         raise HTTPException(404, f"no local voice for {lang}")
     if not piper.is_cached(s, text, lang):
@@ -855,7 +865,7 @@ def tts(lang: str, text: str, request: Request, s: Settings = Depends(get_settin
         path = piper.synthesize(s, text, lang)
     except piper.SpeechError as exc:
         raise HTTPException(400, str(exc)) from exc
-    return FileResponse(path, media_type="audio/wav", headers={"Cache-Control": "public, max-age=31536000"})
+    return FileResponse(path, media_type="audio/wav", headers={"Cache-Control": "public, max-age=86400"})  # a day: native takes may replace it
 
 
 # ---- recordings ---------------------------------------------------------------------
@@ -1046,7 +1056,7 @@ def transcribe_audio(audio_id: str, s: Settings = Depends(get_settings)) -> Audi
     try:
         cues = piper.transcribe_cues(_audio_repo(s).dir / meta.filename, language=meta.language)
     except piper.SpeechError as exc:
-        raise HTTPException(500, str(exc)) from exc
+        raise HTTPException(422, str(exc)) from exc
     meta.cues = [Cue(**c) for c in cues]
     _audio_repo(s).save(meta)
     return AudioDetail(**_audio_out(meta).model_dump(), cues=meta.cues)
