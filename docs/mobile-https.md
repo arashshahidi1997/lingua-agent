@@ -89,6 +89,26 @@ version the next time they're opened.
 npm --prefix web run build && systemctl --user restart lingua-agent
 ```
 
+## Owner and guests
+
+`tailscale serve` adds `Tailscale-User-Login` / `Tailscale-User-Name` to each request
+(`src/lingua_agent/api/identity.py`). Logins in `.lingua-agent/sharing.json` are the owner; every other login
+is a guest with their own progress, cards, recordings, Talk sessions and uploads under
+`.lingua-agent/guests/<login>/` (voices, the speech cache and courses are shared). A request without the header
+comes from the laptop itself and counts as the owner, which is safe only because the server binds 127.0.0.1.
+
+```json
+{"owner_logins": ["owner@example.com"],
+ "guest_ai_provider": null,
+ "guest_daily_model_calls": 80,
+ "guest_storage_mb": 500}
+```
+
+Guests get 403 on material sources (the owner's SSD and Drive), 429 after their daily AI calls (Talk turns and
+summaries, lessons from text; `guest_ai_provider` pins them to a cheap or local model if the owner's is a paid
+API), and 413 past their storage cap. `GET /api/me` says who the caller is. Shared users reach port 443 only
+once the tailnet policy grants it (infra owns the policy).
+
 ## Quick recommendation
 
 | Goal | Pick |

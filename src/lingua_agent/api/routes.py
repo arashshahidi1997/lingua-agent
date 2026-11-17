@@ -6,7 +6,7 @@ import json
 from datetime import datetime
 from pathlib import Path
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Request
 from fastapi.responses import FileResponse
 
 from .. import __version__
@@ -31,6 +31,7 @@ from ..storage import JsonRepository
 from ..tutor.agent import reply as tutor_reply
 from ..tutor.session import open_session
 from . import schemas as S
+from .identity import charge_model_call, require_owner
 
 
 # Settings dependency: app.state.settings is set in main.py; this lets tests
@@ -119,7 +120,9 @@ def update_profile(patch: S.LearnerProfilePatch, s: Settings = Depends(get_setti
 
 
 @router.post("/ingest/text", response_model=S.IngestSummary)
-def ingest_text_endpoint(req: S.IngestTextRequest, s: Settings = Depends(get_settings)) -> S.IngestSummary:
+def ingest_text_endpoint(req: S.IngestTextRequest, request: Request,
+                         s: Settings = Depends(get_settings)) -> S.IngestSummary:
+    charge_model_call(request, s, 5)  # a lesson is about five model calls
     provider = get_provider(s.ai_provider)
     try:
         result = ingest_text(
@@ -243,11 +246,13 @@ def get_session(session_id: str, s: Settings = Depends(get_settings)) -> S.Tutor
 
 
 @router.post("/tutor/sessions/{session_id}/messages", response_model=S.TutorMessageResponse)
-def send_message(session_id: str, req: S.TutorMessageRequest, s: Settings = Depends(get_settings)) -> S.TutorMessageResponse:
+def send_message(session_id: str, req: S.TutorMessageRequest, request: Request,
+                 s: Settings = Depends(get_settings)) -> S.TutorMessageResponse:
     repo = JsonRepository(s.data_dir, "sessions", TutorSession)
     sess = repo.get(session_id)
     if not sess:
         raise HTTPException(status_code=404, detail=f"session not found: {session_id}")
+    charge_model_call(request, s)
     profile = _load_profile(s)
     provider = get_provider(s.ai_provider)
     msg = tutor_reply(session=sess, learner=profile, user_message=req.content, provider=provider)
@@ -280,7 +285,8 @@ def _session_out(sess: TutorSession) -> S.TutorSessionOut:
 
 # ---- Materials adapter (Phase 6c) -----------------------------------------
 
-@router.get("/materials/sources", response_model=list[S.MaterialsSourceOut])
+@router.get("/materials/sources", response_model=list[S.MaterialsSourceOut]
+             , dependencies=[Depends(require_owner)])
 def materials_sources(s: Settings = Depends(get_settings)) -> list[S.MaterialsSourceOut]:
     profile = _load_profile(s)
     out: list[S.MaterialsSourceOut] = []
@@ -296,7 +302,8 @@ def materials_sources(s: Settings = Depends(get_settings)) -> list[S.MaterialsSo
     return out
 
 
-@router.post("/materials/sources", response_model=S.MaterialsSourceOut, status_code=201)
+@router.post("/materials/sources", response_model=S.MaterialsSourceOut, status_code=201
+             , dependencies=[Depends(require_owner)])
 def materials_add_source(req: S.AddMaterialsSourceRequest,
                           s: Settings = Depends(get_settings)) -> S.MaterialsSourceOut:
     profile = _load_profile(s)
@@ -318,7 +325,8 @@ def materials_add_source(req: S.AddMaterialsSourceRequest,
     )
 
 
-@router.delete("/materials/sources/{name}", status_code=204)
+@router.delete("/materials/sources/{name}", status_code=204
+             , dependencies=[Depends(require_owner)])
 def materials_remove_source(name: str, s: Settings = Depends(get_settings)) -> None:
     profile = _load_profile(s)
     before = len(profile.materials_sources)
@@ -328,7 +336,8 @@ def materials_remove_source(name: str, s: Settings = Depends(get_settings)) -> N
     _save_profile(s, profile)
 
 
-@router.get("/materials/list", response_model=S.MaterialsListResponse)
+@router.get("/materials/list", response_model=S.MaterialsListResponse
+             , dependencies=[Depends(require_owner)])
 def materials_list(source: str, folder: str = "",
                     s: Settings = Depends(get_settings)) -> S.MaterialsListResponse:
     profile = _load_profile(s)
@@ -353,7 +362,8 @@ def materials_list(source: str, folder: str = "",
     )
 
 
-@router.post("/materials/ingest", response_model=S.IngestSummary)
+@router.post("/materials/ingest", response_model=S.IngestSummary
+             , dependencies=[Depends(require_owner)])
 def materials_ingest(req: S.MaterialsIngestRequest,
                       s: Settings = Depends(get_settings)) -> S.IngestSummary:
     profile = _load_profile(s)

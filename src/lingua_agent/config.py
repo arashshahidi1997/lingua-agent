@@ -30,6 +30,12 @@ class Settings:
     anthropic_api_key: str | None
     anthropic_model: str
     ollama_base_url: str
+    # Data every user shares (voices, the speech cache, extra courses). None = data_dir, i.e. the owner's.
+    shared_dir: Path | None = None
+
+    @property
+    def shared_data_dir(self) -> Path:
+        return self.shared_dir or self.data_dir
 
     @classmethod
     def load(cls, *, cwd: Path | None = None) -> "Settings":

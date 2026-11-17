@@ -36,7 +36,7 @@ def _load_cached(path: str, mtime: float) -> CourseDef:
 
 def course_files(settings: Settings) -> list[Path]:
     files = sorted(PACKAGE_DATA.glob("*.yaml"))
-    user_dir = settings.data_dir / "courses"
+    user_dir = settings.shared_data_dir / "courses"
     if user_dir.exists():
         files += sorted(user_dir.glob("*.yaml"))
     return files

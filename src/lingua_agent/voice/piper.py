@@ -34,7 +34,7 @@ class SpeechError(RuntimeError):
 
 
 def voices_dir(settings: Settings) -> Path:
-    return settings.data_dir / "voices"
+    return settings.shared_data_dir / "voices"
 
 
 def find_voice(settings: Settings, lang: str) -> Path | None:
@@ -94,7 +94,7 @@ def synthesize(settings: Settings, text: str, lang: str) -> Path:
     if backend is None or model is None:
         raise SpeechError(f"no local voice for {lang!r}")
     key = hashlib.sha256(f"{model.name}\x1f{text}".encode("utf-8")).hexdigest()[:24]
-    cache = settings.data_dir / "tts_cache"
+    cache = settings.shared_data_dir / "tts_cache"
     cache.mkdir(parents=True, exist_ok=True)
     out = cache / f"{key}.wav"
     if out.exists() and out.stat().st_size > 44:

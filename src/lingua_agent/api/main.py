@@ -15,6 +15,7 @@ from fastapi.staticfiles import StaticFiles
 
 from ..config import Settings
 from .course_routes import router as course_router
+from .identity import settings_for
 from .routes import get_settings, router
 
 
@@ -40,7 +41,8 @@ def build_app(settings: Settings | None = None, *, web_dir: Path | None = None,
     )
 
     # Wire the settings dependency.
-    app.dependency_overrides[get_settings] = lambda: settings
+    # Per request: the owner gets these settings, a Tailscale guest their own data dir (identity.py).
+    app.dependency_overrides[get_settings] = settings_for
     app.state.settings = settings
     app.include_router(router)
     app.include_router(course_router)

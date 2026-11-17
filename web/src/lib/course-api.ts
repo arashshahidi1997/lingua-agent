@@ -239,6 +239,11 @@ export interface AudioTrackDetail extends AudioTrack {
   cues: Cue[]
 }
 
+// ---- who am I ------------------------------------------------------------
+
+/** From the Tailscale login: the owner, or a guest with their own progress and data. */
+export interface WhoAmI { login: string; name: string; owner: boolean }
+
 // ---- client ---------------------------------------------------------------
 
 async function req<T>(path: string, init?: RequestInit): Promise<T> {
@@ -267,6 +272,8 @@ const q = (params: Record<string, string | number | undefined | null>) => {
 }
 
 export const courseApi = {
+  me: () => req<WhoAmI>('/me'),
+
   // courses / Path
   courses: (target?: string, support?: string) => req<CourseSummary[]>(`/courses${q({ target, support })}`),
   course: (id: string) => req<Course>(`/courses/${id}`),

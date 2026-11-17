@@ -1,6 +1,7 @@
 import { useEffect, useState, type ReactNode } from 'react'
 import { Download, HardDrive } from 'lucide-react'
 import { api, type Language } from '../lib/api'
+import { courseApi } from '../lib/course-api'
 import { useAsync } from '../lib/hooks'
 import { hasVoice } from '../lib/speech'
 import { languageName } from '../lib/rtl'
@@ -19,11 +20,18 @@ export default function Settings() {
   const { settings, update, pair, setPair } = useSettings()
   const langs = useAsync('languages', () => api.languages())
   const health = useAsync('health', () => api.health())
-  const sources = useAsync('materials', () => api.materialsSources())
+  const me = useAsync('me', () => courseApi.me())
+  // Material sources are the owner's SSD and Drive; guests don't see them (the API answers 403).
+  const sources = useAsync('materials', async () => ((await courseApi.me()).owner ? api.materialsSources() : null))
 
   return (
     <Screen title="Settings" onBack={nav.close}>
       <div className="mx-auto w-full max-w-2xl space-y-10 px-4 pb-20 pt-6">
+        {me.data && !me.data.owner && (
+          <p className="rounded-2xl bg-surface-2 px-4 py-3 text-[15px] text-ink">
+            Signed in as {me.data.name}. <span className="text-ink-2">Your progress, cards and recordings are your own.</span>
+          </p>
+        )}
         <Group title="Languages">
           {langs.error && <ErrorNote error={langs.error} onRetry={langs.reload} />}
           <div className="grid gap-4 sm:grid-cols-3">
@@ -107,7 +115,7 @@ export default function Settings() {
           <p className="mt-1 text-[13px] text-ink-3">Configured with environment variables on the server. See docs/providers.md.</p>
         </Group>
 
-        <Group title="Material sources">
+        {sources.data !== null && <Group title="Material sources">
           {sources.loading && !sources.data && <Loading />}
           {sources.error && <ErrorNote error={sources.error} onRetry={sources.reload} />}
           {sources.data?.length === 0 && <p className="text-sm text-ink-3">No sources configured. Add one with <code className="text-[13px]">lingua-agent materials add</code>.</p>}
@@ -128,7 +136,7 @@ export default function Settings() {
               ))}
             </ul>
           )}
-        </Group>
+        </Group>}
 
         <Group title="Your data">
           <a

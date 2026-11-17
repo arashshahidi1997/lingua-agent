@@ -13,7 +13,7 @@ from datetime import datetime
 from pathlib import Path
 from typing import Literal
 
-from fastapi import APIRouter, Depends, File, Form, HTTPException, UploadFile
+from fastapi import APIRouter, Depends, File, Form, HTTPException, Request, UploadFile
 from fastapi.responses import FileResponse, Response
 from pydantic import BaseModel, Field
 
@@ -41,6 +41,7 @@ from ..srs import SM2Scheduler
 from ..storage import JsonRepository
 from ..voice import piper
 from ..voice.subtitles import parse_transcript
+from .identity import charge_model_call, check_guest_storage, identify, require_owner
 from .routes import get_settings
 
 router = APIRouter(prefix="/api", tags=["lingua-agent v2"])
@@ -689,10 +690,11 @@ def get_talk(session_id: str, s: Settings = Depends(get_settings)) -> TalkSessio
 
 
 @router.post("/talk/sessions/{session_id}/messages", response_model=TalkMessage)
-def say(session_id: str, req: SayRequest, s: Settings = Depends(get_settings)) -> TalkMessage:
+def say(session_id: str, req: SayRequest, request: Request, s: Settings = Depends(get_settings)) -> TalkMessage:
     sess = _talk_or_404(s, session_id)
     if sess.ended:
         raise HTTPException(409, "This conversation has ended. Start a new one.")
+    charge_model_call(request, s)
     found = store.find_scenario(s, sess.scenario_id) if sess.scenario_id else None
     course, sc = found if found else (None, None)
     started = utcnow()
@@ -703,8 +705,10 @@ def say(session_id: str, req: SayRequest, s: Settings = Depends(get_settings)) -
 
 
 @router.post("/talk/sessions/{session_id}/end", response_model=TalkSummaryOut)
-def end_talk(session_id: str, s: Settings = Depends(get_settings)) -> TalkSummaryOut:
+def end_talk(session_id: str, request: Request, s: Settings = Depends(get_settings)) -> TalkSummaryOut:
     sess = _talk_or_404(s, session_id)
+    if any(m.role == "user" for m in sess.messages):
+        charge_model_call(request, s)
     found = store.find_scenario(s, sess.scenario_id) if sess.scenario_id else None
     course, sc = found if found else (None, None)
     draft = summarize(get_provider(s.ai_provider), sess, sc)
@@ -719,6 +723,20 @@ def end_talk(session_id: str, s: Settings = Depends(get_settings)) -> TalkSummar
     _talk_repo(s).save(sess)
     return TalkSummaryOut(went_well=draft.went_well, mistakes=[m.model_dump() for m in draft.mistakes],
                           new_words=words, cards_added=added)
+
+
+# ---- who am I ------------------------------------------------------------------------
+
+class WhoAmI(BaseModel):
+    login: str
+    name: str
+    owner: bool
+
+
+@router.get("/me", response_model=WhoAmI)
+def me(request: Request) -> WhoAmI:
+    who = identify(request)
+    return WhoAmI(login=who.login, name=who.name, owner=who.owner)
 
 
 # ---- speech -------------------------------------------------------------------------
@@ -796,8 +814,10 @@ def list_recordings(ref: str | None = None, ref_prefix: str | None = None,
 
 
 @router.post("/recordings", response_model=RecordingOut, status_code=201)
-def add_recording(file: UploadFile = File(...), ref: str = Form(...), language: str = Form(...),
-                  seconds: float | None = Form(None), s: Settings = Depends(get_settings)) -> RecordingOut:
+def add_recording(request: Request, file: UploadFile = File(...), ref: str = Form(...),
+                  language: str = Form(...), seconds: float | None = Form(None),
+                  s: Settings = Depends(get_settings)) -> RecordingOut:
+    check_guest_storage(request, s, int(request.headers.get("content-length") or 0))
     mime, ext = _ext_for(file)
     rid = make_id("rec", ref, utcnow().isoformat())
     meta = RecordingMeta(id=rid, ref=ref[:200], language=language[:8], mime_type=mime,
@@ -858,8 +878,10 @@ def get_audio(audio_id: str, s: Settings = Depends(get_settings)) -> AudioDetail
 
 
 @router.post("/audio", response_model=AudioOut, status_code=201)
-def upload_audio(file: UploadFile = File(...), language: str = Form(...), title: str | None = Form(None),
-                 transcript: UploadFile | None = File(None), s: Settings = Depends(get_settings)) -> AudioOut:
+def upload_audio(request: Request, file: UploadFile = File(...), language: str = Form(...),
+                 title: str | None = Form(None), transcript: UploadFile | None = File(None),
+                 s: Settings = Depends(get_settings)) -> AudioOut:
+    check_guest_storage(request, s, int(request.headers.get("content-length") or 0))
     mime, ext = _ext_for(file)
     name = title or Path(file.filename or "audio").stem
     aid = make_id("audio", name, utcnow().isoformat())
@@ -874,7 +896,8 @@ def upload_audio(file: UploadFile = File(...), language: str = Form(...), title:
     return _audio_out(meta)
 
 
-@router.post("/audio/from-materials", response_model=AudioOut, status_code=201)
+@router.post("/audio/from-materials", response_model=AudioOut, status_code=201,
+             dependencies=[Depends(require_owner)])
 def audio_from_materials(req: FromMaterialsRequest, s: Settings = Depends(get_settings)) -> AudioOut:
     cfg = find_source(_profile(s), req.source)
     if cfg is None:
