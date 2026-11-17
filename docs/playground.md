@@ -2,7 +2,9 @@
 
 The `lingua-agent playground` command opens a local browser UI on top of the existing core. Use it for clicking through ingest → lessons → review → tutor without typing CLI commands.
 
-> **Not the production UI.** The real product UI is the FastAPI + React PWA planned in Phase 8 — see [`clients.md`](clients.md). The playground is the iteration / demo / "let me actually try this" tool, which is how every Python AI project ships internal tools (Hugging Face Spaces, OpenAI, Anthropic, Cohere all use Streamlit/Gradio for this).
+> **A developer tool.** Learners use the web app (Today · Path · Library · Talk; see
+> [`architecture.md`](architecture.md)). The playground covers only the v1 core — own-text ingest, lessons,
+> review, and the terminal-era tutor — and is kept for trying the pipeline quickly.
 
 ## Install + launch
 

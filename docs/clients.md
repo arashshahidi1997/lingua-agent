@@ -1,5 +1,9 @@
 # Client platforms
 
+> **Where this stands (2026-11-17):** the PWA is built and in use — installed on Android phones from the
+> laptop over Tailscale ([mobile-https.md](mobile-https.md)). The desktop wrapper and native apps below are
+> still options, not plans.
+
 `lingua-agent` is built as a **headless Python core** plus thin clients. This separation means we can ship desktop and mobile without rewriting the language-learning logic.
 
 ```

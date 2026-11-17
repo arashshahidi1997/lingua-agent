@@ -2,7 +2,9 @@
 
 Agentic AI language-learning platform. Local-first. Open-source. _Any language A → any language B._
 
-> Status: alpha (MVP). Pipeline runs end-to-end against a deterministic mock AI provider; real providers (OpenAI-compatible, Anthropic) are an optional install extra.
+> Status: in daily use on two phones. A web app (Today · Path · Library · Talk) with a hand-written Farsi A1
+> course, served from a laptop over Tailscale; owner and guest each have their own progress. Work in progress
+> is tracked in [`docs/backlog.md`](docs/backlog.md); the latest review in [`docs/audit/`](docs/audit/).
 
 ## Mission
 
@@ -75,7 +77,8 @@ pip install -e ".[playground]"
 lingua-agent playground   # → http://localhost:8501
 ```
 
-A Streamlit UI with tabs for ingest / lessons / review / tutor on top of the same core. **Not the production UI** (that's Phase 8 — FastAPI + React PWA), just the iteration tool. See [`docs/playground.md`](docs/playground.md).
+A Streamlit UI on the v1 core (ingest, lessons, review, the terminal-era tutor). **A developer tool, not the
+learner interface** — that's the web app above. See [`docs/playground.md`](docs/playground.md).
 
 ## Use it on your phone (Android PWA)
 
@@ -137,7 +140,7 @@ lingua-agent review answer --card-id <id> --quality 4
 # 7. Export to Anki-compatible CSV
 lingua-agent export anki --target it --output content/exports/italian.csv
 
-# 8. Tutor chat (mock provider — deterministic responses for now)
+# 8. Tutor chat in the terminal (developer tool; learners use Talk in the web app)
 lingua-agent tutor chat --source en --target it
 ```
 
@@ -201,7 +204,12 @@ PDF and EPUB ingestion are Phase 7.
 
 ## Architecture overview
 
-See [docs/architecture.md](docs/architecture.md). In one paragraph: a CLI (Typer) drives an ingest pipeline, a tutor agent, and an SRS scheduler. All three call into typed Pydantic models persisted via a `Repository` Protocol (JSON-on-disk today, SQLite later). AI access is hidden behind an `AIProvider` Protocol whose default impl is the deterministic mock used by tests. The tutor exposes a typed tool surface and logs every call.
+See [docs/architecture.md](docs/architecture.md). In one paragraph: a FastAPI server serves the React PWA and
+the API; courses are hand-written YAML turned into generated exercises, with per-learner progress, SM-2
+flashcards, stories, Talk role-plays and Piper speech; owner and guests are told apart by the Tailscale login.
+Everything is typed Pydantic, stored as JSON on disk, and AI access goes through an `AIProvider` protocol
+(mock for tests; OpenAI-compatible incl. Ollama; Anthropic; Claude Max). The CLI and playground are developer
+tools on the same core.
 
 Other docs:
 - [`docs/decisions.md`](docs/decisions.md) — design decisions and reversals.

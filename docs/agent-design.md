@@ -1,5 +1,9 @@
 # Tutor agent design
 
+> **Scope (2026-11-17):** this is the v1 tutor, used by the terminal `lingua-agent tutor chat`. Learners talk
+> through **Talk** in the web app (`course/talk.py`: structured turns with gentle corrections and a summary);
+> its HTTP API replaced `/api/tutor/*`. The tool-calling design below remains the plan for Phase 6.
+
 ## Why an agent and not a chat loop
 
 A chat loop produces plausible language conversation but cannot mutate learner state, schedule reviews, generate exercises tied to weak skills, or audit its own behaviour. We want all four. The tutor is therefore an **agent that calls typed tools**, and every tool call is logged.

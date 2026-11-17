@@ -1,121 +1,73 @@
 # Architecture
 
-```
-                     ┌─────────────────────────────────┐
-                     │              CLI                │  Typer
-                     │  (lingua-agent ingest / review  │
-                     │   / unit / tutor / export)      │
-                     └──────────────┬──────────────────┘
-                                    │
-        ┌───────────────────────────┼───────────────────────────┐
-        │                           │                           │
-   ┌────▼─────┐              ┌──────▼───────┐            ┌──────▼────────┐
-   │  ingest  │  pipeline    │    tutor     │ session +  │     srs       │
-   │  text /  │ ───────────▶ │  agent +     │ tool log   │   sm2 /       │
-   │ markdown │              │  typed tools │            │   scheduler   │
-   └────┬─────┘              └──────┬───────┘            └──────┬────────┘
-        │                           │                           │
-        │     ┌─────────────────────┼─────────────────────┐     │
-        │     │                     │                     │     │
-        │  ┌──▼────┐            ┌───▼────┐            ┌───▼─────┴─┐
-        └─▶│lesson │            │   ai   │            │  models   │
-           │ gen + │            │provider│            │ (Pydantic │
-           │ md    │            │ proto  │            │   v2)     │
-           │export │            │        │            │           │
-           └──┬────┘            └───┬────┘            └─────┬─────┘
-              │                     │                       │
-              │    ┌────────────────┼───────────────────┐   │
-              │    │                │                   │   │
-              ▼    ▼                ▼                   ▼   ▼
-           content/units/      mock | openai           Repository
-           content/cards/      | anthropic             (json-on-disk
-           content/exports/                            today, sqlite
-                                                      tomorrow)
-```
-
-## Key abstractions
-
-### `AIProvider` (Protocol)
-- `generate_structured(prompt: str, schema: type[BaseModel]) -> BaseModel`
-- `chat(messages: list[Message], tools: list[Tool] | None) -> ChatResponse`
-
-The mock provider returns deterministic Pydantic-valid output. Switching providers does not touch any pipeline code.
-
-### `Scheduler` (Protocol)
-- `update(card: Flashcard, rating: int, reviewed_at: datetime) -> Flashcard`
-- `due(cards, *, now) -> list[Flashcard]`
-
-SM-2 is the only implementation today; `py-fsrs` is the planned second.
-
-### `Repository[Entity]` (Protocol)
-- `save(entity)`, `get(id)`, `list(**filters)`, `delete(id)`
-
-`JsonRepository` writes one file per entity-type under `${LINGUA_DATA_DIR}/<entity>/<id>.json`. SQLite implementation is a future swap.
-
-### `LessonUnit`
-The canonical lesson is a markdown file with YAML frontmatter under `content/units/<unit_id>.md`. The frontmatter is the schema; the body is for humans. Round-trips through `lesson.markdown_export.read_unit` / `write_unit`.
-
-### Tutor agent
-`TutorSession` carries learner state, current language pair, conversation history, and an append-only `tool_calls` log. `tutor/tools.py` defines every tool as a Pydantic call object; `tutor/agent.py` is a thin loop that asks the provider for the next action and dispatches.
-
-## Data flow: ingest
+lingua-agent is a FastAPI server with a React PWA on top, served from one laptop to phones over Tailscale.
+Learners use the web app; the CLI and the Streamlit playground are developer tools on the same core.
 
 ```
-text / markdown
-  │
-  ▼
-normalize  ──▶  detect_language (or validate --source)
-  │
-  ▼
-segment paragraphs / sentences
-  │
-  ▼
-generate_lesson_unit  ──▶  AIProvider.generate_structured(LessonDraft)
-  │
-  ├──▶ extract_vocabulary
-  ├──▶ extract_grammar_points
-  ├──▶ generate_exercises
-  └──▶ generate_flashcards
-  │
-  ▼
-persist all artifacts (Repository)
-write content/units/<id>.md
-return UnitSummary
+ phones / laptop browser ──HTTPS──▶ tailscale serve ──▶ 127.0.0.1:8000  FastAPI (lingua-agent serve)
+                                    adds Tailscale-User-Login            │
+                                                                         ├── web/dist   React PWA (Today · Path · Library · Talk · Settings)
+                                                                         ├── /api/*     api/routes.py         profile, own-text lessons (ingest), cards, export, materials
+                                                                         │              api/course_routes.py  courses, sessions, practice, Today, stories, Talk, speech, recordings, audio
+                                                                         └── api/identity.py  owner or guest → which data dir
 ```
 
-## Data flow: review
+## Who is calling
 
-```
-list_due_cards(target_language, now)
-  │
-  ▼
-present card to user (CLI prompt)
-  │
-  ▼
-collect rating 0..5
-  │
-  ▼
-Scheduler.update(card, rating, now)
-  │
-  ▼
-Repository.save(card); append ReviewEvent
-```
+`api/identity.py` reads the header Tailscale Serve adds. Logins in `.lingua-agent/sharing.json` are the owner;
+any other login is a guest with their own data dir, `.lingua-agent/guests/<login>/`. Voices, the speech cache
+and extra courses are shared. Without the header a request must come from the machine itself (the server
+binds 127.0.0.1). Guests get 403 on the owner's material sources and transcription, 429 past a daily cap of
+model calls, 413 past a storage cap. See [mobile-https.md](mobile-https.md).
 
-## Storage layout
+## Courses (the Path)
 
-```
-${LINGUA_DATA_DIR}/                # default: ./.lingua-agent
-├── learner_profile.json
-├── documents/<id>.json
-├── lessons/<id>.json              # mirror of content/units/<id>.md
-├── flashcards/<id>.json
-├── exercises/<id>.json
-├── attempts/<id>.json
-├── reviews/<id>.json
-└── sessions/<id>.json
-content/
-├── inbox/                         # user drops files here
-├── units/<id>.md                  # human-readable lessons (canonical)
-├── cards/                         # optional flashcard exports
-└── exports/                       # CSV / future apkg
-```
+- **Content** is hand-written YAML: `src/lingua_agent/course/data/<course>.yaml` (Farsi A1 for English
+  speakers today). Units → lessons → items (`text`, `tr`, `gloss`), plus one story or dialogue and one
+  role-play scenario per unit. `course/models.py`, loaded and cached by `course/store.py`.
+- **Exercises** are generated from items (`course/exercises.py`): intro, choose the meaning, choose the
+  text, listen, match, word order, type the transliteration. Deterministic per seed; the client grades.
+- **Progress** per learner: `course_progress/<course>.json` (lessons, quizzes, per-item stats, applied event
+  ids) and `activity.json` (seconds per day → daily goal and streak). Completions and reviews carry an
+  `event_id`, so the app's offline queue can replay them safely.
+- **Cards**: finishing a lesson adds one flashcard per item (meaning → Persian, with the Persian kept apart in
+  `target_text`/`target_tr`); review runs SM-2 (`srs/`). Practice draws on due and weak items.
+- **Checkpoint quizzes** open once a unit is reached; passing one before the lessons marks them done.
+
+## Talk
+
+`course/talk.py`: each turn is a structured `TalkTurn` (reply, transliteration, meaning, and a correction of the
+learner's last message only when needed). Ending a conversation writes a stored summary; its new words become
+cards (one per word, none for words the course teaches). The model comes from the AI provider setting.
+
+## Own texts ("Your lessons")
+
+`ingest/pipeline.py` turns a pasted text into a lesson: analysis, bilingual reading, vocabulary, grammar,
+exercises and cards, with five or so model calls. The text may be in the learner's own language (translated
+into the target) or in the target language itself (meanings and explanations in the support language).
+
+## Speech and audio
+
+`voice/piper.py`: Piper voices in `.lingua-agent/voices/<lang>/`, synthesised once and cached by text;
+without one, the app falls back to the browser's voices. Recordings (shadowing, the speaking diary) and
+imported audio with `.srt`/`.vtt` cues live in the learner's data dir; faster-whisper transcription is
+optional. `tools/recording_scripts.py` makes reading sheets for recording a native voice for the course.
+
+## AI providers
+
+`ai/`: an `AIProvider` protocol with `generate_structured` (schema-validated, repaired) and `chat`.
+Implementations: mock (tests, no network), OpenAI-compatible (OpenAI, Ollama, OpenRouter, vLLM, …, with
+`json_schema` output), Anthropic API, Claude Max. Chosen with `LINGUA_AI_PROVIDER`; see
+[providers.md](providers.md).
+
+## Storage
+
+JSON files under `.lingua-agent/` (`storage.py`: one file per entity, atomic writes). Course content is in the
+package; everything a learner makes is in their data dir.
+
+## Developer tools
+
+- `lingua-agent` CLI: ingest, units, review, export, materials, voices, and a terminal tutor chat
+  (`tutor/`, the v1 agent).
+- `lingua-agent playground`: a Streamlit UI on the v1 core, for trying the pipeline. Neither is the learner
+  interface.
