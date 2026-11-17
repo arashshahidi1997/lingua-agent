@@ -1,4 +1,4 @@
-import type { ReactNode } from 'react'
+import { useLayoutEffect, useRef, useState, type ReactNode } from 'react'
 import { BookText, Check, Flag, Lock, MessageCircle, Play } from 'lucide-react'
 import { courseApi, type Course, type LessonState, type UnitSummary } from '../lib/course-api'
 import { useAsync } from '../lib/hooks'
@@ -6,6 +6,9 @@ import { languageName } from '../lib/rtl'
 import { useNav } from '../state/nav'
 import { useSettings } from '../state/settings'
 import { Button, Empty, ErrorNote, Loading, Page, ProgressLine } from '../components/ui'
+import { Target } from '../components/Text'
+import { Treat } from '../components/Treats'
+import { TREATS, treatFor } from '../lib/treats'
 
 export default function PathView() {
   const { pair } = useSettings()
@@ -35,11 +38,18 @@ export default function PathView() {
         </div>
       </div>
 
-      <div className="space-y-12">
-        {c.units.map((u, i) => <UnitSection key={u.id} course={c} unit={u} index={i} />)}
+      <div className="space-y-6">
+        {c.units.map((u, i) => (
+          <UnitSection key={u.id} course={c} unit={u} index={i} startStep={stepsBefore(c, i)} />
+        ))}
       </div>
     </Page>
   )
+}
+
+/** Steps on the road before unit i (lessons, story, role-play, quiz and the milestone), so the wave flows on. */
+function stepsBefore(c: Course, i: number): number {
+  return c.units.slice(0, i).reduce((n, u) => n + u.lessons.length + (u.story_id ? 1 : 0) + (u.scenario_id ? 1 : 0) + 2, 0)
 }
 
 function NoCourse() {
@@ -57,10 +67,99 @@ function NoCourse() {
   )
 }
 
-function UnitSection({ course, unit, index }: { course: Course; unit: UnitSummary; index: number }) {
+// ---- the winding path ------------------------------------------------------------------
+
+const ROW = 112          // vertical distance between steps
+const NODE = 56          // step circle
+const STEP_ANGLE = Math.PI / 2.6
+
+interface Step {
+  key: string
+  state: LessonState | 'open'
+  title: string
+  detail?: string
+  icon?: ReactNode
+  onClick?: () => void
+}
+
+/** Width of an element, kept current. */
+function useWidth<T extends HTMLElement>(): [React.RefObject<T | null>, number] {
+  const ref = useRef<T>(null)
+  const [w, setW] = useState(340)
+  useLayoutEffect(() => {
+    const el = ref.current
+    if (!el) return
+    const update = () => setW(el.clientWidth)
+    update()
+    const ro = new ResizeObserver(update)
+    ro.observe(el)
+    return () => ro.disconnect()
+  }, [])
+  return [ref, w]
+}
+
+function UnitSection({ course, unit, index, startStep }: { course: Course; unit: UnitSummary; index: number; startStep: number }) {
   const nav = useNav()
+  const [ref, width] = useWidth<HTMLDivElement>()
   // The quiz opens as soon as the unit is reached; before its lessons are done it is a test-out.
   const testOut = unit.quiz_state === 'current' && !unit.done
+
+  const steps: Step[] = [
+    ...unit.lessons.map((l): Step => ({
+      key: l.id,
+      state: l.state,
+      title: l.title,
+      detail: l.state === 'done' && l.best_score !== null ? `Best ${Math.round(l.best_score * 100)}%` : `${l.item_count} items`,
+      onClick: () => nav.open({ kind: 'lesson-sheet', courseId: course.id, lessonId: l.id, locked: l.state === 'locked' }),
+    })),
+    ...(unit.story_id ? [{
+      key: 'story',
+      state: unit.story_unlocked ? 'open' : 'locked',
+      icon: <BookText size={20} />,
+      title: 'Story',
+      detail: 'Read and listen',
+      onClick: unit.story_unlocked ? () => nav.open({ kind: 'story', id: unit.story_id! }) : undefined,
+    } as Step] : []),
+    ...(unit.scenario_id ? [{
+      key: 'role-play',
+      state: unit.scenario_unlocked ? 'open' : 'locked',
+      icon: <MessageCircle size={20} />,
+      title: 'Role-play',
+      detail: 'Practise a conversation',
+      onClick: unit.scenario_unlocked ? () => nav.open({ kind: 'talk', scenarioId: unit.scenario_id }) : undefined,
+    } as Step] : []),
+    {
+      key: 'quiz',
+      state: testOut ? 'open' : unit.quiz_state,
+      icon: <Flag size={20} />,
+      title: testOut ? 'Test out' : 'Checkpoint quiz',
+      detail:
+        unit.quiz_state === 'locked' ? 'Opens when you reach this unit' :
+        unit.quiz_state === 'done' ? 'Passed' :
+        testOut ? 'Already know it? Passing marks the lessons done.' :
+        'Pass it to finish the unit.',
+      onClick: unit.quiz_state === 'locked' ? undefined : () => nav.open({
+        kind: 'player',
+        source: { type: 'quiz', courseId: course.id, unitId: unit.id, title: `${unit.title} · checkpoint`, testOut },
+      }),
+    },
+  ]
+
+  // Positions: a gentle wave across the column, continuing from the previous unit so the road flows on.
+  const amp = Math.max(0, Math.min(width / 2 - 92, 120))
+  const xAt = (i: number) => width / 2 + amp * Math.sin((startStep + i) * STEP_ANGLE)
+  const points = steps.map((_, i) => ({ x: xAt(i), y: NODE / 2 + i * ROW }))
+  const milestone = { x: xAt(steps.length), y: NODE / 2 + steps.length * ROW + 8 }
+  const height = milestone.y + 96
+
+  // The road is solid as far as the learner has come, dotted beyond.
+  const reached = steps.reduce((acc, st, i) => (st.state === 'done' || st.state === 'current' ? i : acc), -1)
+  const earned = unit.done || unit.quiz_state === 'done'
+  const all = [...points, milestone]
+  const seg = (a: { x: number; y: number }, b: { x: number; y: number }) =>
+    `M${a.x} ${a.y} C${a.x} ${a.y + ROW * 0.55} ${b.x} ${b.y - ROW * 0.55} ${b.x} ${b.y}`
+  const kind = treatFor(index)
+  const treat = TREATS[kind]
 
   return (
     <section aria-labelledby={`unit-${unit.id}`}>
@@ -68,94 +167,84 @@ function UnitSection({ course, unit, index }: { course: Course; unit: UnitSummar
       <h2 id={`unit-${unit.id}`} className="mt-0.5 text-xl font-semibold tracking-tight">{unit.title}</h2>
       {unit.goal && <p className="mt-1 text-sm text-ink-2">{unit.goal}</p>}
 
-      <ol className="mt-5">
-        {unit.lessons.map((l) => (
-          <Node
-            key={l.id}
-            state={l.state}
-            title={l.title}
-            detail={l.state === 'done' && l.best_score !== null ? `Best ${Math.round(l.best_score * 100)}%` : `${l.item_count} items`}
-            onClick={() => nav.open({ kind: 'lesson-sheet', courseId: course.id, lessonId: l.id, locked: l.state === 'locked' })}
-          />
-        ))}
-        {unit.story_id && (
-          <Node
-            state={unit.story_unlocked ? 'open' : 'locked'}
-            icon={<BookText size={18} />}
-            title="Story"
-            detail="Read and listen"
-            onClick={unit.story_unlocked ? () => nav.open({ kind: 'story', id: unit.story_id! }) : undefined}
-          />
-        )}
-        {unit.scenario_id && (
-          <Node
-            state={unit.scenario_unlocked ? 'open' : 'locked'}
-            icon={<MessageCircle size={18} />}
-            title="Role-play"
-            detail="Practise a conversation"
-            onClick={unit.scenario_unlocked ? () => nav.open({ kind: 'talk', scenarioId: unit.scenario_id }) : undefined}
-          />
-        )}
-        <Node
-          state={testOut ? 'open' : unit.quiz_state}
-          icon={<Flag size={18} />}
-          title={testOut ? 'Test out' : 'Checkpoint quiz'}
-          detail={
-            unit.quiz_state === 'locked' ? 'Opens when you reach this unit' :
-            unit.quiz_state === 'done' ? 'Passed' :
-            testOut ? 'Already know this? Passing marks the unit’s lessons done.' :
-            'Pass it to finish the unit.'
-          }
-          last
-          onClick={unit.quiz_state === 'locked' ? undefined : () => nav.open({
-            kind: 'player',
-            source: { type: 'quiz', courseId: course.id, unitId: unit.id, title: `${unit.title} · checkpoint`, testOut },
+      <div ref={ref} className="relative mt-6" style={{ height }}>
+        <svg className="pointer-events-none absolute inset-0" width={width} height={height} aria-hidden="true">
+          {all.slice(1).map((b, i) => {
+            const done = i < reached || (i === all.length - 2 && earned)
+            return (
+              <path
+                key={i}
+                d={seg(all[i], b)}
+                fill="none"
+                strokeLinecap="round"
+                style={{ stroke: done ? 'var(--accent)' : 'var(--line-strong, #c9c3b8)' }}
+                strokeWidth={done ? 6 : 3}
+                strokeDasharray={done ? undefined : '1 9'}
+                opacity={done ? 0.45 : 1}
+              />
+            )
           })}
-        />
-      </ol>
+        </svg>
+
+        <ol className="absolute inset-0">
+          {steps.map((st, i) => (
+            <PathNode key={st.key} step={st} x={points[i].x} y={points[i].y} />
+          ))}
+        </ol>
+
+        <figure
+          className="absolute flex w-40 -translate-x-1/2 flex-col items-center text-center"
+          style={{ left: milestone.x, top: milestone.y - 34 }}
+          role="img"
+          aria-label={`Unit ${index + 1} milestone: ${treat.gloss}${earned ? ', reached' : ', not reached yet'}`}
+        >
+          <Treat kind={kind} earned={earned} size={68} />
+          <figcaption className={`mt-0.5 rounded-lg bg-canvas/90 px-2 py-0.5 leading-tight ${earned ? 'text-ink' : 'text-ink-3'}`}>
+            <Target text={treat.fa} tr={treat.tr} lang="fa" stack className="text-[15px]" />
+            <span className="block text-[12px] text-ink-3">{earned ? treat.gloss : `${treat.gloss} · after this unit`}</span>
+          </figcaption>
+        </figure>
+      </div>
     </section>
   )
 }
 
-function Node({ state, title, detail, icon, onClick, last }: {
-  state: LessonState | 'open'
-  title: string
-  detail?: string
-  icon?: ReactNode
-  onClick?: () => void
-  last?: boolean
-}) {
+function PathNode({ step, x, y }: { step: Step; x: number; y: number }) {
+  const { state, title, detail, icon, onClick } = step
   const circle = {
     done: 'bg-accent-soft text-accent',
-    current: 'bg-accent text-accent-ink ring-4 ring-accent-soft',
-    open: 'border border-line-strong bg-surface text-ink-2',
+    current: 'bg-accent text-accent-ink ring-[6px] ring-accent-soft',
+    open: 'border-2 border-line-strong bg-surface text-ink-2',
     locked: 'border border-line bg-surface-2 text-ink-3',
   }[state]
   const glyph =
-    state === 'done' && !icon ? <Check size={20} strokeWidth={2.25} /> :
-    state === 'current' && !icon ? <Play size={18} fill="currentColor" className="ms-0.5" /> :
-    state === 'locked' && !icon ? <Lock size={16} /> :
-    icon ?? <Play size={18} />
+    state === 'done' && !icon ? <Check size={22} strokeWidth={2.25} /> :
+    state === 'current' && !icon ? <Play size={20} fill="currentColor" className="ms-0.5" /> :
+    state === 'locked' && !icon ? <Lock size={18} /> :
+    icon ?? <Play size={20} />
   const muted = state === 'locked'
   const stateLabel = { done: 'done', current: 'up next', open: 'available', locked: 'locked' }[state]
 
   return (
-    <li className="relative">
-      {!last && <span aria-hidden className="absolute start-[23.5px] top-14 h-[calc(100%-3rem)] w-px bg-line-strong" />}
+    <li className="absolute w-44 -translate-x-1/2" style={{ left: x, top: y - NODE / 2 }}>
       <button
         type="button"
         onClick={onClick}
         disabled={!onClick}
         aria-label={`${title}, ${stateLabel}`}
-        className="flex w-full items-center gap-4 rounded-2xl py-2 pe-2 text-start transition-colors enabled:hover:bg-surface-2/60 disabled:cursor-default"
+        className="group flex w-full flex-col items-center gap-1.5 rounded-2xl text-center disabled:cursor-default"
       >
-        <span className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-full ${circle}`}>{glyph}</span>
-        <span className="min-w-0 flex-1">
-          <span className={`block truncate text-[15px] ${muted ? 'text-ink-3' : state === 'current' ? 'font-medium text-ink' : 'text-ink'}`}>{title}</span>
-          {detail && <span className="block text-[13px] text-ink-3">{detail}</span>}
+        <span
+          className={`flex shrink-0 items-center justify-center rounded-full transition-transform group-enabled:group-hover:scale-105 ${circle}`}
+          style={{ width: NODE, height: NODE }}
+        >
+          {glyph}
+        </span>
+        <span className="block max-w-full rounded-lg bg-canvas/90 px-2 py-0.5">
+          <span className={`block truncate text-[14px] leading-tight ${muted ? 'text-ink-3' : state === 'current' ? 'font-medium text-ink' : 'text-ink'}`}>{title}</span>
+          {detail && <span className="mt-0.5 line-clamp-2 block text-[12px] leading-snug text-ink-3">{detail}</span>}
         </span>
       </button>
-      {!last && <div className="h-3" />}
     </li>
   )
 }
