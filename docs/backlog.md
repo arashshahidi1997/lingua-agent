@@ -10,14 +10,13 @@ lessons or features; new ideas wait in "Ideas (parked)".
 
 ## Complete what exists (first)
 
-- [ ] Completeness audit: use every surface as a learner (phone and desktop, owner and guest) and list what's broken, missing or rough; fold the findings in below [web, core]
+- [x] Completeness audit: [audit/2026-11-17-completeness.md](audit/2026-11-17-completeness.md) — 4 decisions, 14 broken, 15 rough, 3 guest items, leftovers
+- [ ] Work through the audit's A (broken), B (rough) and C (guest) items [web, core]
+- [ ] Decisions D1–D4 in the audit (Talk's model, Add-text language, offline review, v1 leftovers) — **user**
 - [ ] Your voice for the existing course: 4 recordings from `content/recording/fa-en-a1/*.html` → Drive folder → split, match, normalise; the app prefers the native clip over Piper [content, core] — recording: **user**
-- [ ] Desktop rail sometimes highlights two tabs at once (seen on Library + Talk, Path + Library) [web]
-- [ ] Talk on Ollama on this CPU: about a minute per reply; measure, then decide (shorter prompts, a smaller model for Talk, or Claude for Talk) [core]
 - [ ] Generated lessons ("Your lessons") are poor with `qwen2.5:7b` (see Phase 5b below); either fix or label them clearly as experimental [core]
 - [ ] Sara and Ali share one synthetic voice (only `fa_IR-amir` installed) — moot once your voice is in, except for lines not yet recorded [core]
 - [ ] Docs out of date with Product v2: architecture.md, clients.md, playground.md, roadmap order; README status line still says "MVP" [docs]
-- [ ] Old surfaces left over from v1: `/api/tutor/*` (replaced by Talk), the Streamlit playground — keep, fold in, or remove [core]
 
 ## Now
 
