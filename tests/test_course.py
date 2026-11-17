@@ -388,3 +388,106 @@ def test_audio_supports_range_requests(client: TestClient):
                         files={"file": ("a.mp3", b"0123456789", "audio/mpeg")}).json()
     r = client.get(track["url"], headers={"Range": "bytes=2-5"})
     assert r.status_code == 206 and r.content == b"2345"
+
+
+# ---- audit 2026-11-17 fixes ------------------------------------------------------------
+
+def test_course_cards_carry_target_text(client: TestClient):
+    s = client.get("/api/courses/fa-en-test/lessons/u1-l1/session").json()
+    client.post("/api/courses/fa-en-test/lessons/u1-l1/complete", json={"results": _all_correct(s)})
+    card = next(c for c in client.get("/api/cards/due", params={"target": "fa"}).json() if c["front"] == "hello")
+    assert (card["text"], card["tr"]) == ("سلام", "salâm")
+
+
+def test_review_is_idempotent_and_counts_time(client: TestClient):
+    s = client.get("/api/courses/fa-en-test/lessons/u1-l1/session").json()
+    client.post("/api/courses/fa-en-test/lessons/u1-l1/complete", json={"results": _all_correct(s)})
+    cid = client.get("/api/cards/due", params={"target": "fa"}).json()[0]["id"]
+    body = {"rating": 5, "event_id": "evt-1", "seconds": 120}
+    first = client.post(f"/api/cards/{cid}/review", json=body).json()
+    again = client.post(f"/api/cards/{cid}/review", json=body).json()
+    assert first["repetitions_after"] == again["repetitions_after"] == 1
+    assert client.get("/api/today", params={"target": "fa"}).json()["minutes_today"] == 2
+
+
+def test_lesson_completion_replay_is_ignored(client: TestClient):
+    s = client.get("/api/courses/fa-en-test/lessons/u1-l1/session").json()
+    body = {"results": _all_correct(s), "seconds": 60, "event_id": "done-1"}
+    client.post("/api/courses/fa-en-test/lessons/u1-l1/complete", json=body)
+    client.post("/api/courses/fa-en-test/lessons/u1-l1/complete", json=body)
+    prog = client.get("/api/courses/fa-en-test").json()
+    assert prog["units"][0]["lessons"][0]["state"] == "done"
+    assert client.get("/api/today", params={"target": "fa"}).json()["minutes_today"] == 1
+
+
+def test_test_out_is_reachable_before_lessons(client: TestClient):
+    units = client.get("/api/courses/fa-en-test").json()["units"]
+    assert units[0]["quiz_state"] == "current" and not units[0]["done"]   # first unit: test-out open
+    assert units[1]["quiz_state"] == "locked"
+
+
+def test_today_suggests_checkpoint(client: TestClient):
+    for lid in ("u1-l1", "u1-l2"):
+        s = client.get(f"/api/courses/fa-en-test/lessons/{lid}/session").json()
+        client.post(f"/api/courses/fa-en-test/lessons/{lid}/complete", json={"results": _all_correct(s)})
+    t = client.get("/api/today", params={"target": "fa"}).json()
+    assert t["checkpoint"] == {"unit_id": "u1", "unit_title": "Hello"}
+
+
+def test_talk_resume_and_idempotent_end(client: TestClient):
+    sess = client.post("/api/talk/sessions", json={"target": "fa", "scenario_id": "t1"}).json()
+    assert client.get("/api/talk/sessions/latest", params={"target": "fa", "scenario_id": "t1"}).json()["id"] == sess["id"]
+    client.post(f"/api/talk/sessions/{sess['id']}/messages", json={"content": "coffee and water"})
+    first = client.post(f"/api/talk/sessions/{sess['id']}/end").json()
+    second = client.post(f"/api/talk/sessions/{sess['id']}/end").json()
+    assert first == second and second["cards_added"] == first["cards_added"]
+    assert client.get(f"/api/talk/sessions/{sess['id']}").json()["summary"]["went_well"] == first["went_well"]
+    assert client.get("/api/talk/sessions/latest", params={"target": "fa", "scenario_id": "t1"}).status_code == 404
+    # The same words in another conversation don't make new cards.
+    other = client.post("/api/talk/sessions", json={"target": "fa", "scenario_id": "t1"}).json()
+    client.post(f"/api/talk/sessions/{other['id']}/messages", json={"content": "coffee and water"})
+    assert client.post(f"/api/talk/sessions/{other['id']}/end").json()["cards_added"] == 0
+
+
+def test_activity_endpoint_dedupes(client: TestClient):
+    for _ in range(2):
+        assert client.post("/api/activity", json={"seconds": 180, "kind": "story", "event_id": "s-1"}).status_code == 204
+    assert client.get("/api/today", params={"target": "fa"}).json()["minutes_today"] == 3
+
+
+def test_recordings_and_audio_filter_by_language(client: TestClient):
+    for lang in ("fa", "ru"):
+        client.post("/api/recordings", data={"ref": "diary", "language": lang}, files={"file": ("r.webm", b"x", "audio/webm")})
+        client.post("/api/audio", data={"language": lang}, files={"file": ("a.mp3", b"x", "audio/mpeg")})
+    assert [r["language"] for r in client.get("/api/recordings", params={"language": "fa"}).json()] == ["fa"]
+    assert [a["language"] for a in client.get("/api/audio", params={"language": "ru"}).json()] == ["ru"]
+
+
+def test_delete_generated_unit(client: TestClient):
+    r = client.post("/api/ingest/text", json={"text": "Coffee and water.", "title": "Cafe", "source_language": "en",
+                                              "target_language": "fa", "support_language": "en"})
+    uid = r.json()["unit_id"]
+    assert client.delete(f"/api/units/{uid}").status_code == 204
+    assert client.get(f"/api/units/{uid}").status_code == 404
+    assert client.get("/api/cards/due", params={"target": "fa"}).json() == []
+    assert client.delete(f"/api/units/{uid}").status_code == 404
+
+
+def test_native_text_ingest_runs(client: TestClient):
+    r = client.post("/api/ingest/text", json={"text": "من قهوه و آب می‌خواهم.", "title": "Native",
+                                              "source_language": "fa", "target_language": "fa", "support_language": "en"})
+    assert r.status_code == 200, r.text
+
+
+def test_health_label(client: TestClient):
+    assert client.get("/api/health").json()["ai_label"] == "Mock replies (no AI model)"
+
+
+def test_requests_without_tailscale_header_must_be_local(tmp_path: Path, monkeypatch: pytest.MonkeyPatch, course_dir: Path):
+    monkeypatch.chdir(tmp_path)
+    monkeypatch.setenv("LINGUA_DATA_DIR", str(tmp_path / "data"))
+    app = build_app(Settings.load(cwd=tmp_path))
+    lan = TestClient(app, client=("192.168.1.20", 50000))
+    assert lan.get("/api/me").status_code == 403
+    assert lan.get("/api/me", headers={"Tailscale-User-Login": "x@y.z"}).json()["owner"] is False
+    assert TestClient(app, client=("127.0.0.1", 50000)).get("/api/me").json()["owner"] is True

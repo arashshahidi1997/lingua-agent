@@ -42,6 +42,7 @@ class TalkSession(BaseModel):
     support: str
     messages: list[TalkMessage] = Field(default_factory=list)
     ended: bool = False
+    summary: dict | None = None  # stored when ended; ending again returns it
     created_at: datetime = Field(default_factory=utcnow)
     updated_at: datetime = Field(default_factory=utcnow)
 

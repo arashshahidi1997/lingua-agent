@@ -162,7 +162,7 @@ def ingest_text(
     # 3. Vocabulary
     vocab_prompt = P.vocabulary_extraction_prompt(
         source_language=source_language, target_language=target_language,
-        level=cefr_level, text=text,
+        level=cefr_level, text=text, support_language=support_language,
     )
     vocab_draft = provider.generate_structured(
         vocab_prompt, VocabularyDraft,
@@ -187,7 +187,7 @@ def ingest_text(
     # 4. Grammar
     grammar_prompt = P.grammar_extraction_prompt(
         source_language=source_language, target_language=target_language,
-        level=cefr_level, text=text,
+        level=cefr_level, text=text, support_language=support_language,
     )
     grammar_draft = provider.generate_structured(
         grammar_prompt, GrammarDraft,
@@ -247,12 +247,25 @@ def ingest_text(
     # 6. Flashcards — one production card per vocab item.
     flashcards: list[Flashcard] = []
     now = utcnow()
+    native = source_language == target_language  # the text is in the language being learned
+    meaning_lang = support_language or "en"
     for v in vocab:
-        translation = next(iter(v.translations.get(target_language, [])), v.lemma)
+        if native:
+            # Like course cards: meaning on the front, the target word on the back.
+            meaning = next(iter(v.translations.get(meaning_lang, [])), None)
+            if not meaning:
+                continue
+            front, target_text, target_tr = meaning, v.lemma, v.transliteration
+        else:
+            target_text = next(iter(v.translations.get(target_language, [])), v.lemma)
+            front, target_tr = v.lemma, None
+        back = f"{target_text} · {target_tr}" if target_tr else target_text
         flashcards.append(Flashcard(
             id=make_id("card", target_language, v.id, "production"),
-            front=v.lemma,
-            back=translation,
+            front=front,
+            back=back,
+            target_text=target_text,
+            target_tr=target_tr,
             source_language=source_language,
             target_language=target_language,
             direction=CardDirection.PRODUCTION,

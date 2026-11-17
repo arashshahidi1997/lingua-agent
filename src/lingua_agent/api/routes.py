@@ -7,11 +7,13 @@ from datetime import datetime
 from pathlib import Path
 
 from fastapi import APIRouter, Depends, HTTPException, Request
-from fastapi.responses import FileResponse
+from fastapi.responses import FileResponse, Response
 
 from .. import __version__
 from ..ai import get_provider
 from ..config import Settings
+from ..course.store import log_activity
+from ..ids import short_hash
 from ..ingest import ingest_text
 from ..languages import list_languages
 from ..materials import MaterialsError, MaterialsSourceConfig, build_provider
@@ -23,13 +25,10 @@ from ..models import (
     LearnerProfile,
     LessonUnit,
     ReviewEvent,
-    TutorSession,
     VocabularyItem,
 )
 from ..srs import SM2Scheduler, export_cards_csv
 from ..storage import JsonRepository
-from ..tutor.agent import reply as tutor_reply
-from ..tutor.session import open_session
 from . import schemas as S
 from .identity import charge_model_call, require_owner
 
@@ -62,7 +61,18 @@ def _save_profile(s: Settings, profile: LearnerProfile) -> None:
                  encoding="utf-8")
 
 
+def _card_target(card: Flashcard) -> tuple[str | None, str | None]:
+    if card.target_text:
+        return card.target_text, card.target_tr
+    # Course and Talk cards made before target_text existed: back is "text · tr".
+    if any(t.startswith(("course:", "talk")) for t in card.tags):
+        text, _, tr = card.back.partition(" · ")
+        return text.strip(), (tr.strip() or None)
+    return None, None
+
+
 def _card_out(card: Flashcard) -> S.CardOut:
+    text, tr = _card_target(card)
     return S.CardOut(
         id=card.id, front=card.front, back=card.back,
         source_language=card.source_language, target_language=card.target_language,
@@ -70,6 +80,7 @@ def _card_out(card: Flashcard) -> S.CardOut:
         interval=card.interval, ease_factor=card.ease_factor,
         repetitions=card.repetitions, lapses=card.lapses,
         needs_extra_review=card.needs_extra_review, due_at=card.due_at,
+        text=text, tr=tr,
     )
 
 
@@ -90,7 +101,19 @@ def _unit_item(unit: LessonUnit) -> S.UnitListItem:
 
 @router.get("/health", response_model=S.HealthResponse)
 def health(s: Settings = Depends(get_settings)) -> S.HealthResponse:
-    return S.HealthResponse(status="ok", version=__version__, ai_provider=s.ai_provider)
+    return S.HealthResponse(status="ok", version=__version__, ai_provider=s.ai_provider,
+                            ai_label=_ai_label(s))
+
+
+def _ai_label(s: Settings) -> str:
+    """The model in plain words, e.g. "Ollama · qwen2.5:7b, on this computer"."""
+    if s.ai_provider == "openai":
+        url = s.openai_base_url
+        local = any(h in url for h in ("localhost", "127.0.0.1", "[::1]"))
+        host = ("Ollama" if ":11434" in url else "a local server") if local else url.split("//")[-1].split("/")[0]
+        return f"{host} · {s.openai_model}" + (", on this computer" if local else "")
+    return {"mock": "Mock replies (no AI model)", "anthropic": f"Claude API · {s.anthropic_model}",
+            "claude-max": "Claude (Claude Max subscription)"}.get(s.ai_provider, s.ai_provider)
 
 
 @router.get("/languages", response_model=list[S.LanguageOut])
@@ -164,6 +187,28 @@ def get_unit(unit_id: str, s: Settings = Depends(get_settings)) -> LessonUnit:
     return unit
 
 
+@router.delete("/units/{unit_id}", status_code=204)
+def delete_unit(unit_id: str, s: Settings = Depends(get_settings)) -> Response:
+    """Delete a lesson made from your own text, with what only it uses (words, grammar, exercises, cards)."""
+    units = JsonRepository(s.data_dir, "lessons", LessonUnit)
+    unit = units.get(unit_id)
+    if not unit:
+        raise HTTPException(status_code=404, detail=f"unit not found: {unit_id}")
+    others = [u for u in units.list() if u.id != unit_id]
+    for bucket, model, field in (("vocabulary", VocabularyItem, "vocabulary_ids"),
+                                 ("grammar", GrammarPoint, "grammar_ids"),
+                                 ("exercises", Exercise, "exercise_ids"),
+                                 ("flashcards", Flashcard, "flashcard_ids")):
+        still_used = {i for u in others for i in getattr(u, field)}
+        repo = JsonRepository(s.data_dir, bucket, model)
+        for entity_id in getattr(unit, field):
+            if entity_id not in still_used:
+                repo.delete(entity_id)
+    (s.content_dir / "units" / f"{unit.id}.md").unlink(missing_ok=True)
+    units.delete(unit_id)
+    return Response(status_code=204)
+
+
 @router.get("/units/{unit_id}/detail", response_model=S.UnitDetail)
 def get_unit_detail(unit_id: str, s: Settings = Depends(get_settings)) -> S.UnitDetail:
     """Return the unit with all referenced entities inlined.
@@ -218,46 +263,24 @@ def review_card(card_id: str, req: S.ReviewRequest, s: Settings = Depends(get_se
     card = cards_repo.get(card_id)
     if not card:
         raise HTTPException(status_code=404, detail=f"card not found: {card_id}")
+    event_id = f"rev_{short_hash(req.event_id, length=20)}" if req.event_id else None
+    if event_id and reviews_repo.get(event_id) is not None:
+        # A replay from the offline queue: already applied.
+        return S.ReviewResponse(card=_card_out(card), interval_after=card.interval,
+                                ease_after=card.ease_factor, repetitions_after=card.repetitions)
     sched = SM2Scheduler()
     card, event = sched.update(card, req.rating)
+    if event_id:
+        event = event.model_copy(update={"id": event_id})
     cards_repo.save(card)
     reviews_repo.save(event)
+    log_activity(s, req.seconds)
     return S.ReviewResponse(
         card=_card_out(card),
         interval_after=card.interval,
         ease_after=card.ease_factor,
         repetitions_after=card.repetitions,
     )
-
-
-@router.post("/tutor/sessions", response_model=S.TutorSessionOut)
-def create_session(req: S.OpenSessionRequest, s: Settings = Depends(get_settings)) -> S.TutorSessionOut:
-    sess = open_session(source=req.source_language, target=req.target_language,
-                         support=req.support_language, settings=s)
-    return _session_out(sess)
-
-
-@router.get("/tutor/sessions/{session_id}", response_model=S.TutorSessionOut)
-def get_session(session_id: str, s: Settings = Depends(get_settings)) -> S.TutorSessionOut:
-    sess = JsonRepository(s.data_dir, "sessions", TutorSession).get(session_id)
-    if not sess:
-        raise HTTPException(status_code=404, detail=f"session not found: {session_id}")
-    return _session_out(sess)
-
-
-@router.post("/tutor/sessions/{session_id}/messages", response_model=S.TutorMessageResponse)
-def send_message(session_id: str, req: S.TutorMessageRequest, request: Request,
-                 s: Settings = Depends(get_settings)) -> S.TutorMessageResponse:
-    repo = JsonRepository(s.data_dir, "sessions", TutorSession)
-    sess = repo.get(session_id)
-    if not sess:
-        raise HTTPException(status_code=404, detail=f"session not found: {session_id}")
-    charge_model_call(request, s)
-    profile = _load_profile(s)
-    provider = get_provider(s.ai_provider)
-    msg = tutor_reply(session=sess, learner=profile, user_message=req.content, provider=provider)
-    repo.save(sess)
-    return S.TutorMessageResponse(role=msg.role, content=msg.content, created_at=msg.created_at)
 
 
 @router.get("/export/anki")
@@ -271,22 +294,10 @@ def export_anki(target: str, s: Settings = Depends(get_settings)) -> FileRespons
     return FileResponse(out, media_type="text/tab-separated-values", filename=f"lingua-agent-{target}.csv")
 
 
-def _session_out(sess: TutorSession) -> S.TutorSessionOut:
-    return S.TutorSessionOut(
-        id=sess.id,
-        source_language=sess.source_language,
-        target_language=sess.target_language,
-        support_language=sess.support_language,
-        messages=[m.model_dump(mode="json") for m in sess.messages],
-        created_at=sess.created_at,
-        updated_at=sess.updated_at,
-    )
-
-
 # ---- Materials adapter (Phase 6c) -----------------------------------------
 
-@router.get("/materials/sources", response_model=list[S.MaterialsSourceOut]
-             , dependencies=[Depends(require_owner)])
+@router.get("/materials/sources", response_model=list[S.MaterialsSourceOut],
+            dependencies=[Depends(require_owner)])
 def materials_sources(s: Settings = Depends(get_settings)) -> list[S.MaterialsSourceOut]:
     profile = _load_profile(s)
     out: list[S.MaterialsSourceOut] = []
@@ -302,8 +313,8 @@ def materials_sources(s: Settings = Depends(get_settings)) -> list[S.MaterialsSo
     return out
 
 
-@router.post("/materials/sources", response_model=S.MaterialsSourceOut, status_code=201
-             , dependencies=[Depends(require_owner)])
+@router.post("/materials/sources", response_model=S.MaterialsSourceOut, status_code=201,
+             dependencies=[Depends(require_owner)])
 def materials_add_source(req: S.AddMaterialsSourceRequest,
                           s: Settings = Depends(get_settings)) -> S.MaterialsSourceOut:
     profile = _load_profile(s)
@@ -325,8 +336,8 @@ def materials_add_source(req: S.AddMaterialsSourceRequest,
     )
 
 
-@router.delete("/materials/sources/{name}", status_code=204
-             , dependencies=[Depends(require_owner)])
+@router.delete("/materials/sources/{name}", status_code=204,
+             dependencies=[Depends(require_owner)])
 def materials_remove_source(name: str, s: Settings = Depends(get_settings)) -> None:
     profile = _load_profile(s)
     before = len(profile.materials_sources)
@@ -336,8 +347,8 @@ def materials_remove_source(name: str, s: Settings = Depends(get_settings)) -> N
     _save_profile(s, profile)
 
 
-@router.get("/materials/list", response_model=S.MaterialsListResponse
-             , dependencies=[Depends(require_owner)])
+@router.get("/materials/list", response_model=S.MaterialsListResponse,
+             dependencies=[Depends(require_owner)])
 def materials_list(source: str, folder: str = "",
                     s: Settings = Depends(get_settings)) -> S.MaterialsListResponse:
     profile = _load_profile(s)
@@ -362,8 +373,8 @@ def materials_list(source: str, folder: str = "",
     )
 
 
-@router.post("/materials/ingest", response_model=S.IngestSummary
-             , dependencies=[Depends(require_owner)])
+@router.post("/materials/ingest", response_model=S.IngestSummary,
+             dependencies=[Depends(require_owner)])
 def materials_ingest(req: S.MaterialsIngestRequest,
                       s: Settings = Depends(get_settings)) -> S.IngestSummary:
     profile = _load_profile(s)

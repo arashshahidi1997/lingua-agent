@@ -82,6 +82,17 @@ def _synthesize_binary(model: Path, text: str, out: Path) -> None:
         raise SpeechError(proc.stderr.decode("utf-8", "replace")[-500:])
 
 
+def _cache_path(settings: Settings, text: str, model: Path) -> Path:
+    key = hashlib.sha256(f"{model.name}\x1f{text}".encode("utf-8")).hexdigest()[:24]
+    return settings.shared_data_dir / "tts_cache" / f"{key}.wav"
+
+
+def is_cached(settings: Settings, text: str, lang: str) -> bool:
+    model = find_voice(settings, lang)
+    path = _cache_path(settings, " ".join(text.split()), model) if model else None
+    return bool(path and path.exists() and path.stat().st_size > 44)
+
+
 def synthesize(settings: Settings, text: str, lang: str) -> Path:
     """Return the path of a cached WAV for `text`; synthesise it on first request."""
     text = " ".join(text.split())
@@ -93,10 +104,8 @@ def synthesize(settings: Settings, text: str, lang: str) -> Path:
     model = find_voice(settings, lang)
     if backend is None or model is None:
         raise SpeechError(f"no local voice for {lang!r}")
-    key = hashlib.sha256(f"{model.name}\x1f{text}".encode("utf-8")).hexdigest()[:24]
-    cache = settings.shared_data_dir / "tts_cache"
-    cache.mkdir(parents=True, exist_ok=True)
-    out = cache / f"{key}.wav"
+    out = _cache_path(settings, text, model)
+    out.parent.mkdir(parents=True, exist_ok=True)
     if out.exists() and out.stat().st_size > 44:
         return out
     tmp = out.with_suffix(".tmp.wav")

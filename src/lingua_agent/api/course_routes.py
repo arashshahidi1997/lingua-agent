@@ -34,7 +34,7 @@ from ..course.talk import TalkMessage, TalkSession, opener_turn, persona_name, s
 from ..ids import make_id, short_hash
 from ..materials import MaterialsError, build_provider
 from ..materials.registry import find_source
-from ..models import Flashcard, LearnerProfile
+from ..models import Flashcard, LearnerProfile, ReviewEvent
 from ..models.base import utcnow
 from ..models.srs import CardDirection, CardType
 from ..srs import SM2Scheduler
@@ -121,7 +121,8 @@ class ItemResult(BaseModel):
 
 class CompleteRequest(BaseModel):
     results: list[ItemResult] = Field(default_factory=list)
-    seconds: int = 0
+    seconds: int = Field(0, ge=0, le=6 * 3600)
+    event_id: str | None = Field(None, max_length=80, description="Idempotency key: a replay is ignored.")
 
 
 class CompleteResponse(BaseModel):
@@ -175,6 +176,7 @@ class TodayOut(BaseModel):
     streak_days: int
     story: StorySummary | None
     scenario: ScenarioSummary | None
+    checkpoint: dict | None = None  # {unit_id, unit_title}: lessons done, quiz not passed
 
 
 class OpenTalkRequest(BaseModel):
@@ -190,6 +192,7 @@ class TalkSessionOut(BaseModel):
     support: str
     messages: list[TalkMessage]
     ended: bool
+    summary: dict | None = None
 
 
 class SayRequest(BaseModel):
@@ -328,8 +331,11 @@ def _course_out(course: CourseDef, prog: CourseProgress) -> CourseOut:
                                  best_score=prog.lessons[lesson.id].best_score if lesson.id in prog.lessons else None)
                    for lesson in unit.lessons]
         all_done = all(ls.state == "done" for ls in lessons)
+        # Reached = the first unit, or one of its lessons is current or done. From then on its quiz is open:
+        # before the lessons are done it's a test-out (passing marks them done).
+        reached = unit is course.units[0] or any(ls.state != "locked" for ls in lessons)
         quiz = prog.quizzes.get(unit.id)
-        quiz_state = "done" if quiz and quiz.best_score >= QUIZ_PASS else ("current" if all_done else "locked")
+        quiz_state = "done" if quiz and quiz.best_score >= QUIZ_PASS else ("current" if reached else "locked")
         units.append(UnitSummary(id=unit.id, title=unit.title, goal=unit.goal, lessons=lessons,
                                  story_id=unit.story, scenario_id=unit.scenario,
                                  story_unlocked=_unit_unlocked(course, prog, unit.id),
@@ -364,7 +370,7 @@ def _add_cards(s: Settings, course: CourseDef, items: list[CourseItem], tag: str
         if repo.get(cid) is not None:
             continue
         back = f"{item.text} · {item.tr}" if item.tr else item.text
-        repo.save(Flashcard(id=cid, front=item.gloss, back=back,
+        repo.save(Flashcard(id=cid, front=item.gloss, back=back, target_text=item.text, target_tr=item.tr,
                             source_language=course.support, target_language=course.target,
                             direction=CardDirection.PRODUCTION,
                             card_type=CardType.SENTENCE if len(X.words(item.text)) > 1 else CardType.VOCAB,
@@ -383,6 +389,16 @@ def _apply_results(prog: CourseProgress, results: list[ItemResult]) -> float:
         else:
             st.wrong += 1
     return sum(r.correct for r in results) / len(results) if results else 1.0
+
+
+def _replayed(prog: CourseProgress, event_id: str | None) -> bool:
+    """True when this event was already applied (an offline replay); records it otherwise."""
+    if not event_id:
+        return False
+    if event_id in prog.events:
+        return True
+    prog.events = [*prog.events[-499:], event_id]
+    return False
 
 
 def _attempt_seed(prog: CourseProgress, key: str) -> str:
@@ -442,6 +458,9 @@ def complete_lesson(course_id: str, lesson_id: str, req: CompleteRequest,
         raise HTTPException(404, f"lesson not found: {lesson_id}")
     unit, lesson = found
     prog = store.load_progress(s, course_id)
+    if _replayed(prog, req.event_id):
+        rec = prog.lessons.get(lesson.id)
+        return CompleteResponse(score=rec.best_score if rec else 0.0, passed=True, cards_added=0, unlocked=None)
     score = _apply_results(prog, req.results)
     store.record(prog.lessons, lesson.id, score)
     prog.updated_at = utcnow()
@@ -475,6 +494,10 @@ def complete_unit_quiz(course_id: str, unit_id: str, req: CompleteRequest,
     if not unit:
         raise HTTPException(404, f"unit not found: {unit_id}")
     prog = store.load_progress(s, course_id)
+    if _replayed(prog, req.event_id):
+        rec = prog.quizzes.get(unit.id)
+        return CompleteResponse(score=rec.best_score if rec else 0.0,
+                                passed=bool(rec and rec.best_score >= QUIZ_PASS), cards_added=0, unlocked=None)
     score = _apply_results(prog, req.results)
     store.record(prog.quizzes, unit.id, score)
     passed = score >= QUIZ_PASS
@@ -519,9 +542,12 @@ def practice(course_id: str, n: int = 12, s: Settings = Depends(get_settings)) -
 def complete_practice(course_id: str, req: CompleteRequest, s: Settings = Depends(get_settings)) -> CompleteResponse:
     course = _course_or_404(s, course_id)
     prog = store.load_progress(s, course_id)
+    if _replayed(prog, req.event_id):
+        return CompleteResponse(score=0.0, passed=True, cards_added=0, unlocked=None)
     score = _apply_results(prog, req.results)
-    # Practice also counts as review: nudge the matching flashcards through SM-2.
+    # Practice also counts as review: nudge the matching flashcards through SM-2, with history.
     repo = JsonRepository(s.data_dir, "flashcards", Flashcard)
+    reviews = JsonRepository(s.data_dir, "reviews", ReviewEvent)
     sched = SM2Scheduler()
     per_item: dict[str, list[bool]] = {}
     for r in req.results:
@@ -529,8 +555,9 @@ def complete_practice(course_id: str, req: CompleteRequest, s: Settings = Depend
     for item_id, outcomes in per_item.items():
         card = repo.get(_card_id(course.id, item_id))
         if card is not None and card.is_due():
-            card, _event = sched.update(card, 4 if all(outcomes) else 2)
+            card, event = sched.update(card, 4 if all(outcomes) else 2)
             repo.save(card)
+            reviews.save(event)
     prog.updated_at = utcnow()
     store.save_progress(s, prog)
     store.log_activity(s, req.seconds)
@@ -587,7 +614,10 @@ def today(target: str, support: str = "en", s: Settings = Depends(get_settings))
     current = _current_unit_id(course, prog)
     story = _pick_for_unit([_story_summary(course, prog, st) for st in course.stories], order, current)
     scen = _pick_for_unit([_scenario_summary(course, prog, sc) for sc in course.scenarios], order, current)
-    return TodayOut(course=_summary(course, prog), next_lesson=_next_lesson(course, prog), due_count=due,
+    checkpoint = next(({"unit_id": u.id, "unit_title": u.title} for u in course.units
+                       if all(lesson.id in prog.lessons for lesson in u.lessons)
+                       and not (u.id in prog.quizzes and prog.quizzes[u.id].best_score >= QUIZ_PASS)), None)
+    return TodayOut(checkpoint=checkpoint, course=_summary(course, prog), next_lesson=_next_lesson(course, prog), due_count=due,
                     learned_count=len(_learned_items(course, prog)),
                     minutes_today=store.minutes_today(days), daily_goal_minutes=goal,
                     streak_days=store.streak(days), story=story, scenario=scen)
@@ -655,7 +685,7 @@ def _talk_out(s: Settings, sess: TalkSession) -> TalkSessionOut:
         course, sc = found
         scen = _scenario_out(course, store.load_progress(s, course.id), sc)
     return TalkSessionOut(id=sess.id, scenario=scen, target=sess.target, support=sess.support,
-                          messages=sess.messages, ended=sess.ended)
+                          messages=sess.messages, ended=sess.ended, summary=sess.summary)
 
 
 def _talk_or_404(s: Settings, session_id: str) -> TalkSession:
@@ -684,6 +714,16 @@ def open_talk(req: OpenTalkRequest, s: Settings = Depends(get_settings)) -> Talk
     return _talk_out(s, sess)
 
 
+@router.get("/talk/sessions/latest", response_model=TalkSessionOut)
+def latest_talk(target: str, scenario_id: str | None = None, s: Settings = Depends(get_settings)) -> TalkSessionOut:
+    """The most recent conversation that hasn't ended, to resume it."""
+    open_ = [t for t in _talk_repo(s).list()
+             if t.target == target and t.scenario_id == scenario_id and not t.ended]
+    if not open_:
+        raise HTTPException(404, "no open conversation")
+    return _talk_out(s, max(open_, key=lambda t: t.updated_at))
+
+
 @router.get("/talk/sessions/{session_id}", response_model=TalkSessionOut)
 def get_talk(session_id: str, s: Settings = Depends(get_settings)) -> TalkSessionOut:
     return _talk_out(s, _talk_or_404(s, session_id))
@@ -707,22 +747,56 @@ def say(session_id: str, req: SayRequest, request: Request, s: Settings = Depend
 @router.post("/talk/sessions/{session_id}/end", response_model=TalkSummaryOut)
 def end_talk(session_id: str, request: Request, s: Settings = Depends(get_settings)) -> TalkSummaryOut:
     sess = _talk_or_404(s, session_id)
+    if sess.ended and sess.summary is not None:
+        return TalkSummaryOut(**sess.summary)
     if any(m.role == "user" for m in sess.messages):
         charge_model_call(request, s)
     found = store.find_scenario(s, sess.scenario_id) if sess.scenario_id else None
     course, sc = found if found else (None, None)
     draft = summarize(get_provider(s.ai_provider), sess, sc)
-    words = [CourseItem(id=f"{sess.id}-w{i}", text=w.text, tr=w.tr, gloss=w.gloss)
+    words = [CourseItem(id=f"{sess.id}-w{i}", text=w.text.strip(), tr=w.tr, gloss=w.gloss.strip())
              for i, w in enumerate(draft.new_words) if w.text.strip() and w.gloss.strip()]
+    # One card per word, whichever session it came from; words the course teaches already have theirs.
+    taught = {" ".join(i.text.split()) for c in store.load_courses(s) if c.target == sess.target
+              for i in c.items().values()}
+    fresh = [CourseItem(id=f"word:{' '.join(w.text.split())}", text=w.text, tr=w.tr, gloss=w.gloss)
+             for w in words if " ".join(w.text.split()) not in taught]
     added = 0
-    if words:
-        pseudo = course or CourseDef(id=f"talk-{sess.target}", target=sess.target, support=sess.support,
-                                     level="A1", title="Talk", units=[])
-        added = _add_cards(s, pseudo, words, "talk")
+    if fresh:
+        talk_deck = CourseDef(id=f"talk-{sess.target}", target=sess.target, support=sess.support,
+                              level="A1", title="Talk", units=[])
+        added = _add_cards(s, talk_deck, fresh, "talk")
+    out = TalkSummaryOut(went_well=draft.went_well, mistakes=[m.model_dump() for m in draft.mistakes],
+                         new_words=words, cards_added=added)
     sess.ended = True
+    sess.summary = out.model_dump(mode="json")
     _talk_repo(s).save(sess)
-    return TalkSummaryOut(went_well=draft.went_well, mistakes=[m.model_dump() for m in draft.mistakes],
-                          new_words=words, cards_added=added)
+    return out
+
+
+# ---- activity -----------------------------------------------------------------------
+
+class ActivityRequest(BaseModel):
+    seconds: int = Field(ge=0, le=6 * 3600)
+    kind: Literal["story", "audio", "review", "other"] = "other"
+    event_id: str | None = Field(None, max_length=80)
+
+
+@router.post("/activity", status_code=204)
+def log_activity_endpoint(req: ActivityRequest, s: Settings = Depends(get_settings)) -> Response:
+    """Time spent outside lessons (stories, audio, the diary) toward the daily goal and streak."""
+    seen_path = s.data_dir / "activity_events.json"
+    if req.event_id:
+        try:
+            seen = json.loads(seen_path.read_text("utf-8")) if seen_path.exists() else []
+        except ValueError:
+            seen = []
+        if req.event_id in seen:
+            return Response(status_code=204)
+        seen_path.write_text(json.dumps([*seen[-499:], req.event_id]), encoding="utf-8")
+    if req.seconds:
+        store.log_activity(s, req.seconds)
+    return Response(status_code=204)
 
 
 # ---- who am I ------------------------------------------------------------------------
@@ -749,11 +823,14 @@ def speech_info(s: Settings = Depends(get_settings)) -> SpeechInfo:
 
 
 @router.get("/tts")
-def tts(lang: str, text: str, s: Settings = Depends(get_settings)) -> FileResponse:
+def tts(lang: str, text: str, request: Request, s: Settings = Depends(get_settings)) -> FileResponse:
     if not re.fullmatch(r"[a-z]{2,3}", lang):
         raise HTTPException(400, "bad language code")
     if not piper.tts_available(s, lang):
         raise HTTPException(404, f"no local voice for {lang}")
+    if not piper.is_cached(s, text, lang):
+        # Course text is synthesised once and shared; a guest's new text counts against their daily cap.
+        charge_model_call(request, s)
     try:
         path = piper.synthesize(s, text, lang)
     except piper.SpeechError as exc:
@@ -805,10 +882,11 @@ def _rec_out(m: RecordingMeta) -> RecordingOut:
 
 
 @router.get("/recordings", response_model=list[RecordingOut])
-def list_recordings(ref: str | None = None, ref_prefix: str | None = None,
+def list_recordings(ref: str | None = None, ref_prefix: str | None = None, language: str | None = None,
                     s: Settings = Depends(get_settings)) -> list[RecordingOut]:
     recs = [m for m in _rec_repo(s).list()
-            if (ref is None or m.ref == ref) and (ref_prefix is None or m.ref.startswith(ref_prefix))]
+            if (ref is None or m.ref == ref) and (ref_prefix is None or m.ref.startswith(ref_prefix))
+            and (language is None or m.language == language)]
     recs.sort(key=lambda m: m.created_at, reverse=True)
     return [_rec_out(m) for m in recs]
 
@@ -866,8 +944,9 @@ def _audio_or_404(s: Settings, audio_id: str) -> AudioMeta:
 
 
 @router.get("/audio", response_model=list[AudioOut])
-def list_audio(s: Settings = Depends(get_settings)) -> list[AudioOut]:
-    items = sorted(_audio_repo(s).list(), key=lambda m: m.created_at, reverse=True)
+def list_audio(language: str | None = None, s: Settings = Depends(get_settings)) -> list[AudioOut]:
+    items = sorted((m for m in _audio_repo(s).list() if language is None or m.language == language),
+                   key=lambda m: m.created_at, reverse=True)
     return [_audio_out(m) for m in items]
 
 
@@ -939,7 +1018,7 @@ def audio_file(audio_id: str, s: Settings = Depends(get_settings)) -> FileRespon
     return FileResponse(_audio_repo(s).dir / meta.filename, media_type=meta.mime_type)
 
 
-@router.post("/audio/{audio_id}/transcribe", response_model=AudioDetail)
+@router.post("/audio/{audio_id}/transcribe", response_model=AudioDetail, dependencies=[Depends(require_owner)])
 def transcribe_audio(audio_id: str, s: Settings = Depends(get_settings)) -> AudioDetail:
     meta = _audio_or_404(s, audio_id)
     if not piper.stt_available():

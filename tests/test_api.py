@@ -108,29 +108,15 @@ def test_persian_ingest_preserves_script(client: TestClient):
     assert any("دوست من" in s for s in sources)
 
 
-def test_tutor_session_message_flow(client: TestClient):
-    r = client.post("/api/tutor/sessions", json={
-        "source_language": "en", "target_language": "fa", "support_language": "en",
-    })
-    assert r.status_code == 200
-    sess_id = r.json()["id"]
-
-    r = client.post(f"/api/tutor/sessions/{sess_id}/messages", json={"content": "Hi tutor"})
-    assert r.status_code == 200
-    assert r.json()["role"] == "assistant"
-    assert "[mock tutor]" in r.json()["content"]
-
-    r = client.get(f"/api/tutor/sessions/{sess_id}")
-    assert r.status_code == 200
-    msgs = r.json()["messages"]
-    assert any(m["role"] == "user" for m in msgs)
-    assert any(m["role"] == "assistant" for m in msgs)
+def test_tutor_api_is_gone(client: TestClient):
+    # Replaced by Talk (/api/talk/*); the tutor agent stays for the CLI.
+    assert client.post("/api/tutor/sessions", json={"source_language": "en", "target_language": "fa"}).status_code in (404, 405)
 
 
 def test_404s_have_clear_messages(client: TestClient):
     assert client.get("/api/units/nope").status_code == 404
     assert client.post("/api/cards/nope/review", json={"rating": 3}).status_code == 404
-    assert client.get("/api/tutor/sessions/nope").status_code == 404
+    assert client.get("/api/talk/sessions/nope").status_code == 404
     assert client.get("/api/export/anki", params={"target": "it"}).status_code == 404
 
 

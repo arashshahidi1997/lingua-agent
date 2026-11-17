@@ -17,6 +17,7 @@ class HealthResponse(BaseModel):
     status: str = "ok"
     version: str
     ai_provider: str
+    ai_label: str = ""
 
 
 class LanguageOut(BaseModel):
@@ -108,10 +109,14 @@ class CardOut(BaseModel):
     lapses: int
     needs_extra_review: bool
     due_at: datetime
+    text: str | None = None  # target side alone (course and Talk cards)
+    tr: str | None = None
 
 
 class ReviewRequest(BaseModel):
     rating: int = Field(ge=0, le=5)
+    event_id: str | None = Field(None, max_length=80, description="Idempotency key: a replay is ignored.")
+    seconds: int = Field(0, ge=0, le=3600, description="Time spent on the card, for the daily goal.")
 
 
 class ReviewResponse(BaseModel):
@@ -119,32 +124,6 @@ class ReviewResponse(BaseModel):
     interval_after: int
     ease_after: float
     repetitions_after: int
-
-
-class TutorSessionOut(BaseModel):
-    id: str
-    source_language: str
-    target_language: str
-    support_language: str | None
-    messages: list[dict]
-    created_at: datetime
-    updated_at: datetime
-
-
-class OpenSessionRequest(BaseModel):
-    source_language: str
-    target_language: str
-    support_language: str | None = "en"
-
-
-class TutorMessageRequest(BaseModel):
-    content: str = Field(min_length=1)
-
-
-class TutorMessageResponse(BaseModel):
-    role: str
-    content: str
-    created_at: datetime
 
 
 # ---- Materials adapter (Phase 6c) -----------------------------------------

@@ -132,3 +132,10 @@ def test_broken_sharing_file_keeps_laptop_as_owner(client: TestClient, tmp_path:
     assert client.get("/api/me").json()["owner"] is True
     assert client.get("/api/me", headers=OWNER).json()["owner"] is False  # unknown login: guest, safe default
     assert client.get("/api/materials/sources", headers=OWNER).status_code == 403
+
+
+def test_guest_cannot_transcribe(client: TestClient):
+    track = client.post("/api/audio", data={"language": "fa"}, files={"file": ("a.mp3", b"x", "audio/mpeg")},
+                        headers=ANYA).json()
+    assert client.post(f"/api/audio/{track['id']}/transcribe", headers=ANYA).status_code == 403
+    assert "owner" in client.get("/api/materials/sources", headers=ANYA).json()["detail"]

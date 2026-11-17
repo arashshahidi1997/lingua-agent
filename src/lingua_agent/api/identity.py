@@ -64,6 +64,11 @@ def identify(request: Request) -> Identity:
     base = base_settings(request)
     login = (request.headers.get("Tailscale-User-Login") or "").strip().lower()
     if not login:
+        host = request.client.host if request.client else ""
+        if host not in ("127.0.0.1", "::1", "localhost", "testclient"):
+            # Only the laptop itself may skip Tailscale; e.g. `serve --host 0.0.0.0` on a LAN must not
+            # make every neighbour the owner.
+            raise HTTPException(403, "Open the app through Tailscale.")
         owners = sharing_config(base)["owner_logins"]
         return Identity(login=owners[0] if owners else "owner", name="you", owner=True)
     name = request.headers.get("Tailscale-User-Name") or login.split("@")[0]
@@ -89,7 +94,7 @@ def settings_for(request: Request) -> Settings:
 
 def require_owner(request: Request) -> None:
     if not identify(request).owner:
-        raise HTTPException(403, "Only Arash can do this here.")
+        raise HTTPException(403, "Only the owner of this app can do that.")
 
 
 def charge_model_call(request: Request, s: Settings, n: int = 1) -> None:

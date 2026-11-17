@@ -135,6 +135,7 @@ class CourseProgress(BaseModel):
     lessons: dict[str, LessonRecord] = Field(default_factory=dict)
     quizzes: dict[str, LessonRecord] = Field(default_factory=dict)  # by unit id
     items: dict[str, ItemStats] = Field(default_factory=dict)
+    events: list[str] = Field(default_factory=list)  # applied event ids (offline replays are ignored)
     updated_at: datetime = Field(default_factory=utcnow)
 
 

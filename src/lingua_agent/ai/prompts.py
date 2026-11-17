@@ -10,6 +10,17 @@ from __future__ import annotations
 from textwrap import dedent
 
 
+def _name(code: str | None) -> str | None:
+    """Language name for prompts ("fa" → "Persian"): models follow names better than codes."""
+    if not code:
+        return code
+    try:
+        from ..languages import get_language
+        return get_language(code).name.split(" (")[0]
+    except Exception:  # unknown code: keep it
+        return code
+
+
 def material_analysis_prompt(*, source_language: str, target_language: str, support_language: str | None,
                               level: str | None, text: str) -> str:
     return dedent(f"""
@@ -29,10 +40,35 @@ def material_analysis_prompt(*, source_language: str, target_language: str, supp
     """).strip()
 
 
-def vocabulary_extraction_prompt(*, source_language: str, target_language: str, level: str | None, text: str) -> str:
+def vocabulary_extraction_prompt(*, source_language: str, target_language: str, level: str | None, text: str,
+                                 support_language: str | None = None) -> str:
+    native = source_language == target_language
+    key = (support_language or "en") if native else target_language  # translations are keyed by language code
+    source_language, target_language, support_language = _name(source_language), _name(target_language), _name(support_language)
+    if native:
+        # Native material: the words are in the text; their meanings go into the support language.
+        meaning = support_language or "English"
+        return dedent(f"""
+            This text is written in {target_language}, the language the learner (level: {level or 'unspecified'})
+            is studying. Extract the {target_language} words and phrases worth learning from it. For each item:
+            lemma (dictionary form) and surface (the exact form used in the text), translations keyed by
+            "{key}" (meanings in {meaning}), part of speech, gender only if {target_language} has grammatical
+            gender (Persian does not), a transliteration if {target_language} isn't written in Latin script, an
+            example sentence quoted from the text, and CEFR level if known.
+
+            Mark uncertainty with confidence: "uncertain". Do not invent definitions.
+
+            Text:
+            ---
+            {text}
+            ---
+
+            Return JSON: {{"items": [...]}}
+        """).strip()
     return dedent(f"""
         Extract vocabulary the learner of {target_language} (level: {level or 'unspecified'}) should learn from the
-        following {source_language} text. For each item include lemma, surface, translations into {target_language},
+        following {source_language} text. For each item include lemma, surface, translations into {target_language}
+        keyed by "{key}",
         part of speech, gender if applicable, an example sentence quoting from the text, and CEFR level if known.
 
         Mark uncertainty with confidence: "uncertain". Do not invent definitions.
@@ -46,10 +82,15 @@ def vocabulary_extraction_prompt(*, source_language: str, target_language: str, 
     """).strip()
 
 
-def grammar_extraction_prompt(*, source_language: str, target_language: str, level: str | None, text: str) -> str:
+def grammar_extraction_prompt(*, source_language: str, target_language: str, level: str | None, text: str,
+                              support_language: str | None = None) -> str:
+    source_language, target_language, support_language = _name(source_language), _name(target_language), _name(support_language)
+    explain = support_language or "en"
+    not_source = "" if source_language == target_language else f" (not of {source_language})"
     return dedent(f"""
-        Identify the most useful grammar points exemplified in this {source_language} text for a learner of
-        {target_language} at level {level or 'unspecified'}. Cite the exact sentence(s) as evidence; do not invent.
+        Identify the most useful grammar points of {target_language}{not_source} that a learner at level
+        {level or 'unspecified'} can study with this {source_language} text.
+        Write each point's name and summary in {explain}. Cite the exact sentence(s) as evidence; do not invent.
 
         Text:
         ---
@@ -62,16 +103,24 @@ def grammar_extraction_prompt(*, source_language: str, target_language: str, lev
 
 def lesson_generation_prompt(*, source_language: str, target_language: str, support_language: str | None,
                               level: str | None, title: str, text: str) -> str:
+    source_language, target_language, support_language = _name(source_language), _name(target_language), _name(support_language)
+    explain = support_language or "en"
+    if source_language == target_language:
+        pairs = (f"bilingual_reading: the text split into sentences, each pair with source = the {target_language} "
+                 f"sentence exactly as written and target = its natural translation into {explain}")
+    else:
+        pairs = (f"bilingual_reading: the text split into sentences, each pair with source = the {source_language} "
+                 f"sentence and target = its natural translation into {target_language}")
     return dedent(f"""
-        Build a self-contained lesson titled {title!r} for a learner whose target language is {target_language},
-        explained in {support_language or target_language}, at CEFR level {level or 'A1'}.
+        Build a self-contained lesson titled {title!r} for a learner of {target_language} at CEFR level
+        {level or 'A1'}, with all explanations in {explain}.
 
-        Source material ({source_language}):
+        Material ({source_language}):
         ---
         {text}
         ---
 
-        Return JSON with: bilingual_reading (list of source/target pairs), summary.
+        Return JSON with: {pairs}; summary (2-3 sentences in {explain}).
         Translate naturally; mark provenance.generated=true on every translation.
         For Persian content, preserve original script. Transliteration is optional.
     """).strip()

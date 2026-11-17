@@ -41,6 +41,9 @@ class Flashcard(BaseModel):
     examples: list[str] = Field(default_factory=list)
     audio_ref: str | None = None
     image_ref: str | None = None
+    # Target side alone, for speech and script display (course and Talk cards; `back` keeps "text · tr").
+    target_text: str | None = None
+    target_tr: str | None = None
     tags: list[str] = Field(default_factory=list)
 
     # SM-2 state
