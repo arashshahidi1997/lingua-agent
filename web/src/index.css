@@ -4,22 +4,22 @@
  * @theme inline exposes them to Tailwind as bg-canvas, text-ink, border-line, … */
 
 :root {
-  --canvas: #fafaf9;
-  --surface: #ffffff;
-  --surface-2: #f5f5f4;
+  --canvas: #c9ece6;  /* Persian turquoise (firuzeh), light */
+  --surface: #fbfefd;
+  --surface-2: #e6f6f3;
   --ink: #1c1917;
-  --ink-2: #57534e;
-  --ink-3: #736b66;
-  --line: #e7e5e4;
-  --line-strong: #d6d3d1;
+  --ink-2: #44403c;
+  --ink-3: #4f5b59;
+  --line: #b3dcd5;
+  --line-strong: #8ec8bf;
   --accent: #0f766e;
   --accent-strong: #115e59;
   --accent-ink: #ffffff;
-  --accent-soft: #e6f4f1;
+  --accent-soft: #e9f8f5;
   --danger: #b42318;
   --danger-soft: #fdf0ee;
   --focus: #0f766e;
-  --hover: #f0efed;
+  --hover: #bde4dd;
   /* Carpet border (components/Carpet.tsx): muted madder, indigo, ivory and saffron, drawn faint. */
   --carpet-red: #a4574a;
   --carpet-indigo: #45567a;
@@ -31,22 +31,22 @@
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --canvas: #0f0e0d;
-    --surface: #181614;
-    --surface-2: #221f1d;
+    --canvas: #0b2b2a;  /* deep turquoise */
+    --surface: #103735;
+    --surface-2: #154240;
     --ink: #f2f0ee;
-    --ink-2: #b4aea8;
-    --ink-3: #928b85;
-    --line: #2c2826;
-    --line-strong: #3d3835;
+    --ink-2: #c2d3d0;
+    --ink-3: #9fb6b2;
+    --line: #1f504c;
+    --line-strong: #2c635e;
     --accent: #3cc7b4;
     --accent-strong: #6fd8c9;
     --accent-ink: #062b27;
-    --accent-soft: #12302c;
+    --accent-soft: #0f4a44;
     --danger: #f08b80;
     --danger-soft: #2e1714;
     --focus: #3cc7b4;
-    --hover: #2e2a27;
+    --hover: #1a4a47;
     --carpet-red: #6b2f27;
     --carpet-indigo: #2b3858;
     --carpet-ivory: #3a332b;
