@@ -20,7 +20,8 @@ wrong in the review file; a short file with just these, named after the word, is
 | به به! خیلی خوب. | 1 · line 69 | all takes marked bad in the app review |
 | شما چی؟ | 1 · line 74 | all takes marked bad in the app review |
 
-All ten are on one reading sheet: `5-redo.html` (record it as **5-redo**).
+All ten are on one reading sheet: `5-redo.html`. **Done 2026-11-18** (`Redo1.m4a`): new takes in, the
+old weak ones marked bad. Check them in the app (Review your voice › Sheet 5).
 
 ## Doubtful takes (speech recognition heard something else; may be fine)
 
