@@ -19,7 +19,9 @@ from pydantic import BaseModel, Field
 
 from ..ai import get_provider
 from ..config import Settings
+from ..course import cloze
 from ..course import exercises as X
+from ..course.cloze import Cloze
 from ..course import store
 from ..course.models import (
     CourseDef,
@@ -444,15 +446,21 @@ def get_lesson(course_id: str, lesson_id: str, s: Settings = Depends(get_setting
 
 
 @router.get("/courses/{course_id}/lessons/{lesson_id}/session", response_model=ExerciseSession)
-def lesson_session(course_id: str, lesson_id: str, s: Settings = Depends(get_settings)) -> ExerciseSession:
+def lesson_session(course_id: str, lesson_id: str, mode: str = "learn",
+                   s: Settings = Depends(get_settings)) -> ExerciseSession:
     course = _course_or_404(s, course_id)
     found = course.lesson(lesson_id)
     if not found:
         raise HTTPException(404, f"lesson not found: {lesson_id}")
     _, lesson = found
     prog = store.load_progress(s, course_id)
-    exs = X.lesson_session(lesson.id, lesson.items, _pool_upto(course, lesson.id),
-                           kind=lesson.kind, seed=_attempt_seed(prog, lesson.id))
+    if mode == "fast":
+        # Fast track: no introductions, no transliteration crutch, one exercise per item and a match.
+        exs = X.quiz_session(lesson.id, lesson.items, _pool_upto(course, lesson.id),
+                             n=len(lesson.items), seed=_attempt_seed(prog, lesson.id))
+    else:
+        exs = X.lesson_session(lesson.id, lesson.items, _pool_upto(course, lesson.id),
+                               kind=lesson.kind, seed=_attempt_seed(prog, lesson.id))
     return ExerciseSession(id=lesson.id, title=lesson.title, course_id=course.id, target=course.target, exercises=exs)
 
 
@@ -651,6 +659,43 @@ def get_story(story_id: str, s: Settings = Depends(get_settings)) -> StoryOut:
     summ = _story_summary(course, store.load_progress(s, course.id), st)
     return StoryOut(**summ.model_dump(), speakers={k: v.model_dump() for k, v in st.speakers.items()},
                     lines=[ln.model_dump() for ln in st.lines])
+
+
+# ---- fill in the blanks ------------------------------------------------------------------
+
+class ClozeCheckRequest(BaseModel):
+    answers: dict[str, str]   # gap id → what the learner typed or picked
+    seed: int = 0
+    focus: str = "mixed"
+
+
+class ClozeCheckResponse(BaseModel):
+    correct: dict[str, bool]
+    answers: dict[str, str]   # gap id → the right word
+    score: float
+
+
+@router.get("/stories/{story_id}/cloze", response_model=Cloze)
+def story_cloze(story_id: str, focus: str = "mixed", seed: int = 0, s: Settings = Depends(get_settings)) -> Cloze:
+    """The story with gaps chosen by a grammar focus (mixed, verbs, prepositions, vocab); new seed, new gaps."""
+    found = store.find_story(s, story_id)
+    if not found:
+        raise HTTPException(404, f"story not found: {story_id}")
+    course, st = found
+    return cloze.build(course, st, focus=focus, seed=seed)
+
+
+@router.post("/stories/{story_id}/cloze/check", response_model=ClozeCheckResponse)
+def story_cloze_check(story_id: str, req: ClozeCheckRequest, s: Settings = Depends(get_settings)) -> ClozeCheckResponse:
+    found = store.find_story(s, story_id)
+    if not found:
+        raise HTTPException(404, f"story not found: {story_id}")
+    course, st = found
+    z = cloze.build(course, st, focus=req.focus, seed=req.seed)
+    gaps = {p.gap.id: p.gap for ln in z.lines for p in ln.parts if p.gap}
+    correct = {gid: cloze.check(g.answer, req.answers.get(gid, ""), g.tr) for gid, g in gaps.items()}
+    return ClozeCheckResponse(correct=correct, answers={gid: g.answer for gid, g in gaps.items()},
+                              score=sum(correct.values()) / len(correct) if correct else 1.0)
 
 
 # ---- Talk ---------------------------------------------------------------------------

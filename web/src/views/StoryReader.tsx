@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import { Mic, Pause, Play, Square, Trash2 } from 'lucide-react'
+import { Mic, Pause, Play, Square, Trash2, PencilLine } from 'lucide-react'
 import { courseApi, type Recording, type Story } from '../lib/course-api'
 import { errorMessage, useAsync } from '../lib/hooks'
 import { canRecord, useRecorder } from '../lib/recorder'
@@ -30,6 +30,7 @@ export default function StoryReader({ id }: { id: string }) {
 type ShadowPhase = 'listen' | 'record' | 'compare' | 'saving'
 
 function Reader({ story }: { story: Story }) {
+  const nav = useNav()
   const { pair, settings } = useSettings()
   const lang = pair.target
   const [showAll, setShowAll] = useState(settings.showGloss)
@@ -129,6 +130,9 @@ function Reader({ story }: { story: Story }) {
           <Button onClick={playAll} variant={playingAll ? 'secondary' : 'primary'} disabled={!!shadow}>
             {playingAll ? <Pause size={18} aria-hidden /> : <Play size={18} fill="currentColor" aria-hidden />}
             {playingAll ? 'Stop' : current !== null ? 'Play from here' : 'Play all'}
+          </Button>
+          <Button variant="secondary" onClick={() => nav.open({ kind: 'cloze', storyId: story.id })}>
+            <PencilLine size={17} aria-hidden /> Fill the gaps
           </Button>
           <div className="min-w-[14rem]">
             <Toggle label="Show translations" checked={showAll} onChange={setShowAll} />

@@ -21,6 +21,7 @@ import AudioPlayer from './views/AudioPlayer'
 import UnitReader from './views/UnitReader'
 import TalkChat from './views/TalkChat'
 import ChatbotPrompt from './views/ChatbotPrompt'
+import ClozeReader from './views/ClozeReader'
 import { useTalkEnabled } from './lib/features'
 
 const TABS: { key: Tab; label: string; icon: ReactNode }[] = [
@@ -142,6 +143,7 @@ function OverlayView({ overlay }: { overlay: Overlay }) {
     case 'player': return <Player source={overlay.source} />
     case 'review': return <Review />
     case 'story': return <StoryReader id={overlay.id} />
+    case 'cloze': return <ClozeReader storyId={overlay.storyId} />
     case 'audio': return <AudioPlayer id={overlay.id} />
     case 'unit': return <UnitReader id={overlay.id} />
     case 'talk':

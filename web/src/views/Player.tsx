@@ -16,7 +16,7 @@ import { Target } from '../components/Text'
 import { PlayButton } from '../components/PlayButton'
 
 function loadSession(src: PlayerSource): Promise<ExerciseSession> {
-  if (src.type === 'lesson') return courseApi.lessonSession(src.courseId, src.lessonId)
+  if (src.type === 'lesson') return courseApi.lessonSession(src.courseId, src.lessonId, src.fast ? 'fast' : 'learn')
   if (src.type === 'quiz') return courseApi.unitQuiz(src.courseId, src.unitId)
   return courseApi.practice(src.courseId)
 }

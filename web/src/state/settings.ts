@@ -16,6 +16,7 @@ export interface Settings {
   rate: 0.75 | 1
   dailyGoal: 5 | 10 | 15 | 20
   showStreak: boolean
+  fastTrack: boolean      // Path: every lesson open, lessons run as quizzes
 }
 
 export const DEFAULT_PAIR: Pair = { source: 'en', target: 'fa', support: 'en' }
@@ -27,6 +28,7 @@ export const DEFAULT_SETTINGS: Settings = {
   rate: 1,
   dailyGoal: 10,
   showStreak: false,
+  fastTrack: false,
 }
 
 export interface SettingsCtx {

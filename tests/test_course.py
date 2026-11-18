@@ -529,3 +529,32 @@ def test_native_takes_replace_synthetic_speech(client: TestClient, tmp_path: Pat
         seen.add(r.content)
     assert seen == {b"take1", b"take2", b"take3"}  # every take gets played
     assert client.get("/api/speech").json()["native_texts"] == 1
+
+
+def test_story_cloze(client: TestClient):
+    z = client.get("/api/stories/s1/cloze", params={"focus": "mixed", "seed": 3}).json()
+    gaps = [p["gap"] for ln in z["lines"] for p in ln["parts"] if p["gap"]]
+    assert z["gap_count"] == len(gaps) >= 1
+    assert all(g["answer"] in z["bank"] for g in gaps)
+    # Text and gaps put back together give the original lines.
+    rebuilt = ["".join(p["text"] if p["text"] is not None else p["gap"]["answer"] for p in ln["parts"]) for ln in z["lines"]]
+    assert rebuilt == [ln["text"] for ln in client.get("/api/stories/s1").json()["lines"]]
+    right = {g["id"]: g["answer"].replace("‌", "") for g in gaps}   # ZWNJ is optional when typing
+    ok = client.post("/api/stories/s1/cloze/check", json={"answers": right, "seed": 3, "focus": "mixed"}).json()
+    assert ok["score"] == 1.0
+    wrong = client.post("/api/stories/s1/cloze/check", json={"answers": {}, "seed": 3, "focus": "mixed"}).json()
+    assert wrong["score"] == 0.0 and set(wrong["answers"]) == set(right)
+
+
+def test_cloze_rules():
+    from lingua_agent.course.cloze import check, kind_of
+    assert kind_of("می‌خورم", set()) == "verb" and kind_of("نیستید", set()) == "verb" and kind_of("رفتند", set()) == "verb"
+    assert kind_of("به", set()) == "preposition" and kind_of("را", set()) == "ra"
+    assert kind_of("کتاب", {"کتاب"}) == "vocab" and kind_of("کتاب", set()) is None
+    assert check("می‌خورم", "میخورم") and check("می‌خورم", "mikhoram", "mikhoram") and not check("می‌خورم", "میخوری")
+
+
+def test_fast_track_session(client: TestClient):
+    fast = client.get("/api/courses/fa-en-test/lessons/u1-l2/session", params={"mode": "fast"}).json()
+    kinds = [e["kind"] for e in fast["exercises"]]
+    assert "intro" not in kinds and kinds[-1] == "match"

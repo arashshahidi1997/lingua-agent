@@ -22,6 +22,21 @@ lessons or features; new ideas wait in "Ideas (parked)".
 - [ ] Sara and Ali share one synthetic voice (only `fa_IR-amir` installed) — moot once your voice is in, except for lines not yet recorded [core]
 - [ ] Roadmap order still pre-v2 (architecture, clients, playground, README updated 2026-11-17) [docs]
 
+## Learning modes for analytical learners (Anya's feedback, 2026-11-18)
+
+Anya finds drill-style lessons boring; she likes context, decoding real text, cloze in longer texts, writing,
+and discovering grammar patterns. Agreed order:
+
+- [x] Fast track on the Path: every lesson open, lessons run as quizzes (no intros, no transliteration help)
+- [x] 1. Fill the gaps in whole stories and dialogues, by focus (mixed, verbs, prepositions, words); type in script or transliteration, or use a word bank; new gaps per round
+- [ ] 2. Grammar lab: discover the rule from examples (present and past stems, ezafe, را, plural, negation, compound verbs), then rule cards and transform tasks (make it negative / past / plural) [core, web, content]
+- [ ] 3. Decode mode: a text above your level, help in steps (transliteration → meaning → structure → translation), hints counted, meaning questions at the end [web]
+- [ ] 4. Dictation in Arash's voice; sentence rebuilding from stories [web]
+- [ ] 5. Songs and film: private Library items with a YouTube embed (start/end), pasted lyrics or dialogue, tap-along line sync, then decode/cloze/vocab on top. First picks: «ترش و شیرین» (Attaran, Namjoo), «دارو ونمی‌کنم» (Fereydoon Farrokhzad), «برو برو» (Arash), the film «مارمولک». Lyrics are pasted by the user, never shipped [core, web]
+
+Reference: *Persian of Iran Today* (UT Austin, CC BY-NC-ND 3.0, in ~/Downloads) — inspiration for structure
+only (cultural notes, listening, writing, games); no derivatives, so none of its text or exercises in the app.
+
 ## Now
 
 - [ ] Review the Product v2 proposal and answer its open questions (cloud vs local generation, Persian TTS, gamification, transliteration scheme, audience) [docs] — **user**

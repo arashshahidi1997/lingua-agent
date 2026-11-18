@@ -4,7 +4,7 @@ export type Tab = 'today' | 'path' | 'library' | 'talk'
 export type LibrarySection = 'stories' | 'audio' | 'lessons' | 'add'
 
 export type PlayerSource =
-  | { type: 'lesson'; courseId: string; lessonId: string; title?: string }
+  | { type: 'lesson'; courseId: string; lessonId: string; title?: string; fast?: boolean }
   | { type: 'quiz'; courseId: string; unitId: string; title?: string; testOut?: boolean }
   | { type: 'practice'; courseId: string }
 
@@ -15,6 +15,7 @@ export type Overlay =
   | { kind: 'player'; source: PlayerSource }
   | { kind: 'review' }
   | { kind: 'story'; id: string }
+  | { kind: 'cloze'; storyId: string }
   | { kind: 'audio'; id: string }
   | { kind: 'unit'; id: string }
   | { kind: 'talk'; scenarioId: string | null }

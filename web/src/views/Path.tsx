@@ -5,13 +5,13 @@ import { useAsync } from '../lib/hooks'
 import { languageName } from '../lib/rtl'
 import { useNav } from '../state/nav'
 import { useSettings } from '../state/settings'
-import { Button, Empty, ErrorNote, Loading, Page, ProgressLine } from '../components/ui'
+import { Button, Empty, ErrorNote, Loading, Page, ProgressLine, Toggle } from '../components/ui'
 import { Target } from '../components/Text'
 import { Treat } from '../components/Treats'
 import { TREATS, treatFor } from '../lib/treats'
 
 export default function PathView() {
-  const { pair } = useSettings()
+  const { pair, settings, update } = useSettings()
   const nav = useNav()
   const courses = useAsync(`${pair.target}|${pair.support}|${nav.dataVersion}`, () => courseApi.courses(pair.target, pair.support))
   const courseId = courses.data?.[0]?.id ?? null
@@ -35,6 +35,14 @@ export default function PathView() {
         <div className="mt-5 flex items-center gap-3">
           <ProgressLine value={c.progress} label="Course progress" />
           <span className="shrink-0 text-[13px] tabular-nums text-ink-3">{c.lessons_done}/{c.lessons_total}</span>
+        </div>
+        <div className="mt-4 max-w-md">
+          <Toggle
+            label="Fast track"
+            description="Every lesson open, straight to the questions: no introductions, no transliteration help."
+            checked={settings.fastTrack}
+            onChange={(v) => update({ fastTrack: v })}
+          />
         </div>
       </div>
 
@@ -100,6 +108,8 @@ function useWidth<T extends HTMLElement>(): [React.RefObject<T | null>, number] 
 
 function UnitSection({ course, unit, index, startStep }: { course: Course; unit: UnitSummary; index: number; startStep: number }) {
   const nav = useNav()
+  const { settings } = useSettings()
+  const fast = settings.fastTrack
   const [ref, width] = useWidth<HTMLDivElement>()
   // The quiz opens as soon as the unit is reached; before its lessons are done it is a test-out.
   const testOut = unit.quiz_state === 'current' && !unit.done
@@ -107,10 +117,10 @@ function UnitSection({ course, unit, index, startStep }: { course: Course; unit:
   const steps: Step[] = [
     ...unit.lessons.map((l): Step => ({
       key: l.id,
-      state: l.state,
+      state: fast && l.state === 'locked' ? 'open' : l.state,
       title: l.title,
       detail: l.state === 'done' && l.best_score !== null ? `Best ${Math.round(l.best_score * 100)}%` : `${l.item_count} items`,
-      onClick: () => nav.open({ kind: 'lesson-sheet', courseId: course.id, lessonId: l.id, locked: l.state === 'locked' }),
+      onClick: () => nav.open({ kind: 'lesson-sheet', courseId: course.id, lessonId: l.id, locked: l.state === 'locked' && !fast }),
     })),
     ...(unit.story_id ? [{
       key: 'story',

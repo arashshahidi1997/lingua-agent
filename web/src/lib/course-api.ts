@@ -242,6 +242,26 @@ export interface AudioTrackDetail extends AudioTrack {
   cues: Cue[]
 }
 
+// ---- fill in the blanks ------------------------------------------------------
+
+export type ClozeFocus = 'mixed' | 'verbs' | 'prepositions' | 'vocab'
+
+export interface ClozeGap { id: string; answer: string; tr: string | null; kind: 'verb' | 'preposition' | 'ra' | 'vocab' }
+export interface ClozePart { text: string | null; gap: ClozeGap | null }
+export interface ClozeLine { speaker: string | null; parts: ClozePart[]; tr: string | null; gloss: string }
+
+export interface Cloze {
+  story_id: string
+  title: string
+  title_gloss: string
+  focus: ClozeFocus
+  lines: ClozeLine[]
+  bank: string[]          // the answers, shuffled, plus a few distractors
+  gap_count: number
+}
+
+export interface ClozeCheck { correct: Record<string, boolean>; answers: Record<string, string>; score: number }
+
 // ---- who am I ------------------------------------------------------------
 
 /** From the Tailscale login: the owner, or a guest with their own progress and data. */
@@ -281,8 +301,9 @@ export const courseApi = {
   courses: (target?: string, support?: string) => req<CourseSummary[]>(`/courses${q({ target, support })}`),
   course: (id: string) => req<Course>(`/courses/${id}`),
   lesson: (courseId: string, lessonId: string) => req<LessonDetail>(`/courses/${courseId}/lessons/${lessonId}`),
-  lessonSession: (courseId: string, lessonId: string) =>
-    req<ExerciseSession>(`/courses/${courseId}/lessons/${lessonId}/session`),
+  // mode 'fast' (fast track): no introductions, no transliteration crutch, one exercise per item.
+  lessonSession: (courseId: string, lessonId: string, mode: 'learn' | 'fast' = 'learn') =>
+    req<ExerciseSession>(`/courses/${courseId}/lessons/${lessonId}/session${q({ mode: mode === 'fast' ? 'fast' : undefined })}`),
   completeLesson: (courseId: string, lessonId: string, body: CompleteRequest) =>
     post<CompleteResponse>(`/courses/${courseId}/lessons/${lessonId}/complete`, body),
   unitQuiz: (courseId: string, unitId: string) => req<ExerciseSession>(`/courses/${courseId}/units/${unitId}/quiz`),
@@ -300,6 +321,10 @@ export const courseApi = {
   // stories
   stories: (target: string, support: string) => req<StorySummary[]>(`/stories${q({ target, support })}`),
   story: (id: string) => req<Story>(`/stories/${id}`),
+  // A story with gaps chosen by a grammar focus; a new seed gives new gaps.
+  cloze: (id: string, focus: ClozeFocus, seed: number) => req<Cloze>(`/stories/${id}/cloze${q({ focus, seed })}`),
+  clozeCheck: (id: string, focus: ClozeFocus, seed: number, answers: Record<string, string>) =>
+    post<ClozeCheck>(`/stories/${id}/cloze/check`, { focus, seed, answers }),
 
   // Talk
   scenarios: (target: string, support: string) => req<ScenarioSummary[]>(`/scenarios${q({ target, support })}`),

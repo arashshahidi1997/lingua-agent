@@ -10,12 +10,15 @@ import { PlayButton } from '../components/PlayButton'
 
 export default function LessonSheet({ courseId, lessonId, locked }: { courseId: string; lessonId: string; locked: boolean }) {
   const nav = useNav()
-  const { pair } = useSettings()
+  const { pair, settings } = useSettings()
+  // Fast track opens every lesson and runs it as a quiz.
+  const fast = settings.fastTrack
+  locked = locked && !fast
   const { data, error, reload } = useAsync(`${courseId}/${lessonId}`, () => courseApi.lesson(courseId, lessonId))
 
   const start = () => nav.replace({
     kind: 'player',
-    source: { type: 'lesson', courseId, lessonId, title: data?.title },
+    source: { type: 'lesson', courseId, lessonId, title: data?.title, fast },
   })
 
   return (
@@ -25,7 +28,8 @@ export default function LessonSheet({ courseId, lessonId, locked }: { courseId: 
       footer={
         <div className="flex items-center gap-3">
           {locked && <p className="min-w-0 flex-1 text-[13px] text-ink-3">Finish the lessons before this one to unlock it.</p>}
-          <Button size="lg" block={!locked} disabled={locked || !data} onClick={start}>
+          {fast && <p className="min-w-0 flex-1 text-[13px] text-ink-3">Fast track: straight to the questions.</p>}
+          <Button size="lg" block={!locked && !fast} disabled={locked || !data} onClick={start}>
             Start
           </Button>
         </div>
