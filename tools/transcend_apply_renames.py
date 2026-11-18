@@ -34,7 +34,6 @@ from __future__ import annotations
 import argparse
 import csv
 import os
-import shutil
 import sys
 from collections import Counter
 from datetime import datetime
