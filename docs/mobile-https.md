@@ -89,6 +89,13 @@ version the next time they're opened.
 npm --prefix web run build && systemctl --user restart lingua-agent
 ```
 
+## Backups
+
+`tools/backup_data.sh` copies `.lingua-agent/` (progress of every user, cards, recordings, native voice takes)
+to Google Drive with rclone every night at 03:30 (`systemctl --user list-timers lingua-backup.timer`; it
+catches up after sleep). `current/` mirrors the data; files changed or deleted are kept under `old/<date>/`
+for 60 days. To restore: stop the service, `rclone copy <dest>/current .lingua-agent`, start it again.
+
 ## Owner and guests
 
 `tailscale serve` adds `Tailscale-User-Login` / `Tailscale-User-Name` to each request

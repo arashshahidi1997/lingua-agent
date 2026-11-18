@@ -16,7 +16,7 @@ lessons or features; new ideas wait in "Ideas (parked)".
 - [ ] Talk's own model, if it comes back: compare models on the neighbour test via OpenRouter (key is Arash's step; see infra) before choosing [core] — **user**
 - [ ] Offline-first app (agreed 2026-11-17, after the voice recordings): course, exercises, audio, progress and recordings on the phone; the laptop becomes the sync point and backup; optional Android APK (Capacitor). Write the plan first for approval [web, core]
 - [~] Your voice for the existing course — first part done 2026-11-18: lesson u1-l1 (6 words × 3 takes, `Greetings.m4a`) processed with `tools/native_voice.py`; the app plays a random take, Piper for the rest. Recording format that works: each word 3 times, a pause after each.
-- [ ] Back up `.lingua-agent/` (progress, recordings, native_audio): nothing copies it yet — hand to inf-manager — **user decision**
+- [x] Back up `.lingua-agent/` (2026-11-18): `tools/backup_data.sh`, nightly 03:30 via the systemd user timer `lingua-backup.timer` → Drive `home/language/lingua-agent-backup/current`, changed/deleted files kept 60 days under `old/<date>/`; voices and the speech cache skipped
 - [ ] Your voice for the existing course (rest): 4 recordings from `content/recording/fa-en-a1/*.html` → Drive folder → split, match, normalise; the app prefers the native clip over Piper [content, core] — recording: **user**
 - [ ] Generated lessons ("Your lessons") are poor with `qwen2.5:7b` (see Phase 5b below); either fix or label them clearly as experimental [core]
 - [ ] Sara and Ali share one synthetic voice (only `fa_IR-amir` installed) — moot once your voice is in, except for lines not yet recorded [core]
@@ -65,7 +65,7 @@ Not started on purpose: they wait until what exists is complete.
 
 ## Housekeeping
 
-- [ ] mkdocs is not in `.venv`; docs build unchecked since `product-v2.md` and `exclude_docs: log/` were added [docs, config]
+- [x] Docs build checked: the "Deploy docs" workflow built and published the site on 2026-11-18
 - [ ] Drive subset sync from the SSD (command in the memory note `session_state_2026-05-17.md`) — needs the SSD mounted — **user**
 - [ ] Ollama on the XPS is CPU-only: ~6 min per lesson with `qwen2.5:7b`; disk at 95% [infra, not lingua] — **user**
 
