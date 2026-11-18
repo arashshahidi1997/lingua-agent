@@ -4,8 +4,10 @@
   python3 .claude/skills/project-manager/round.py handoffs since      # chosen sections
   python3 .claude/skills/project-manager/round.py since --since <sha>
   python3 .claude/skills/project-manager/round.py board               # rewrite the manager board
+  python3 .claude/skills/project-manager/round.py config              # which config, layout and paths are used
 
-All sections but `board` are read-only.
+All sections but `board` are read-only. The config is found as described in _common.py ($MANAGER_CONFIG,
+.projio/manager.yml, .claude/manager.yml); every key has a default and missing folders are skipped.
 
 Sections:
   handoffs  newest open handoff per series in `handoffs.dir`; a series with more than one open handoff is flagged
@@ -19,6 +21,7 @@ Sections:
             (newest handoffs and dirty units under Sessions, unpushed commits under Sync) are regenerated.
             The "As of" line of What's up and the "Updated" line get the same stamp, the time of the rewrite.
             Warns when the board is not gitignored.
+  config    the config file, layout (projio or generic) and resolved paths, and which of them exist
 """
 
 from __future__ import annotations
@@ -34,7 +37,7 @@ import sys
 
 sys.dont_write_bytecode = True  # the synced copy of this folder must stay byte-identical
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from _common import age, board_path, front, git, load_adapter, stamp, to_root, unit_of  # noqa: E402
+from _common import age, board_path, existing, front, git, load_adapter, stamp, to_root, unit_of  # noqa: E402
 
 
 def handoff_rows(cfg: dict) -> list[dict]:
@@ -45,7 +48,8 @@ def handoff_rows(cfg: dict) -> list[dict]:
         with open(f, encoding="utf-8", errors="replace") as fh:
             fm, _ = front(fh.read())
         nid = os.path.basename(f)[:-3]
-        ts = stamp(fm.get("timestamp", "") or nid)
+        ts = stamp(fm.get("timestamp", "") or nid) or stamp(fm.get("date", "")) or dt.datetime.fromtimestamp(
+            os.path.getmtime(f))
         rows.append({"path": f, "id": ts.strftime("%Y%m%d-%H%M%S") if ts else nid, "ts": ts,
                      "series": fm.get("series", "") or "-", "status": fm.get("status", ""),
                      "title": fm.get("title", ""), "git_commit": fm.get("git_commit", "")})
@@ -53,7 +57,10 @@ def handoff_rows(cfg: dict) -> list[dict]:
     return rows
 
 
-def show_handoffs(rows: list[dict]) -> None:
+def show_handoffs(rows: list[dict], cfg: dict) -> None:
+    if not existing([cfg["handoffs"]["dir"]]):
+        print("## handoffs: %s not found (handoffs.dir); none read" % cfg["handoffs"]["dir"])
+        return
     open_by = collections.defaultdict(list)
     for r in rows:
         if r["status"] == "open":
@@ -121,8 +128,9 @@ BOARD_SECTIONS = [
      "As of {stamp}.\n\n- Running now: nothing yet.\n- Latest: nothing yet.\n- Waiting on you: nothing yet.\n"
      "- Next to start: nothing yet."),
     ("copy", "Delegate",
-     "Nothing to delegate. Kickoffs go here numbered, each with a tag line (**independent** or **depends on "
-     "<what>**) and a ```text block; say \"delegated <n>\" or \"delegated all\" once one is started."),
+     "Nothing to delegate. Each kickoff goes here under `### <CODE> · <session title>` (a short unique code, "
+     "e.g. SPD), with a tag line (**independent** or **depends on <CODE or what>**) and a ```text block; say "
+     "\"delegated <CODE>\" or \"delegated all\" once started."),
     ("decisions", "Decisions waiting for you", "_None._"),
     ("sessions", "Sessions, by state", "| Session | State | Notes |\n|---|---|---|"),
     ("waiting", "Waiting on others", "_None._"),
@@ -255,6 +263,22 @@ def show_board(cfg: dict, rows: list[dict]) -> None:
         print("  warning: not gitignored")
 
 
+def show_config(cfg: dict) -> None:
+    print("## config: %s (layout %s)" % (cfg["_config"] or "none, defaults only", cfg["_layout"]))
+    print("  prefix         %r; standing manager %smanager; adapter skill %s" % (
+        cfg["prefix"], cfg["prefix"], cfg["adapter_skill"] or "-"))
+    for d in cfg["incoming"]["dirs"]:
+        print("  incoming       %-40s %s" % (d, "ok" if existing([d]) else "missing"))
+    if not cfg["incoming"]["dirs"]:
+        print("  incoming       (none configured)")
+    d = cfg["handoffs"]["dir"]
+    print("  handoffs       %-40s %s" % (d, "ok" if existing([d]) else "missing"))
+    b = board_path(cfg)
+    ignored = subprocess.run(["git", "check-ignore", "-q", b], capture_output=True).returncode == 0
+    print("  board          %-40s %s" % (b, "gitignored" if ignored else "NOT gitignored"))
+    print("  units          %s" % (", ".join(u["name"] for u in cfg["units"]) or "(none: top-level folders)"))
+
+
 def main(argv: list[str]) -> int:
     to_root()
     cfg = load_adapter()
@@ -267,13 +291,15 @@ def main(argv: list[str]) -> int:
     rows = handoff_rows(cfg)
     for s in sections:
         if s == "handoffs":
-            show_handoffs(rows)
+            show_handoffs(rows, cfg)
         elif s == "since":
             show_since(rows, cfg, given)
         elif s == "dirty":
             show_dirty(cfg)
         elif s == "board":
             show_board(cfg, rows)
+        elif s == "config":
+            show_config(cfg)
         else:
             print("unknown section: " + s, file=sys.stderr)
             return 2

@@ -4,7 +4,7 @@
   python3 .claude/skills/project-manager/procs.py --hours 6
 
 Groups show count, RAM, age range and orphans (parent pid 1), with up to 10 rows each. Groups matching
-`procs.protect` in .projio/manager.yml are marked "protected": never propose them for a kill. Old Claude
+`procs.protect` in the manager config are marked "protected": never propose them for a kill. Old Claude
 sessions are archived from the app, never killed here.
 """
 

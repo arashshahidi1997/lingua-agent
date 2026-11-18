@@ -17,7 +17,7 @@ metadata:
 
 **Load the core first:** `.claude/skills/project-manager/SKILL.md`, a read-only copy of projio's
 `src/projio/data/skills/project-manager/` (SKILL.md, round.py, _common.py, incoming.py, procs.py; version
-projio 1ee6fe5, copied 2026-11-14 from `~/Documents/infra/.claude/skills/project-manager/`). Never edit it
+projio 6fe4e9d, copied 2026-11-18 from the user-level `~/.claude/skills/project-manager/`). Never edit it
 here; recopy after each projio push. lingua-specific behaviour goes in this file. Machine keys are in
 `.projio/manager.yml`. Read `README.md` and `docs/roadmap.md` before the first round.
 

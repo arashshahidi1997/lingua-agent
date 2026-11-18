@@ -4,7 +4,8 @@
   python3 .claude/skills/project-manager/incoming.py --all     # also open notes with no "from" signal
   python3 .claude/skills/project-manager/incoming.py --json
 
-A note counts as incoming when its status is open (`incoming.open_statuses`) or unknown, and its title starts
+The note folders are `incoming.dirs` in the manager config (see _common.py); folders that do not exist are
+skipped, and with none the list is empty (a project without incoming notes). A note counts as incoming when its status is open (`incoming.open_statuses`) or unknown, and its title starts
 with `incoming.title_prefix` ("[from <project>] …") or its body has an `incoming.body_markers` line naming the
 sender. Per note: id, commit state (UNCOMMITTED / modified / committed), age, sender, where it is cited (docs
 matching `incoming.cited_by.globs`, and commit messages when `cited_by.git_log`), and flags:
@@ -26,7 +27,7 @@ import sys
 
 sys.dont_write_bytecode = True  # the synced copy of this folder must stay byte-identical
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from _common import CLOSED, age, front, git, load_adapter, stamp, to_root  # noqa: E402
+from _common import CLOSED, age, existing, front, git, load_adapter, stamp, to_root  # noqa: E402
 
 
 def sender_of(title: str, body: str, prefix: str, markers: list[str]) -> str:
@@ -41,7 +42,9 @@ def sender_of(title: str, body: str, prefix: str, markers: list[str]) -> str:
 
 def collect(cfg: dict, show_all: bool) -> tuple[list[dict], list[str]]:
     inc = cfg["incoming"]
-    dirs = inc["dirs"]
+    dirs = existing(inc["dirs"])
+    if not dirs:
+        return [], []
     open_st = set(inc["open_statuses"])
     untracked = set(git("ls-files", "--others", "--exclude-standard", "--", *dirs).split())
     modified = set(git("diff", "--name-only", "HEAD", "--", *dirs).split())
@@ -115,6 +118,11 @@ def main(argv: list[str]) -> int:
             r["ts"] = r["ts"].isoformat() if r["ts"] else None
             r.pop("body")
         print(json.dumps({"notes": rows, "backups": backups}, indent=1))
+        return 0
+    dirs = cfg["incoming"]["dirs"]
+    if not existing(dirs):
+        print("no incoming note folders%s: skipped (set incoming.dirs in %s)" % (
+            " (%s not found)" % ", ".join(dirs) if dirs else "", cfg["_config"] or "the manager config"))
         return 0
     print("%d open %snotes, newest first" % (len(rows), "" if show_all else "incoming "))
     for r in rows:

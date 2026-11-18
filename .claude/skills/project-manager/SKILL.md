@@ -1,13 +1,14 @@
 ---
 name: project-manager
 description: >
-  Core procedure for a manager session in a projio project: one that knows what
+  Core procedure for a manager session in any git project (projio or not): one that knows what
   came in from other projects, which sessions run and what they finished, and
   what the user should decide or start next. Use when the user asks for an
   overview or orchestration, or opens the standing manager session
   (`<prefix>manager`). Always entered through the project's adapter skill
-  (named in `.projio/manager.yml`), which says what the units of work are.
-  Also defines the three-line report work sessions send the manager at wrap.
+  (named in the manager config, `.projio/manager.yml` or `.claude/manager.yml`),
+  which says what the units of work are; `manager-setup` creates both. Also
+  defines the three-line report work sessions send the manager at wrap.
 metadata:
   short-description: Manager core - incoming notes, session states, board, handoffs, decisions, restart
   tags: [manager, orchestration, sessions, handoff, workflow]
@@ -31,16 +32,39 @@ time estimates**.
 
 This file is the core. The project's **adapter** fills in the rest:
 
-- `.projio/manager.yml`: machine keys the helpers read (title `prefix`, the
+- the **manager config**: machine keys the helpers read (title `prefix`, the
   incoming note folders and signals, the handoff folder, the `board` path,
-  `units` for grouping paths, protected processes).
+  `units` for grouping paths, protected processes). The helpers use the first
+  that exists of `$MANAGER_CONFIG`, `.projio/manager.yml` (projio) and
+  `.claude/manager.yml` (any other project). Every key has a default and a
+  folder that does not exist is skipped, so git and a handoff folder are
+  enough. `round.py config` shows what is in use.
 - the adapter skill (`adapter_skill` in that file, usually `<prefix>manager`):
   the units of work and where their state lives, which files belong to the
   sessions (the manager never edits them), the collision unit, the
   integration step, the opener and wrap skills, standing approvals the user
   gave (dated), and any project-specific round sections.
 
-Read the adapter skill before the first round.
+Read the adapter skill before the first round. A project without a manager
+yet gets one from the `manager-setup` skill.
+
+## projio or not
+
+Most of this file works in any git project. Where it names projio, use the
+generic equivalent:
+
+| projio | any other project |
+|---|---|
+| config `.projio/manager.yml` | `.claude/manager.yml` |
+| `note_resolve(note_id=…)` to load a handoff | read the handoff file by its path |
+| handoff as a notio note (`note_create` of type handoff) | a file in `handoffs.dir` named `handoff-YYYYMMDD-HHMMSS-<slug>.md`, from `manager-setup/templates/handoff.md` |
+| incoming notes in `docs/log/issue`, `docs/log/idea` | `incoming.dirs`, often none: then skip round step 1 |
+| `projio sync` installs this skill into `.claude/skills/` | copy this skill's folder (and `manager-setup`) into `.claude/skills/` |
+| `skill_read("project-manager")` | read this file |
+| work sessions wrap with `session-wrap` | the session commits by path, writes a handoff from the template and sends the three-line report (below) |
+
+The helpers are Python 3.9+ stdlib only (PyYAML is used when present) and
+import nothing from projio.
 
 ## Two forms
 
@@ -57,8 +81,10 @@ restart, trust the files.
 ## A round
 
 Run one at the start, when an idle notice arrives, and when the user asks. The
-helpers are in this skill's folder (`.claude/skills/project-manager/` after
-`projio sync`); all are read-only except `round.py board`, which rewrites the
+helpers are in this skill's folder, the base directory Claude Code shows when
+the skill loads (`.claude/skills/project-manager/` after `projio sync` or a
+copy; a plugin's folder when installed as one; the commands below assume the
+first). All are read-only except `round.py board`, which rewrites the
 gitignored board.
 
 1. **Incoming:** `python3 .claude/skills/project-manager/incoming.py`. Notes
@@ -71,19 +97,26 @@ gitignored board.
    newest open handoff per series, commits since the last manager handoff's
    `git_commit`, and dirty paths grouped by unit. **Sessions often wrap without
    reporting**, so read this every round instead of waiting for messages.
-3. **Sessions:** `ListAgents`. Give every session a state, and run the
-   collision guard.
+3. **Sessions:** `ListAgents`, plus the client's session list where there
+   is one (`list_sessions` in the desktop app): `ListAgents` can miss running
+   sessions. Give every session a state, and run the collision guard.
 4. **The adapter's readers** for the project's own units of work.
 5. **Update the board** (see Board): run `round.py board`, write the round's
    kickoffs, decisions, session states and waits into it, and open it in the
    side pane. Chat gets a short status (Incoming · Sessions · What finished ·
    Waiting on the user · Proposed next) that points to the board. Then batch
    the decisions into `AskUserQuestion`.
+6. **Proposed next, completion first:** in the chat's Proposed next and the
+   board's kickoffs, rank work that makes existing things whole before
+   expansion: open bugs and issues, partial or stub notes, untested work,
+   unpushed or uncommitted work, then anything else. New features and ideas
+   are parked in the backlog (say where), not proposed as kickoffs, unless
+   the user asks for them. The `always-complete` skill holds the full rule.
 
 ## Board
 
 One gitignored markdown file per project, `board.path` in
-`.projio/manager.yml` (default `.scratch/<prefix>manager-board.md`). The
+the manager config (default `.scratch/<prefix>manager-board.md`). The
 manager rewrites it every round and after every event (a session started,
 wrapped or asked something; a decision made), and keeps it open in the side
 pane with `show_pane(pane="file", path=<board>)`. When `show_pane` does
@@ -98,14 +131,16 @@ stay short and point to it. Sections, in order:
    running now, latest results, waiting on the user, next to start.
    `round.py board` sets the stamp and gives the "Updated" line the same one;
    the manager rewrites the lines below it every round.
-2. **Delegate:** kickoff prompts, numbered, each with a tag line under its
-   heading and the prompt in a ```` ```text ```` block. The tag is
-   **independent** or **depends on <what>**: another kickoff's shared files,
-   a session finishing, or the user's OK. Every prompt opens with its
-   ``Title this session `<prefix><unit> · <item>`.`` line (Levels,
-   Dispatcher). The user says "delegated <n>" or
-   "delegated all" once one is started; the manager removes it and tracks the
-   session.
+2. **Delegate:** kickoff prompts, each headed `### <CODE> · <session title>`,
+   then its tag line, then the prompt in a ```` ```text ```` block. The code
+   is 2-5 letters or digits, mnemonic where possible (`SPD`, `TO13`, `REO`),
+   unique on the board and never reused once retired. The tag is
+   **independent** or **depends on <what>**: another kickoff by its code
+   ("depends on REO"), a session finishing, or the user's OK. Every prompt
+   opens with its ``Title this session `<prefix><unit> · <item>`.`` line
+   (Levels, Dispatcher). The user says "delegated <CODE>[, <CODE>]" or
+   "delegated all" once started; the manager removes those kickoffs and
+   tracks the sessions.
 3. **Decisions waiting for you:** in plain words, as in Decisions below.
 4. **Sessions, by state:** a table of session · state (running / waiting /
    parked / done) · notes.
@@ -152,7 +187,8 @@ Default to observer plus dispatcher.
   notify_when_idle=true)` and no message. Never poll.
 - **Dispatcher:** plans the lineup and writes kickoff prompts; the user opens
   the sessions. Each kickoff names the unit and item, the handoff to load by
-  `note_resolve(note_id=…)` (never `note_latest`, which races), the done-when,
+  `note_resolve(note_id=…)` (never `note_latest`, which races) or, without
+  projio, by its path, the done-when,
   and how to report back (the manager's name and its session id). Its first
   line is always ``Title this session `<prefix><unit> · <item>`.`` so the
   session renames itself before anything else; a standing manager is titled
@@ -241,17 +277,26 @@ uncommitted paths) and that the machine has room for a batch run (`free -g`).
 
 ## Report-back protocol (work sessions, at wrap)
 
-When `ListAgents` shows `<prefix>manager`, the wrapping session sends it three
-lines with `SendMessage(to="<prefix>manager", message=…)`:
+Every wrap, the session sends the manager three lines with
+`SendMessage(to=<address>, message=…)`:
 
 1. unit · item → done / partial
 2. blockers, `→ manager` items, decisions for the user, in plain words
 3. the handoff id
 
-It is a report, not a request for approval. Across machines, names do not
-resolve: send to the session id the manager gave in the kickoff prompt. If no
-channel works, the session's commits and handoff are the report; the manager
-finds them in round step 2.
+The address, first that works:
+
+1. the manager's session id from the kickoff prompt (also the only way across
+   machines, where names do not resolve);
+2. `ListAgents`: the name `<prefix>manager`;
+3. the client's session list (`list_sessions` in the desktop app): the exact
+   title `<prefix>manager`, not archived, running; send to its session id
+   (`local_…`). `ListAgents` can miss a running manager, e.g. one with Remote
+   Control on.
+
+Never skip the report because `ListAgents` missed the manager. If no address
+works, the commits and handoff are the report; the manager reads them in
+round step 2. It is a report, not a request for approval.
 
 ## Process survey
 
@@ -271,7 +316,8 @@ write a manager handoff and ask the user to start a new manager:
   `status: consumed`;
 - sections: How to resume · What finished · Decisions the user made (don't
   re-ask) · Open, for the next manager · Kickoff snippet;
-- the kickoff loads the handoff by `note_resolve(note_id="<id>")`, titles the
+- the kickoff loads the handoff by `note_resolve(note_id="<id>")` (without
+  projio: by its path), titles the
   session `<prefix>manager`, and runs the adapter skill.
 
 ## Hard rules
