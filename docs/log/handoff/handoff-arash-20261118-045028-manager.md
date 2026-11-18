@@ -5,7 +5,7 @@ timestamp: 20261118-045028
 tags: [handoff]
 series: manager
 branch: "main"
-status: open
+status: consumed
 git_commit: "a783bfd"
 refs: [docs/backlog.md, docs/audit/2026-11-17-completeness.md, content/recording/fa-en-a1/re-record.md]
 ---
