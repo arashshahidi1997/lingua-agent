@@ -8,6 +8,10 @@ wrong in the review file; a short file with just these, named after the word, is
 | Text | Sheet | Note |
 |---|---|---|
 | آ (alef madd, "â") | 4 · line 2 | redo; the current take stays until the new one replaces it |
+| بابا نان دارد. (bâbâ nân dârad) | 4 · line 34 | weak (or line 39 «بابا، نان داری؟» — to confirm) |
+| این … است (in … ast) | 4 · line 42 | weak |
+| چ (che) | 4 · line 55 | weak |
+| قند (ghand) | 4 · line 68 | weak |
 
 ## Doubtful takes (speech recognition heard something else; may be fine)
 
