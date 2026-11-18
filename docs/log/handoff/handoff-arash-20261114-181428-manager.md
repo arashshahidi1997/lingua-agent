@@ -5,7 +5,7 @@ timestamp: 20261114-181428
 tags: [handoff]
 series: manager
 branch: "claude/code-review-bhyt1c"
-status: open
+status: consumed
 git_commit: "d22fc85"
 refs: [docs/backlog.md, docs/product-v2.md, docs/roadmap.md]
 ---
