@@ -194,7 +194,9 @@ function Run({ session, source, onRetry }: { session: ExerciseSession; source: P
     if (ex.kind === 'intro') { advance(results, null); return }
     if (!ready) return
     let ok: boolean
-    if (ex.kind === 'match') ok = (matchMissed ?? []).length === 0
+    // A finished match counts as done: every pair ended up matched. Pairs that needed a second look are
+    // still recorded as not yet known (below), so practice brings them back, but the match isn't repeated.
+    if (ex.kind === 'match') ok = true
     else if (ex.kind === 'order') ok = normSentence(orderText(ex, answer)) === normSentence(ex.answer ?? ex.item?.text ?? '')
     else if (ex.kind === 'type_tr') ok = lenientTr(answer) === lenientTr(ex.answer ?? ex.item?.tr ?? '')
     else ok = answer === ex.answer
@@ -248,7 +250,7 @@ function Run({ session, source, onRetry }: { session: ExerciseSession; source: P
   const footer = (
     <div className={`pb-safe shrink-0 border-t ${phase === 'feedback' ? (correct ? 'border-accent/30 bg-accent-soft' : 'border-danger/30 bg-danger-soft') : 'border-line bg-canvas'}`}>
       <div className="mx-auto w-full max-w-xl px-4 py-4">
-        {phase === 'feedback' && ex && <Feedback ex={ex} correct={correct} lang={lang} trOf={trOf} />}
+        {phase === 'feedback' && ex && <Feedback ex={ex} correct={correct} lang={lang} trOf={trOf} secondLook={ex.kind === 'match' ? (matchMissed ?? []).length : 0} />}
         {phase === 'answer' ? (
           <Button size="lg" block disabled={!ready} onClick={check}>
             {ex?.kind === 'intro' ? 'Continue' : 'Check'}
@@ -277,13 +279,14 @@ function Run({ session, source, onRetry }: { session: ExerciseSession; source: P
   )
 }
 
-function Feedback({ ex, correct, lang, trOf }: { ex: CourseExercise; correct: boolean; lang: string; trOf: (t: string) => string | null }) {
+function Feedback({ ex, correct, lang, trOf, secondLook = 0 }: {
+  ex: CourseExercise; correct: boolean; lang: string; trOf: (t: string) => string | null; secondLook?: number
+}) {
   const it = ex.item
   let right: ReactNode = null
   if (!correct) {
     if (ex.kind === 'choose_gloss') right = ex.answer
     else if (ex.kind === 'type_tr') right = ex.answer ?? it?.tr
-    else if (ex.kind === 'match') right = 'Some pairs took a second try.'
     else {
       const t = ex.answer ?? it?.text ?? ''
       right = <Target text={t} tr={trOf(t) ?? (t === it?.text ? it?.tr : null)} lang={lang} className="text-xl" trClassName="text-[15px] text-ink-2" />
@@ -293,9 +296,14 @@ function Feedback({ ex, correct, lang, trOf }: { ex: CourseExercise; correct: bo
     <div role="status" className="mb-3 flex items-start gap-3">
       <div className="min-w-0 flex-1">
         <p className={`text-[15px] font-semibold ${correct ? 'text-accent' : 'text-danger'}`}>
-          {correct ? 'Correct' : ex.kind === 'match' ? 'Almost' : 'The right answer'}
+          {ex.kind === 'match' ? 'All matched' : correct ? 'Correct' : 'The right answer'}
         </p>
         {right && <div className="mt-0.5 text-ink">{right}</div>}
+        {ex.kind === 'match' && secondLook > 0 && (
+          <p className="mt-0.5 text-[14px] text-ink-2">
+            {secondLook === 1 ? 'One pair' : `${secondLook} pairs`} took a second look — {secondLook === 1 ? 'it comes' : 'they come'} back in practice.
+          </p>
+        )}
         {it && ex.kind !== 'match' && (
           <p className="mt-1 text-[13px] text-ink-2">
             <Target text={it.text} tr={it.tr} lang={lang} trClassName="" /> · {it.gloss}
