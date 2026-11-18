@@ -1,7 +1,13 @@
-# Re-record (optional)
+# Re-record
 
-Marked when processing sheet 1 (2026-11-18). Everything else plays in your voice. Re-record only what sounds
+Marked when processing the sheets (2026-11-18). Everything else plays in your voice. Re-record only what sounds
 wrong in the review file; a short file with just these, named after the word, is enough.
+
+## To record again (your call)
+
+| Text | Sheet | Note |
+|---|---|---|
+| آ (alef madd, "â") | 4 · line 2 | redo; the current take stays until the new one replaces it |
 
 ## Doubtful takes (speech recognition heard something else; may be fine)
 
