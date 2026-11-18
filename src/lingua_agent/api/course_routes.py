@@ -20,6 +20,7 @@ from pydantic import BaseModel, Field
 from ..ai import get_provider
 from ..config import Settings
 from ..course import cloze
+from ..course import grammar as G
 from ..course import exercises as X
 from ..course.cloze import Cloze
 from ..course import store
@@ -696,6 +697,112 @@ def story_cloze_check(story_id: str, req: ClozeCheckRequest, s: Settings = Depen
     correct = {gid: cloze.check(g.answer, req.answers.get(gid, ""), g.tr) for gid, g in gaps.items()}
     return ClozeCheckResponse(correct=correct, answers={gid: g.answer for gid, g in gaps.items()},
                               score=sum(correct.values()) / len(correct) if correct else 1.0)
+
+
+# ---- grammar lab ------------------------------------------------------------------------
+
+class GrammarTopicSummary(BaseModel):
+    id: str
+    title: str
+    title_fa: str
+    unit: str | None
+    status: str
+    task_count: int
+    done: bool
+    best_score: float | None
+
+
+class GrammarTopicOut(G.Topic):
+    course_id: str
+    done: bool
+    best_score: float | None
+
+
+class GrammarCheckRequest(BaseModel):
+    task: int
+    answer: str
+
+
+class GrammarCheckResponse(BaseModel):
+    correct: bool
+    answer: str
+    answer_tr: str | None
+
+
+def _grammar_or_404(s: Settings, request: Request, course_id: str, topic_id: str | None = None):
+    gd = G.load(course_id)
+    if gd is None:
+        raise HTTPException(404, f"no grammar topics for {course_id}")
+    # The owner's approvals in the app override the YAML's status.
+    reviewed = G.approvals(s.shared_data_dir)
+    gd = gd.model_copy(update={"topics": [t.model_copy(update={"status": reviewed.get(t.id, t.status)})
+                                          for t in gd.topics]})
+    if topic_id is None:
+        return gd, None
+    topic = next((t for t in gd.topics if t.id == topic_id), None)
+    # Drafts are for the owner to review; others don't see them.
+    if topic is None or (topic.status == "draft" and not identify(request).owner):
+        raise HTTPException(404, f"grammar topic not found: {topic_id}")
+    return gd, topic
+
+
+@router.get("/courses/{course_id}/grammar", response_model=list[GrammarTopicSummary])
+def grammar_topics(course_id: str, request: Request, s: Settings = Depends(get_settings)) -> list[GrammarTopicSummary]:
+    gd, _ = _grammar_or_404(s, request, course_id)
+    owner = identify(request).owner
+    prog = store.load_progress(s, course_id)
+    return [GrammarTopicSummary(id=t.id, title=t.title, title_fa=t.title_fa, unit=t.unit, status=t.status,
+                                task_count=len(t.tasks), done=t.id in prog.grammar,
+                                best_score=prog.grammar[t.id].best_score if t.id in prog.grammar else None)
+            for t in gd.topics if t.status == "reviewed" or owner]
+
+
+@router.get("/courses/{course_id}/grammar/{topic_id}", response_model=GrammarTopicOut)
+def grammar_topic(course_id: str, topic_id: str, request: Request, s: Settings = Depends(get_settings)) -> GrammarTopicOut:
+    _, t = _grammar_or_404(s, request, course_id, topic_id)
+    prog = store.load_progress(s, course_id)
+    rec = prog.grammar.get(t.id)
+    return GrammarTopicOut(**t.model_dump(by_alias=True), course_id=course_id, done=rec is not None,
+                           best_score=rec.best_score if rec else None)
+
+
+class GrammarReviewRequest(BaseModel):
+    status: Literal["draft", "reviewed"]
+
+
+@router.put("/courses/{course_id}/grammar/{topic_id}/status", status_code=204, dependencies=[Depends(require_owner)])
+def grammar_review(course_id: str, topic_id: str, req: GrammarReviewRequest, request: Request,
+                   s: Settings = Depends(get_settings)) -> Response:
+    """The owner approves a topic for everyone (or takes it back to draft)."""
+    _grammar_or_404(s, request, course_id, topic_id)
+    G.set_approval(s.shared_data_dir, topic_id, req.status)
+    return Response(status_code=204)
+
+
+@router.post("/courses/{course_id}/grammar/{topic_id}/check", response_model=GrammarCheckResponse)
+def grammar_check(course_id: str, topic_id: str, req: GrammarCheckRequest, request: Request,
+                  s: Settings = Depends(get_settings)) -> GrammarCheckResponse:
+    _, t = _grammar_or_404(s, request, course_id, topic_id)
+    if not 0 <= req.task < len(t.tasks):
+        raise HTTPException(404, "no such task")
+    task = t.tasks[req.task]
+    return GrammarCheckResponse(correct=G.check(task, req.answer), answer=task.answer, answer_tr=task.answer_tr)
+
+
+@router.post("/courses/{course_id}/grammar/{topic_id}/complete", response_model=CompleteResponse)
+def grammar_complete(course_id: str, topic_id: str, req: CompleteRequest, request: Request,
+                     s: Settings = Depends(get_settings)) -> CompleteResponse:
+    _, t = _grammar_or_404(s, request, course_id, topic_id)
+    prog = store.load_progress(s, course_id)
+    if _replayed(prog, req.event_id):
+        rec = prog.grammar.get(t.id)
+        return CompleteResponse(score=rec.best_score if rec else 0.0, passed=True, cards_added=0, unlocked=None)
+    score = sum(r.correct for r in req.results) / len(req.results) if req.results else 1.0
+    store.record(prog.grammar, t.id, score)
+    prog.updated_at = utcnow()
+    store.save_progress(s, prog)
+    store.log_activity(s, req.seconds)
+    return CompleteResponse(score=score, passed=True, cards_added=0, unlocked=None)
 
 
 # ---- Talk ---------------------------------------------------------------------------

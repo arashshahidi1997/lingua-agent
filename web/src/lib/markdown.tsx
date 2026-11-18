@@ -1,6 +1,6 @@
-import { Fragment, type ReactNode } from 'react'
+import type { ReactNode } from 'react'
 
-// Just enough markdown for lesson notes: paragraphs, "- " bullet lists,
+// Just enough markdown for lesson notes and grammar rules: paragraphs, "- " bullet lists, "| a | b |" tables,
 // **bold**, *italic* / _italic_ and `code`. No HTML is ever injected.
 // Runs of Arabic-script text (Persian examples in an English note) get their own lang + dir, so they
 // pick up the Persian font and don't scramble the direction of the sentence around them.
@@ -58,20 +58,34 @@ export function Markdown({ text, className = '', rtlLang = 'fa' }: { text: strin
             </ul>
           )
         }
+        if (lines.every((l) => /^\s*\|.*\|\s*$/.test(l))) {
+          const rows = lines
+            .filter((l) => !/^\s*\|[\s:|-]+\|\s*$/.test(l))   // the |---|---| separator
+            .map((l) => l.trim().slice(1, -1).split('|').map((c) => c.trim()))
+          const [head, ...body] = rows
+          return (
+            <div key={bi} className="overflow-x-auto">
+              <table className="w-full border-collapse text-start text-[0.95em]">
+                <thead>
+                  <tr>{head.map((c, ci) => <th key={ci} className="border-b border-line-strong px-2 py-1.5 text-start font-medium text-ink-2">{inline(c, `${bi}-h${ci}`, rtlLang)}</th>)}</tr>
+                </thead>
+                <tbody>
+                  {body.map((r, ri) => (
+                    <tr key={ri} className="border-b border-line">
+                      {r.map((c, ci) => <td key={ci} className="px-2 py-1.5 align-top">{inline(c, `${bi}-${ri}-${ci}`, rtlLang)}</td>)}
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )
+        }
         const heading = /^#{1,6}\s+(.*)$/.exec(lines[0])
         if (heading && lines.length === 1) {
           return <p key={bi} className="font-semibold text-ink">{inline(heading[1], `${bi}`, rtlLang)}</p>
         }
-        return (
-          <p key={bi}>
-            {lines.map((l, li) => (
-              <Fragment key={li}>
-                {li > 0 && <br />}
-                {inline(l.replace(/^#{1,6}\s+/, ''), `${bi}-${li}`, rtlLang)}
-              </Fragment>
-            ))}
-          </p>
-        )
+        // Lines inside a paragraph are soft-wrapped text: join them with spaces, as markdown does.
+        return <p key={bi}>{inline(lines.map((l) => l.replace(/^#{1,6}\s+/, '').trim()).join(' '), `${bi}`, rtlLang)}</p>
       })}
     </div>
   )

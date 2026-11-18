@@ -1,7 +1,7 @@
 import { createContext, useContext } from 'react'
 
 export type Tab = 'today' | 'path' | 'library' | 'talk'
-export type LibrarySection = 'stories' | 'audio' | 'lessons' | 'add'
+export type LibrarySection = 'stories' | 'grammar' | 'audio' | 'lessons' | 'add'
 
 export type PlayerSource =
   | { type: 'lesson'; courseId: string; lessonId: string; title?: string; fast?: boolean }
@@ -16,6 +16,7 @@ export type Overlay =
   | { kind: 'review' }
   | { kind: 'story'; id: string }
   | { kind: 'cloze'; storyId: string }
+  | { kind: 'grammar'; courseId: string; topicId: string }
   | { kind: 'audio'; id: string }
   | { kind: 'unit'; id: string }
   | { kind: 'talk'; scenarioId: string | null }

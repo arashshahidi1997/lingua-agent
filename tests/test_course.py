@@ -558,3 +558,65 @@ def test_fast_track_session(client: TestClient):
     fast = client.get("/api/courses/fa-en-test/lessons/u1-l2/session", params={"mode": "fast"}).json()
     kinds = [e["kind"] for e in fast["exercises"]]
     assert "intro" not in kinds and kinds[-1] == "match"
+
+
+def test_grammar_lab(client: TestClient):
+    # The packaged grammar file belongs to fa-en-a1; this fixture course has none.
+    assert client.get("/api/courses/fa-en-test/grammar").status_code == 404
+
+
+def test_grammar_topics_and_checks(tmp_path: Path, monkeypatch: pytest.MonkeyPatch):
+    from lingua_agent.course import grammar as G
+    gd = G.load("fa-en-a1")
+    assert gd and len(gd.topics) >= 8
+    for t in gd.topics:
+        assert 0 <= t.correct < len(t.choices)
+        for task in t.tasks:
+            if task.kind == "choose":
+                assert task.answer in task.choices, (t.id, task.prompt)
+            else:
+                assert G.check(task, task.answer) or task.mode == "tr", (t.id, task.prompt)
+                assert task.answer_tr is None or G.check(task, task.answer_tr), (t.id, task.prompt)
+    neg = next(t for t in gd.topics if t.id == "g-negation").tasks[0]
+    assert G.check(neg, "من قهوه نمیخورم")              # ZWNJ optional
+    assert G.check(neg, "man ghahve nemikhoram")        # transliteration
+    assert not G.check(neg, "من قهوه می‌خورم")
+    ez = next(t for t in gd.topics if t.id == "g-ezafe").tasks[0]
+    assert G.check(ez, "khane-ye bozorg") and not G.check(ez, "خانه بزرگ")   # tr only: ezafe is invisible
+
+
+def test_grammar_drafts_are_owner_only(tmp_path: Path, monkeypatch: pytest.MonkeyPatch):
+    monkeypatch.chdir(tmp_path)
+    monkeypatch.setenv("LINGUA_DATA_DIR", str(tmp_path / "data"))
+    (tmp_path / "data").mkdir()
+    (tmp_path / "data" / "sharing.json").write_text('{"owner_logins": ["me@x.y"]}')
+    c = TestClient(build_app(Settings.load(cwd=tmp_path)))
+    guest = {"Tailscale-User-Login": "anya@x.y"}
+    mine = c.get("/api/courses/fa-en-a1/grammar").json()
+    assert mine and all(t["status"] == "draft" for t in mine)
+    assert c.get("/api/courses/fa-en-a1/grammar", headers=guest).json() == []
+    assert c.get("/api/courses/fa-en-a1/grammar/g-past", headers=guest).status_code == 404
+    topic = c.get("/api/courses/fa-en-a1/grammar/g-past").json()
+    assert topic["rule"] and topic["tasks"][0]["kind"] == "predict"
+    r = c.post("/api/courses/fa-en-a1/grammar/g-past/check", json={"task": 0, "answer": "didam"}).json()
+    assert r == {"correct": True, "answer": "دیدم", "answer_tr": "didam"}
+    done = c.post("/api/courses/fa-en-a1/grammar/g-past/complete",
+                  json={"results": [{"item_id": "0", "correct": True}, {"item_id": "1", "correct": False}]}).json()
+    assert done["score"] == 0.5
+    assert next(t for t in c.get("/api/courses/fa-en-a1/grammar").json() if t["id"] == "g-past")["done"]
+
+
+def test_owner_approves_grammar_topics(tmp_path: Path, monkeypatch: pytest.MonkeyPatch):
+    monkeypatch.chdir(tmp_path)
+    monkeypatch.setenv("LINGUA_DATA_DIR", str(tmp_path / "data"))
+    (tmp_path / "data").mkdir()
+    (tmp_path / "data" / "sharing.json").write_text('{"owner_logins": ["me@x.y"]}')
+    c = TestClient(build_app(Settings.load(cwd=tmp_path)))
+    guest = {"Tailscale-User-Login": "anya@x.y"}
+    url = "/api/courses/fa-en-a1/grammar/g-past/status"
+    assert c.put(url, json={"status": "reviewed"}, headers=guest).status_code == 403
+    assert c.put(url, json={"status": "reviewed"}).status_code == 204
+    assert [t["id"] for t in c.get("/api/courses/fa-en-a1/grammar", headers=guest).json()] == ["g-past"]
+    assert c.get("/api/courses/fa-en-a1/grammar/g-past", headers=guest).json()["status"] == "reviewed"
+    assert c.put(url, json={"status": "draft"}).status_code == 204
+    assert c.get("/api/courses/fa-en-a1/grammar", headers=guest).json() == []

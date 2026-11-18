@@ -262,6 +262,44 @@ export interface Cloze {
 
 export interface ClozeCheck { correct: Record<string, boolean>; answers: Record<string, string>; score: number }
 
+// ---- grammar lab ------------------------------------------------------------
+
+export interface GrammarTopicSummary {
+  id: string
+  title: string
+  title_fa: string
+  unit: string | null
+  status: 'draft' | 'reviewed'   // drafts are shown to the owner only, for review
+  task_count: number
+  done: boolean
+  best_score: number | null
+}
+
+export interface GrammarExample { text: string; tr: string | null; gloss: string; hl: string[] }
+export interface GrammarSentence { text: string; tr: string | null; gloss: string | null }
+export interface GrammarTask {
+  kind: 'predict' | 'transform' | 'choose'
+  prompt: string
+  given: string | null       // a frame with ___ (predict / choose)
+  from: GrammarSentence | null   // the sentence to change (transform)
+  answer: string
+  answer_tr: string | null
+  choices: string[]
+  mode: 'any' | 'tr'         // tr: answer in transliteration
+}
+
+export interface GrammarTopic extends GrammarTopicSummary {
+  course_id: string
+  intro: string
+  examples: GrammarExample[]
+  question: string
+  choices: string[]
+  correct: number
+  why: string
+  rule: string               // markdown, shown after the learner's guess
+  tasks: GrammarTask[]
+}
+
 // ---- who am I ------------------------------------------------------------
 
 /** From the Tailscale login: the owner, or a guest with their own progress and data. */
@@ -321,6 +359,16 @@ export const courseApi = {
   // stories
   stories: (target: string, support: string) => req<StorySummary[]>(`/stories${q({ target, support })}`),
   story: (id: string) => req<Story>(`/stories/${id}`),
+  grammarTopics: (courseId: string) => req<GrammarTopicSummary[]>(`/courses/${courseId}/grammar`),
+  grammarTopic: (courseId: string, topicId: string) => req<GrammarTopic>(`/courses/${courseId}/grammar/${topicId}`),
+  // Owner only: approve a draft topic for everyone, or take it back to draft.
+  setGrammarStatus: (courseId: string, topicId: string, status: 'draft' | 'reviewed') =>
+    req<void>(`/courses/${courseId}/grammar/${topicId}/status`, { method: 'PUT', body: JSON.stringify({ status }) }),
+  grammarCheck: (courseId: string, topicId: string, task: number, answer: string) =>
+    post<{ correct: boolean; answer: string; answer_tr: string | null }>(`/courses/${courseId}/grammar/${topicId}/check`, { task, answer }),
+  grammarComplete: (courseId: string, topicId: string, body: CompleteRequest) =>
+    post<CompleteResponse>(`/courses/${courseId}/grammar/${topicId}/complete`, body),
+
   // A story with gaps chosen by a grammar focus; a new seed gives new gaps.
   cloze: (id: string, focus: ClozeFocus, seed: number) => req<Cloze>(`/stories/${id}/cloze${q({ focus, seed })}`),
   clozeCheck: (id: string, focus: ClozeFocus, seed: number, answers: Record<string, string>) =>

@@ -29,7 +29,8 @@ and discovering grammar patterns. Agreed order:
 
 - [x] Fast track on the Path: every lesson open, lessons run as quizzes (no intros, no transliteration help)
 - [x] 1. Fill the gaps in whole stories and dialogues, by focus (mixed, verbs, prepositions, words); type in script or transliteration, or use a word bank; new gaps per round
-- [ ] 2. Grammar lab: discover the rule from examples (present and past stems, ezafe, را, plural, negation, compound verbs), then rule cards and transform tasks (make it negative / past / plural) [core, web, content]
+- [x] 2. Grammar lab: 8 topics (endings, present, negation, past, ezafe, را, plural, compound verbs), each discover → rule card → practice (predict, transform, choose); in Library › Grammar and on the Path per unit. Drafts are owner-only until approved in the app
+- [ ] Review the 8 grammar topics as a native speaker and approve them (button in each topic) — **user**
 - [ ] 3. Decode mode: a text above your level, help in steps (transliteration → meaning → structure → translation), hints counted, meaning questions at the end [web]
 - [ ] 4. Dictation in Arash's voice; sentence rebuilding from stories [web]
 - [ ] 5. Songs and film: private Library items with a YouTube embed (start/end), pasted lyrics or dialogue, tap-along line sync, then decode/cloze/vocab on top. First picks: «ترش و شیرین» (Attaran, Namjoo), «دارو ونمی‌کنم» (Fereydoon Farrokhzad), «برو برو» (Arash), the film «مارمولک». Lyrics are pasted by the user, never shipped [core, web]

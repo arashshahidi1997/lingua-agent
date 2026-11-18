@@ -1,4 +1,4 @@
-import { BookText, FileText, Lock, MessagesSquare, Plus } from 'lucide-react'
+import { BookText, Check, FileText, Lightbulb, Lock, MessagesSquare, Plus } from 'lucide-react'
 import { api } from '../lib/api'
 import { courseApi } from '../lib/course-api'
 import { useAsync } from '../lib/hooks'
@@ -13,6 +13,7 @@ import AddText from './AddText'
 
 const SECTIONS: { value: Exclude<LibrarySection, 'add'>; label: string }[] = [
   { value: 'stories', label: 'Stories' },
+  { value: 'grammar', label: 'Grammar' },
   { value: 'audio', label: 'Audio' },
   { value: 'lessons', label: 'Your lessons' },
 ]
@@ -39,10 +40,43 @@ export default function Library() {
         </div>
       )}
       {section === 'stories' && <Stories />}
+      {section === 'grammar' && <Grammar />}
       {section === 'audio' && <AudioSection />}
       {section === 'lessons' && <YourLessons />}
       {section === 'add' && <AddText onBack={() => nav.setLibrarySection('lessons')} />}
     </Page>
+  )
+}
+
+function Grammar() {
+  const { pair } = useSettings()
+  const nav = useNav()
+  const courses = useAsync(`courses|${pair.target}|${pair.support}`, () => courseApi.courses(pair.target, pair.support))
+  const courseId = courses.data?.[0]?.id ?? null
+  const topics = useAsync(courseId ? `grammar|${courseId}|${nav.dataVersion}` : null, () => courseApi.grammarTopics(courseId!))
+
+  if (courses.data && !courseId) return <Empty title="No grammar lab yet">The grammar lab comes with a course for {languageName(pair.target)}.</Empty>
+  if (topics.error?.startsWith('404')) return <Empty title="No grammar lab yet">This course has no grammar topics yet.</Empty>
+  if (topics.error) return <ErrorNote error={topics.error} onRetry={topics.reload} />
+  if (!topics.data) return <Loading />
+  if (topics.data.length === 0) return <Empty title="Grammar topics are coming">They are being reviewed and appear here soon.</Empty>
+  return (
+    <>
+      <p className="mb-4 text-[15px] text-ink-2">
+        Find the pattern yourself from examples, then check it against the rule and try it out. Rule cards stay here.
+      </p>
+      <List>
+        {topics.data.map((t) => (
+          <Row
+            key={t.id}
+            icon={t.done ? <Check size={18} /> : <Lightbulb size={18} />}
+            title={<span>{t.title} {t.title_fa && <span className="text-ink-3">· <Target text={t.title_fa} lang={pair.target} /></span>}</span>}
+            detail={`${t.status === 'draft' ? 'Draft for your review · ' : ''}${t.task_count} tasks${t.best_score !== null ? ` · best ${Math.round(t.best_score * 100)}%` : ''}`}
+            onClick={() => nav.open({ kind: 'grammar', courseId: courseId!, topicId: t.id })}
+          />
+        ))}
+      </List>
+    </>
   )
 }
 

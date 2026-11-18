@@ -1,0 +1,332 @@
+# Grammar lab for the Farsi A1 course: discover the pattern, then the rule, then practice.
+#
+# Each topic: examples with the pattern highlighted (`hl`: the parts of `text` to mark), a question with a
+# few hypotheses (`correct`: index), the rule (markdown, shown only after the guess), and tasks:
+#   predict   — make a form you haven't seen from the rule
+#   transform — change a sentence (negative, past, another person, …)
+#   choose    — pick the right option
+# Answers are checked in script (ZWNJ and diacritics optional) or transliteration; `answer_tr` is the
+# transliteration; `accept` lists other correct answers. `mode: tr` asks for transliteration only (ezafe is
+# invisible in script).
+#
+# status: draft topics are shown to the owner only, for review; set `status: reviewed` to show them to all.
+
+course: fa-en-a1
+topics:
+  - id: g-endings
+    title: Who is doing it?
+    title_fa: شناسه‌ها
+    unit: u4
+    status: draft
+    intro: >
+      Six sentences, all "to be tired". Only one thing changes from sentence to sentence. Find it.
+    examples:
+      - {text: "من خسته هستم", tr: "man khaste hastam", gloss: "I am tired", hl: ["م"]}
+      - {text: "تو خسته هستی", tr: "to khaste hasti", gloss: "you are tired", hl: ["ی"]}
+      - {text: "ما خسته هستیم", tr: "mâ khaste hastim", gloss: "we are tired", hl: ["یم"]}
+      - {text: "شما خسته هستید", tr: "shomâ khaste hastid", gloss: "you (polite / plural) are tired", hl: ["ید"]}
+      - {text: "آنها خسته هستند", tr: "ânhâ khaste hastand", gloss: "they are tired", hl: ["ند"]}
+      - {text: "خسته هستم", tr: "khaste hastam", gloss: "I am tired", hl: ["م"]}
+    question: What tells you who is tired?
+    choices:
+      - The ending after هست (-am, -i, -im, -id, -and)
+      - The word at the start of the sentence
+      - The word خسته changes its form
+    correct: 0
+    why: >
+      The ending carries the person. That's why the last sentence works without «من»: «هستم» alone
+      already says *I*.
+    rule: |
+      **Persian verbs end in a personal ending** that says who does it:
+
+      | | ending | example |
+      |---|---|---|
+      | I | ‎-am | هستم hastam |
+      | you | ‎-i | هستی hasti |
+      | he / she | ‎-ad | (for "to be": است ast) |
+      | we | ‎-im | هستیم hastim |
+      | you (polite, plural) | ‎-id | هستید hastid |
+      | they | ‎-and | هستند hastand |
+
+      Because the ending already says who, the pronoun is often left out: «خسته‌ام» or «خسته هستم» = *I'm
+      tired*. These same six endings come back in every tense you will learn.
+    tasks:
+      - {kind: predict, prompt: "We are students.", given: "ما دانشجو ___", answer: "هستیم", answer_tr: "hastim"}
+      - {kind: predict, prompt: "They are here.", given: "آنها اینجا ___", answer: "هستند", answer_tr: "hastand"}
+      - {kind: predict, prompt: "Are you Iranian? (polite)", given: "شما ایرانی ___؟", answer: "هستید", answer_tr: "hastid"}
+      - {kind: transform, prompt: "Say it about us instead.", from: {text: "من معلم هستم", tr: "man mo'allem hastam", gloss: "I am a teacher"}, answer: "ما معلم هستیم", answer_tr: "mâ mo'allem hastim"}
+      - {kind: transform, prompt: "Say it about them.", from: {text: "تو دانشجو هستی", tr: "to dâneshju hasti", gloss: "you are a student"}, answer: "آنها دانشجو هستند", answer_tr: "ânhâ dâneshju hastand"}
+      - {kind: transform, prompt: "Leave out the pronoun.", from: {text: "من خسته هستم", tr: "man khaste hastam", gloss: "I am tired"}, answer: "خسته هستم", answer_tr: "khaste hastam", accept: ["خسته‌ام", "khasteam"]}
+
+  - id: g-present
+    title: The present tense
+    title_fa: زمان حال
+    unit: u7
+    status: draft
+    intro: >
+      "To eat" in six persons. Two parts never change, one part does.
+    examples:
+      - {text: "می‌خورم", tr: "mikhoram", gloss: "I eat", hl: ["می‌", "خور"]}
+      - {text: "می‌خوری", tr: "mikhori", gloss: "you eat", hl: ["می‌", "خور"]}
+      - {text: "می‌خورد", tr: "mikhorad", gloss: "he / she eats", hl: ["می‌", "خور"]}
+      - {text: "می‌خوریم", tr: "mikhorim", gloss: "we eat", hl: ["می‌", "خور"]}
+      - {text: "می‌خورید", tr: "mikhorid", gloss: "you (pl.) eat", hl: ["می‌", "خور"]}
+      - {text: "می‌خورند", tr: "mikhorand", gloss: "they eat", hl: ["می‌", "خور"]}
+    question: How is the present tense built?
+    choices:
+      - "می‌ + a stem that stays (خور) + the personal ending"
+      - "The infinitive خوردن + an ending"
+      - "A different word for each person"
+    correct: 0
+    why: >
+      «می‌» marks the present, «خور» is the verb's present stem, and the ending is the one you already know
+      from «هستم، هستی…» (with ‎-ad for he/she).
+    rule: |
+      **Present = ‎می‌ + present stem + ending**: می‌ + خور + م = می‌خورم *I eat*.
+
+      The present stem has to be learned with each verb; often it looks nothing like the infinitive:
+
+      | infinitive | present stem | I … |
+      |---|---|---|
+      | خوردن khordan *eat* | خور | می‌خورم |
+      | رفتن raftan *go* | رو | می‌روم (spoken: می‌رم) |
+      | دیدن didan *see* | بین | می‌بینم |
+      | کردن kardan *do* | کن | می‌کنم |
+      | خواندن khândan *read* | خوان | می‌خوانم (spoken: می‌خونم) |
+      | نوشتن neveshtan *write* | نویس | می‌نویسم |
+      | آمدن âmadan *come* | آ (ـآی) | می‌آیم (spoken: میام) |
+
+      The same form also means *I'm eating* and, with a time word, *I'll eat* (فردا می‌روم *I'm going tomorrow*).
+    tasks:
+      - {kind: predict, prompt: "خواندن (stem خوان): we read", given: "ما ___", answer: "می‌خوانیم", answer_tr: "mikhânim"}
+      - {kind: predict, prompt: "کردن (stem کن): they do", given: "آنها ___", answer: "می‌کنند", answer_tr: "mikonand"}
+      - {kind: predict, prompt: "نوشتن (stem نویس): I write", given: "من ___", answer: "می‌نویسم", answer_tr: "minevisam"}
+      - {kind: predict, prompt: "Stem detective: دیدن → می‌بینم. What is the present stem of دیدن?", given: "___", answer: "بین", answer_tr: "bin"}
+      - {kind: transform, prompt: "Say it about yourself.", from: {text: "او چای می‌خورد", tr: "u chây mikhorad", gloss: "she drinks tea"}, answer: "من چای می‌خورم", answer_tr: "man chây mikhoram", accept: ["چای می‌خورم"]}
+      - {kind: transform, prompt: "Say it about us.", from: {text: "تو به مدرسه می‌روی", tr: "to be madrese miravi", gloss: "you go to school"}, answer: "ما به مدرسه می‌رویم", answer_tr: "mâ be madrese miravim", accept: ["به مدرسه می‌رویم"]}
+
+  - id: g-negation
+    title: Saying no
+    title_fa: منفی
+    unit: u4
+    status: draft
+    intro: >
+      Each pair is a sentence and its negative. What did the negative add?
+    examples:
+      - {text: "می‌خورم ← نمی‌خورم", tr: "mikhoram → nemikhoram", gloss: "I eat → I don't eat", hl: ["ن"]}
+      - {text: "هستم ← نیستم", tr: "hastam → nistam", gloss: "I am → I'm not", hl: ["نیست"]}
+      - {text: "است ← نیست", tr: "ast → nist", gloss: "is → isn't", hl: ["نیست"]}
+      - {text: "دارم ← ندارم", tr: "dâram → nadâram", gloss: "I have → I don't have", hl: ["ن"]}
+      - {text: "رفتم ← نرفتم", tr: "raftam → naraftam", gloss: "I went → I didn't go", hl: ["ن"]}
+    question: How do you make a verb negative?
+    choices:
+      - "Put ن (ne- / na-) in front of the verb"
+      - "Add نه after the verb"
+      - "Change the ending"
+    correct: 0
+    why: >
+      One letter does it: ن at the front. «To be» has its own negative form, «نیست», with the usual endings.
+    rule: |
+      **Negative = ن in front of the verb**, pronounced *ne-* before می‌ and *na-* otherwise:
+
+      - present: می‌خورم → نمی‌خورم *nemikhoram*
+      - past: رفتم → نرفتم *naraftam*
+      - داشتن *to have* has no می‌: دارم → ندارم *nadâram*
+      - "to be": هستم → نیستم, است → نیست (never «نهستم»)
+
+      «نه» on its own is the word *no*: نه، نمی‌خورم *No, I don't eat.*
+    tasks:
+      - {kind: transform, prompt: "Make it negative.", from: {text: "من قهوه می‌خورم", tr: "man ghahve mikhoram", gloss: "I drink coffee"}, answer: "من قهوه نمی‌خورم", answer_tr: "man ghahve nemikhoram", accept: ["قهوه نمی‌خورم"]}
+      - {kind: transform, prompt: "Make it negative.", from: {text: "او معلم است", tr: "u mo'allem ast", gloss: "he is a teacher"}, answer: "او معلم نیست", answer_tr: "u mo'allem nist"}
+      - {kind: transform, prompt: "Make it negative.", from: {text: "ما ماشین داریم", tr: "mâ mâshin dârim", gloss: "we have a car"}, answer: "ما ماشین نداریم", answer_tr: "mâ mâshin nadârim"}
+      - {kind: transform, prompt: "Make it negative.", from: {text: "آنها ایرانی هستند", tr: "ânhâ irâni hastand", gloss: "they are Iranian"}, answer: "آنها ایرانی نیستند", answer_tr: "ânhâ irâni nistand"}
+      - {kind: predict, prompt: "I don't go (رفتن, stem رو)", given: "من ___", answer: "نمی‌روم", answer_tr: "nemiravam", accept: ["نمی‌رم", "nemiram"]}
+
+  - id: g-past
+    title: The past tense
+    title_fa: گذشته‌ی ساده
+    unit: u8
+    status: draft
+    intro: >
+      Infinitives end in ‎-an. Look at what's left when it's gone, and what the past forms do with it.
+    examples:
+      - {text: "رفتن ← رفتم", tr: "raftan → raftam", gloss: "to go → I went", hl: ["رفت"]}
+      - {text: "رفتن ← رفتی", tr: "raftan → rafti", gloss: "to go → you went", hl: ["رفت"]}
+      - {text: "رفتن ← رفت", tr: "raftan → raft", gloss: "to go → he / she went", hl: ["رفت"]}
+      - {text: "خوردن ← خوردیم", tr: "khordan → khordim", gloss: "to eat → we ate", hl: ["خورد"]}
+      - {text: "دیدن ← دیدند", tr: "didan → didand", gloss: "to see → they saw", hl: ["دید"]}
+    question: How is the past built?
+    choices:
+      - "The infinitive without ‎-an, plus the personal ending"
+      - "می‌ + the present stem + ending"
+      - "The infinitive plus ‎-am"
+    correct: 0
+    why: >
+      Drop ‎-an from the infinitive and you have the past stem; add the endings you know. He/she takes no
+      ending at all: «رفت» *he went*.
+    rule: |
+      **Past = past stem + ending**, and the past stem is the infinitive minus ‎-an:
+      رفتن → رفت → رفتم *raftam* (I went).
+
+      | | رفتن *go* | خوردن *eat* |
+      |---|---|---|
+      | I | رفتم | خوردم |
+      | you | رفتی | خوردی |
+      | he / she | رفت (no ending) | خورد |
+      | we | رفتیم | خوردیم |
+      | you (pl.) | رفتید | خوردید |
+      | they | رفتند | خوردند |
+
+      No می‌ here. Unlike the present stem, the past stem is always regular, so every past form follows
+      straight from the infinitive. The stress falls on the stem's last syllable: *ráftam*.
+    tasks:
+      - {kind: predict, prompt: "دیدن: I saw", given: "من ___", answer: "دیدم", answer_tr: "didam"}
+      - {kind: predict, prompt: "خوردن: they ate", given: "آنها ___", answer: "خوردند", answer_tr: "khordand"}
+      - {kind: predict, prompt: "آمدن: she came", given: "او ___", answer: "آمد", answer_tr: "âmad"}
+      - {kind: predict, prompt: "نوشتن: we wrote", given: "ما ___", answer: "نوشتیم", answer_tr: "neveshtim"}
+      - {kind: transform, prompt: "Make it past.", from: {text: "من به خانه می‌روم", tr: "man be khâne miravam", gloss: "I go home"}, answer: "من به خانه رفتم", answer_tr: "man be khâne raftam", accept: ["به خانه رفتم"]}
+      - {kind: transform, prompt: "Make it past.", from: {text: "او نان می‌خورد", tr: "u nân mikhorad", gloss: "she eats bread"}, answer: "او نان خورد", answer_tr: "u nân khord"}
+      - {kind: transform, prompt: "Make it past.", from: {text: "ما کتاب می‌خوانیم", tr: "mâ ketâb mikhânim", gloss: "we read a book"}, answer: "ما کتاب خواندیم", answer_tr: "mâ ketâb khândim"}
+
+  - id: g-ezafe
+    title: The little ‎-e that links words
+    title_fa: کسره‌ی اضافه
+    unit: u6
+    status: draft
+    intro: >
+      Read the transliterations. Something appears between the two words that you can't see in the Persian
+      script.
+    examples:
+      - {text: "چای سبز", tr: "chây-e sabz", gloss: "green tea", hl: ["چای"]}
+      - {text: "اسم من", tr: "esm-e man", gloss: "my name", hl: ["اسم"]}
+      - {text: "کتاب سارا", tr: "ketâb-e Sârâ", gloss: "Sara's book", hl: ["کتاب"]}
+      - {text: "خانه‌ی بزرگ", tr: "khâne-ye bozorg", gloss: "a big house", hl: ["ی"]}
+      - {text: "آب سرد", tr: "âb-e sard", gloss: "cold water", hl: ["آب"]}
+    question: What does ‎-e do?
+    choices:
+      - "It links a noun to the word describing or owning it, which comes after"
+      - "It means *the*"
+      - "It marks the plural"
+    correct: 0
+    why: >
+      Persian puts the noun first and links what follows with ‎-e: *tea-e green*, *name-e me*. After a vowel
+      it becomes ‎-ye, and then it is written: خانه‌ی.
+    rule: |
+      **Noun + ‎-e + what describes or owns it.** The order is the reverse of English:
+      چای سبز *chây-e sabz* = green tea, اسم من *esm-e man* = my name.
+
+      - After a consonant: ‎-e, usually **not written** (you have to know it's there).
+      - After a vowel: ‎-ye, written ی: خانه‌ی بزرگ *khâne-ye bozorg*, دانشجوی خوب *dâneshju-ye khub*.
+      - It chains: کتاب بزرگ سارا *ketâb-e bozorg-e Sârâ* — Sara's big book.
+      - Not between a number and a noun: یک فنجان چای *yek fenjân chây* (no ‎-e after a measure word).
+    tasks:
+      - {kind: predict, mode: tr, prompt: "Write in transliteration: a big house (خانه، بزرگ)", given: "___", answer: "خانه‌ی بزرگ", answer_tr: "khâne-ye bozorg"}
+      - {kind: predict, mode: tr, prompt: "Write in transliteration: hot tea (چای، داغ)", given: "___", answer: "چای داغ", answer_tr: "chây-e dâgh"}
+      - {kind: predict, mode: tr, prompt: "Write in transliteration: my brother (برادر، من)", given: "___", answer: "برادر من", answer_tr: "barâdar-e man"}
+      - {kind: predict, mode: tr, prompt: "Write in transliteration: Ali's car (ماشین، علی)", given: "___", answer: "ماشین علی", answer_tr: "mâshin-e Ali"}
+      - {kind: choose, prompt: "a cup of tea", choices: ["یک فنجان چای (yek fenjân chây)", "یک فنجان‌ِ چای (yek fenjân-e chây)"], answer: "یک فنجان چای (yek fenjân chây)"}
+
+  - id: g-ra
+    title: «را» — the one I mean
+    title_fa: را
+    unit: u7
+    status: draft
+    intro: >
+      Compare the pairs. Sometimes «را» appears after the thing being eaten or seen, sometimes not.
+    examples:
+      - {text: "من چای می‌خورم", tr: "man chây mikhoram", gloss: "I drink tea (in general)", hl: []}
+      - {text: "من چای را می‌خورم", tr: "man chây râ mikhoram", gloss: "I drink the tea (this one)", hl: ["را"]}
+      - {text: "کتاب را خواندم", tr: "ketâb râ khândam", gloss: "I read the book", hl: ["را"]}
+      - {text: "یک کتاب خواندم", tr: "yek ketâb khândam", gloss: "I read a book", hl: []}
+      - {text: "علی را دیدم", tr: "Ali râ didam", gloss: "I saw Ali", hl: ["را"]}
+    question: When does «را» come after the object?
+    choices:
+      - "When the object is specific: *the* tea, *the* book, Ali"
+      - "Always after a direct object"
+      - "Only in the past tense"
+    correct: 0
+    why: >
+      «را» marks a direct object you mean specifically: *the* one, a name, *this/that* one. A general or
+      *a/an* object goes without it.
+    rule: |
+      **«را» follows a specific direct object** — *the …*, names, *this/that …*, *my …*:
+      کتاب را خواندم *I read the book*, علی را دیدم *I saw Ali*.
+
+      No «را» for general or indefinite objects: چای می‌خورم *I drink tea*, یک کتاب خواندم *I read a book*.
+
+      In speech «را» becomes «رو» (*ro*) or just *-o* after a consonant: کتابو خوندم *ketâbo khundam*.
+    tasks:
+      - {kind: choose, prompt: "I saw Maryam.", given: "مریم ___ دیدم", choices: ["را", "—"], answer: "را"}
+      - {kind: choose, prompt: "I'd like a tea.", given: "یک چای ___ می‌خواهم", choices: ["را", "—"], answer: "—"}
+      - {kind: choose, prompt: "I ate the cake.", given: "کیک ___ خوردم", choices: ["را", "—"], answer: "را"}
+      - {kind: choose, prompt: "We drink water.", given: "ما آب ___ می‌خوریم", choices: ["را", "—"], answer: "—"}
+      - {kind: transform, prompt: "Make the object specific: the book.", from: {text: "کتاب می‌خوانم", tr: "ketâb mikhânam", gloss: "I read (books)"}, answer: "کتاب را می‌خوانم", answer_tr: "ketâb râ mikhânam"}
+
+  - id: g-plural
+    title: More than one
+    title_fa: جمع
+    unit: u4
+    status: draft
+    intro: >
+      Two ways to make a plural appear here. And one place where Persian doesn't use a plural at all.
+    examples:
+      - {text: "کتاب ← کتاب‌ها", tr: "ketâb → ketâb-hâ", gloss: "book → books", hl: ["ها"]}
+      - {text: "خانه ← خانه‌ها", tr: "khâne → khâne-hâ", gloss: "house → houses", hl: ["ها"]}
+      - {text: "دختر ← دخترها", tr: "dokhtar → dokhtar-hâ", gloss: "girl → girls", hl: ["ها"]}
+      - {text: "دانشجو ← دانشجویان", tr: "dâneshju → dâneshju-yân", gloss: "student → students (formal)", hl: ["یان"]}
+      - {text: "دو کتاب", tr: "do ketâb", gloss: "two books", hl: ["کتاب"]}
+    question: What happens after a number?
+    choices:
+      - "The noun stays singular: دو کتاب"
+      - "The noun takes ‎-hâ: دو کتاب‌ها"
+      - "The noun takes ‎-ân"
+    correct: 0
+    why: >
+      After a number the noun stays singular — the number already says how many. Otherwise ‎-hâ is the
+      everyday plural; ‎-ân (‎-yân after a vowel) is for people and living things, mostly in writing.
+    rule: |
+      - **‎-hâ** works for every noun and is the everyday plural: کتاب‌ها، خانه‌ها، دخترها.
+      - **‎-ân** (‎-yân after a vowel) for people and living things, more formal: دختران، دانشجویان.
+      - **After a number, no plural**: دو کتاب *two books*, سه دختر *three girls*.
+      - In speech ‎-hâ is often ‎-â: کتابا *ketâbâ*.
+    tasks:
+      - {kind: predict, prompt: "the houses", given: "___", answer: "خانه‌ها", answer_tr: "khânehâ"}
+      - {kind: predict, prompt: "three books", given: "___", answer: "سه کتاب", answer_tr: "se ketâb"}
+      - {kind: predict, prompt: "the girls (everyday)", given: "___", answer: "دخترها", answer_tr: "dokhtarhâ", accept: ["دختر‌ها"]}
+      - {kind: choose, prompt: "five students", choices: ["پنج دانشجو", "پنج دانشجوها"], answer: "پنج دانشجو"}
+
+  - id: g-compound
+    title: Verbs made of two words
+    title_fa: فعل مرکب
+    unit: u7
+    status: draft
+    intro: >
+      Many Persian verbs are a word plus «کردن» (do), «داشتن» (have) or «شدن» (become). Which part changes?
+    examples:
+      - {text: "کار کردن ← کار می‌کنم", tr: "kâr kardan → kâr mikonam", gloss: "to work → I work", hl: ["می‌کنم"]}
+      - {text: "زندگی کردن ← زندگی می‌کنیم", tr: "zendegi kardan → zendegi mikonim", gloss: "to live → we live", hl: ["می‌کنیم"]}
+      - {text: "دوست داشتن ← دوست دارم", tr: "dust dâshtan → dust dâram", gloss: "to like → I like", hl: ["دارم"]}
+      - {text: "کار کردن ← کار نمی‌کنم", tr: "kâr kardan → kâr nemikonam", gloss: "to work → I don't work", hl: ["نمی‌کنم"]}
+    question: What changes in a two-word verb?
+    choices:
+      - "Only the verb part (کردن, داشتن…): it takes می‌, the ending and the negative"
+      - "Both words take the ending"
+      - "Only the first word changes"
+    correct: 0
+    why: >
+      The first word never changes; the light verb does all the work — tense, person and negation.
+    rule: |
+      **Word + light verb** (کردن *do*, داشتن *have*, شدن *become*, زدن *hit*…): only the light verb is
+      conjugated.
+
+      - کار کردن → کار می‌کنم *I work*, کار کردم *I worked*, کار نمی‌کنم *I don't work*
+      - زندگی کردن → زندگی می‌کنند *they live*
+      - دوست داشتن → دوست دارم *I like* (داشتن takes no می‌), دوست ندارم *I don't like*
+
+      Learn them as one verb: the meaning of the pair is often not the sum of its parts.
+    tasks:
+      - {kind: predict, prompt: "I don't work.", given: "___", answer: "کار نمی‌کنم", answer_tr: "kâr nemikonam"}
+      - {kind: predict, prompt: "We live in Tehran.", given: "ما در تهران ___", answer: "زندگی می‌کنیم", answer_tr: "zendegi mikonim"}
+      - {kind: predict, prompt: "They like tea.", given: "آنها چای ___", answer: "دوست دارند", answer_tr: "dust dârand"}
+      - {kind: transform, prompt: "Make it negative.", from: {text: "من قهوه دوست دارم", tr: "man ghahve dust dâram", gloss: "I like coffee"}, answer: "من قهوه دوست ندارم", answer_tr: "man ghahve dust nadâram"}
+      - {kind: transform, prompt: "Make it past.", from: {text: "او در بیمارستان کار می‌کند", tr: "u dar bimârestân kâr mikonad", gloss: "she works at the hospital"}, answer: "او در بیمارستان کار کرد", answer_tr: "u dar bimârestân kâr kard"}

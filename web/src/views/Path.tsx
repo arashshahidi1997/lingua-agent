@@ -1,6 +1,6 @@
 import { useLayoutEffect, useRef, useState, type ReactNode } from 'react'
-import { BookText, Check, Flag, Lock, MessageCircle, Play } from 'lucide-react'
-import { courseApi, type Course, type LessonState, type UnitSummary } from '../lib/course-api'
+import { BookText, Check, Flag, Lock, MessageCircle, Play, Lightbulb } from 'lucide-react'
+import { courseApi, type Course, type GrammarTopicSummary, type LessonState, type UnitSummary } from '../lib/course-api'
 import { useAsync } from '../lib/hooks'
 import { languageName } from '../lib/rtl'
 import { useNav } from '../state/nav'
@@ -16,6 +16,8 @@ export default function PathView() {
   const courses = useAsync(`${pair.target}|${pair.support}|${nav.dataVersion}`, () => courseApi.courses(pair.target, pair.support))
   const courseId = courses.data?.[0]?.id ?? null
   const course = useAsync(courseId ? `${courseId}|${nav.dataVersion}` : null, () => courseApi.course(courseId!))
+  // Grammar topics belong to a unit; 404 (no grammar lab for this course) just means none.
+  const grammar = useAsync(courseId ? `grammar|${courseId}|${nav.dataVersion}` : null, () => courseApi.grammarTopics(courseId!).catch(() => []))
 
   if (courses.error && !courses.data) {
     if (courses.error.startsWith('404')) return <Page><NoCourse /></Page>
@@ -48,7 +50,8 @@ export default function PathView() {
 
       <div className="space-y-6">
         {c.units.map((u, i) => (
-          <UnitSection key={u.id} course={c} unit={u} index={i} startStep={stepsBefore(c, i)} />
+          <UnitSection key={u.id} course={c} unit={u} index={i} startStep={stepsBefore(c, i, grammar.data ?? [])}
+            grammar={(grammar.data ?? []).filter((g) => g.unit === u.id)} />
         ))}
       </div>
     </Page>
@@ -56,8 +59,9 @@ export default function PathView() {
 }
 
 /** Steps on the road before unit i (lessons, story, role-play, quiz and the milestone), so the wave flows on. */
-function stepsBefore(c: Course, i: number): number {
-  return c.units.slice(0, i).reduce((n, u) => n + u.lessons.length + (u.story_id ? 1 : 0) + (u.scenario_id ? 1 : 0) + 2, 0)
+function stepsBefore(c: Course, i: number, grammar: GrammarTopicSummary[]): number {
+  return c.units.slice(0, i).reduce((n, u) => n + u.lessons.length + (u.story_id ? 1 : 0) + (u.scenario_id ? 1 : 0) + 2
+    + grammar.filter((g) => g.unit === u.id).length, 0)
 }
 
 function NoCourse() {
@@ -106,7 +110,9 @@ function useWidth<T extends HTMLElement>(): [React.RefObject<T | null>, number] 
   return [ref, w]
 }
 
-function UnitSection({ course, unit, index, startStep }: { course: Course; unit: UnitSummary; index: number; startStep: number }) {
+function UnitSection({ course, unit, index, startStep, grammar }: {
+  course: Course; unit: UnitSummary; index: number; startStep: number; grammar: GrammarTopicSummary[]
+}) {
   const nav = useNav()
   const { settings } = useSettings()
   const fast = settings.fastTrack
@@ -121,6 +127,15 @@ function UnitSection({ course, unit, index, startStep }: { course: Course; unit:
       title: l.title,
       detail: l.state === 'done' && l.best_score !== null ? `Best ${Math.round(l.best_score * 100)}%` : `${l.item_count} items`,
       onClick: () => nav.open({ kind: 'lesson-sheet', courseId: course.id, lessonId: l.id, locked: l.state === 'locked' && !fast }),
+    })),
+    // Grammar lab topics of this unit: open once the unit is reached.
+    ...grammar.map((g): Step => ({
+      key: `grammar-${g.id}`,
+      state: g.done ? 'done' : unit.story_unlocked || fast ? 'open' : 'locked',
+      icon: g.done ? undefined : <Lightbulb size={20} />,
+      title: g.title,
+      detail: g.done ? 'Grammar · rule card' : 'Grammar · find the pattern',
+      onClick: unit.story_unlocked || fast || g.done ? () => nav.open({ kind: 'grammar', courseId: course.id, topicId: g.id }) : undefined,
     })),
     ...(unit.story_id ? [{
       key: 'story',
