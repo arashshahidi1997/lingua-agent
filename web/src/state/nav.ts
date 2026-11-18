@@ -16,6 +16,7 @@ export type Overlay =
   | { kind: 'review' }
   | { kind: 'story'; id: string }
   | { kind: 'cloze'; storyId: string }
+  | { kind: 'voice-review' }
   | { kind: 'grammar'; courseId: string; topicId: string }
   | { kind: 'audio'; id: string }
   | { kind: 'unit'; id: string }

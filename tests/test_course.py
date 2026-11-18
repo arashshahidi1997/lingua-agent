@@ -620,3 +620,33 @@ def test_owner_approves_grammar_topics(tmp_path: Path, monkeypatch: pytest.Monke
     assert c.get("/api/courses/fa-en-a1/grammar/g-past", headers=guest).json()["status"] == "reviewed"
     assert c.put(url, json={"status": "draft"}).status_code == 204
     assert c.get("/api/courses/fa-en-a1/grammar", headers=guest).json() == []
+
+
+def test_voice_review_and_bad_takes(client: TestClient, tmp_path: Path):
+    import json as _json
+    root = tmp_path / "data" / "native_audio"
+    (root / "arash").mkdir(parents=True)
+    for n in (1, 2):
+        (root / "arash" / f"s-{n}.m4a").write_bytes(f"take{n}".encode())
+    (root / "index.json").write_text(_json.dumps({"سلام": [
+        {"file": f"arash/s-{n}.m4a", "speaker": "Arash", "source": "Greetings.m4a"} for n in (1, 2)]}), "utf-8")
+    sheet = tmp_path / "content" / "recording" / "fa-en-test"
+    sheet.mkdir(parents=True)
+    (sheet / "1-hello.json").write_text(_json.dumps({"session": "1-hello", "title": "Hello", "clips": [
+        {"n": 1, "text": "سلام", "tr": "salâm", "gloss": "hello", "cue": None, "section": "Greetings"},
+        {"n": 2, "text": "خداحافظ", "tr": "khodâhâfez", "gloss": "goodbye", "cue": None, "section": "Greetings"}]}), "utf-8")
+
+    sheets = client.get("/api/voice/review").json()
+    lines = sheets[0]["lines"]
+    assert [len(ln["takes"]) for ln in lines] == [2, 0]
+    take = lines[0]["takes"][0]
+    assert client.get(take["url"]).content == b"take1"
+    assert client.get("/api/voice/takes/../index.json").status_code == 404
+
+    assert client.put("/api/voice/takes/flag", json={"file": take["file"], "bad": True}).status_code == 204
+    heard = {client.get("/api/tts", params={"lang": "fa", "text": "سلام"}).content for _ in range(20)}
+    assert heard == {b"take2"}                                   # the bad take is never played
+    assert client.get("/api/voice/review").json()[0]["lines"][0]["takes"][0]["bad"] is True
+    assert client.put("/api/voice/takes/flag", json={"file": "nope.m4a", "bad": True}).status_code == 404
+    guest = {"Tailscale-User-Login": "anya@example.com"}
+    assert client.get("/api/voice/review", headers=guest).status_code == 403

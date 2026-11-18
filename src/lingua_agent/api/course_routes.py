@@ -43,6 +43,7 @@ from ..models.srs import CardDirection, CardType
 from ..srs import SM2Scheduler
 from ..storage import JsonRepository
 from ..voice import piper
+from ..voice import native as native_voice
 from ..voice.native import native_count, pick_take
 from ..voice.subtitles import parse_transcript
 from .identity import charge_model_call, check_guest_storage, identify, require_owner
@@ -1018,6 +1019,71 @@ def tts(lang: str, text: str, request: Request, s: Settings = Depends(get_settin
     except piper.SpeechError as exc:
         raise HTTPException(400, str(exc)) from exc
     return FileResponse(path, media_type="audio/wav", headers={"Cache-Control": "public, max-age=86400"})  # a day: native takes may replace it
+
+
+# ---- reviewing the native voice (owner) ------------------------------------------------------
+
+class VoiceTake(BaseModel):
+    file: str
+    source: str
+    bad: bool
+    url: str
+
+
+class VoiceLine(BaseModel):
+    n: int
+    text: str
+    tr: str | None
+    gloss: str
+    cue: str | None
+    section: str
+    takes: list[VoiceTake]
+
+
+class VoiceSheet(BaseModel):
+    id: str
+    title: str
+    lines: list[VoiceLine]
+
+
+class FlagRequest(BaseModel):
+    file: str
+    bad: bool
+
+
+@router.get("/voice/review", response_model=list[VoiceSheet], dependencies=[Depends(require_owner)])
+def voice_review(s: Settings = Depends(get_settings)) -> list[VoiceSheet]:
+    """Every reading-sheet line with its recorded takes, for listening through and marking bad ones."""
+    sheets_dir = s.content_dir / "recording"
+    out: list[VoiceSheet] = []
+    for manifest in sorted(sheets_dir.glob("*/*.json")):
+        sheet = json.loads(manifest.read_text("utf-8"))
+        lines = []
+        for c in sheet.get("clips", []):
+            takes = [VoiceTake(file=t["file"], source=t.get("source", ""), bad=bool(t.get("bad")),
+                               url=f"/api/voice/takes/{t['file']}")
+                     for t in native_voice.takes_for(s, c["text"], include_bad=True)]
+            lines.append(VoiceLine(n=c["n"], text=c["text"], tr=c.get("tr"), gloss=c["gloss"], cue=c.get("cue"),
+                                   section=c["section"], takes=takes))
+        out.append(VoiceSheet(id=sheet["session"], title=sheet["title"], lines=lines))
+    return out
+
+
+@router.get("/voice/takes/{file_path:path}", dependencies=[Depends(require_owner)])
+def voice_take(file_path: str, s: Settings = Depends(get_settings)) -> FileResponse:
+    root = native_voice.index_path(s).parent.resolve()
+    path = (root / file_path).resolve()
+    if root not in path.parents or not path.is_file():
+        raise HTTPException(404, "take not found")
+    return FileResponse(path, media_type="audio/mp4", headers={"Cache-Control": "no-store"})
+
+
+@router.put("/voice/takes/flag", status_code=204, dependencies=[Depends(require_owner)])
+def flag_take(req: FlagRequest, s: Settings = Depends(get_settings)) -> Response:
+    """Mark a take bad (the app stops playing it) or good again."""
+    if not native_voice.set_bad(s, req.file, req.bad):
+        raise HTTPException(404, "take not found")
+    return Response(status_code=204)
 
 
 # ---- recordings ---------------------------------------------------------------------

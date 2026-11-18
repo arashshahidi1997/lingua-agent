@@ -300,6 +300,14 @@ export interface GrammarTopic extends GrammarTopicSummary {
   tasks: GrammarTask[]
 }
 
+// ---- reviewing the native voice (owner) --------------------------------------
+
+export interface VoiceTake { file: string; source: string; bad: boolean; url: string }
+export interface VoiceLine {
+  n: number; text: string; tr: string | null; gloss: string; cue: string | null; section: string; takes: VoiceTake[]
+}
+export interface VoiceSheet { id: string; title: string; lines: VoiceLine[] }
+
 // ---- who am I ------------------------------------------------------------
 
 /** From the Tailscale login: the owner, or a guest with their own progress and data. */
@@ -361,6 +369,11 @@ export const courseApi = {
   story: (id: string) => req<Story>(`/stories/${id}`),
   grammarTopics: (courseId: string) => req<GrammarTopicSummary[]>(`/courses/${courseId}/grammar`),
   grammarTopic: (courseId: string, topicId: string) => req<GrammarTopic>(`/courses/${courseId}/grammar/${topicId}`),
+  // Owner only: every reading-sheet line with its takes; mark a take bad (it stops being played) or good again.
+  voiceReview: () => req<VoiceSheet[]>('/voice/review'),
+  flagTake: (file: string, bad: boolean) =>
+    req<void>('/voice/takes/flag', { method: 'PUT', body: JSON.stringify({ file, bad }) }),
+
   // Owner only: approve a draft topic for everyone, or take it back to draft.
   setGrammarStatus: (courseId: string, topicId: string, status: 'draft' | 'reviewed') =>
     req<void>(`/courses/${courseId}/grammar/${topicId}/status`, { method: 'PUT', body: JSON.stringify({ status }) }),

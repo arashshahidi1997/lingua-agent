@@ -1,6 +1,8 @@
 # Re-record
 
-Marked when processing the sheets (2026-11-18). Everything else plays in your voice. Re-record only what sounds
+Marked when processing the sheets (2026-11-18). From now on, mark weak takes in the app instead
+(Settings › Your voice › Review your voice): a take marked bad stops being played at once, and the marked
+lines are the list for the next recording session. Everything else plays in your voice. Re-record only what sounds
 wrong in the review file; a short file with just these, named after the word, is enough.
 
 ## To record again (your call)

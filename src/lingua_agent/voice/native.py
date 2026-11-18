@@ -33,9 +33,28 @@ def load_index(settings: Settings) -> dict[str, list[dict]]:
         return {}
 
 
-def takes_for(settings: Settings, text: str) -> list[dict]:
+def takes_for(settings: Settings, text: str, *, include_bad: bool = False) -> list[dict]:
+    """The text's takes on disk; takes marked bad in the voice review are left out unless asked for."""
     root = index_path(settings).parent
-    return [t for t in load_index(settings).get(norm(text), []) if (root / t["file"]).exists()]
+    return [t for t in load_index(settings).get(norm(text), [])
+            if (root / t["file"]).exists() and (include_bad or not t.get("bad"))]
+
+
+def set_bad(settings: Settings, file: str, bad: bool) -> bool:
+    """Mark a take bad (it stops being played) or good again. False if no such take."""
+    index = load_index(settings)
+    found = False
+    for takes in index.values():
+        for t in takes:
+            if t["file"] == file:
+                t["bad"] = bad
+                found = True
+    if found:
+        path = index_path(settings)
+        tmp = path.with_suffix(".tmp")
+        tmp.write_text(json.dumps(index, ensure_ascii=False, indent=1), "utf-8")
+        tmp.replace(path)
+    return found
 
 
 def pick_take(settings: Settings, text: str) -> tuple[Path, dict] | None:

@@ -7,7 +7,7 @@ import { hasVoice } from '../lib/speech'
 import { languageName } from '../lib/rtl'
 import { useNav } from '../state/nav'
 import { useSettings, type Settings as S } from '../state/settings'
-import { ErrorNote, Field, Loading, Screen, SectionLabel, Segmented, Toggle, inputCls } from '../components/ui'
+import { Button, ErrorNote, Field, Loading, Screen, SectionLabel, Segmented, Toggle, inputCls } from '../components/ui'
 import { PlayButton } from '../components/PlayButton'
 
 const SAMPLE: Record<string, string> = {
@@ -140,6 +140,13 @@ export default function Settings() {
             </ul>
           )}
         </Group>}
+
+        {me?.owner && (
+          <Group title="Your voice">
+            <p className="text-[15px] text-ink-2">Listen through your recorded takes and mark the bad ones; they stop being played at once.</p>
+            <Button className="mt-3" variant="secondary" onClick={() => nav.open({ kind: 'voice-review' })}>Review your voice</Button>
+          </Group>
+        )}
 
         <Group title="Your data">
           <AnkiExport target={pair.target} />
