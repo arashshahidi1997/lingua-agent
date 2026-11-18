@@ -14,6 +14,13 @@ wrong in the review file; a short file with just these, named after the word, is
 | این … است (in … ast) | 4 · line 42 | weak |
 | چ (che) | 4 · line 55 | weak |
 | قند (ghand) | 4 · line 68 | weak |
+| اسم من … است | 1 · line 28 | all takes marked bad in the app review |
+| آنها | 1 · line 32 | all takes marked bad in the app review |
+| من خسته نیستم | 1 · line 43 | all takes marked bad in the app review |
+| به به! خیلی خوب. | 1 · line 69 | all takes marked bad in the app review |
+| شما چی؟ | 1 · line 74 | all takes marked bad in the app review |
+
+All ten are on one reading sheet: `5-redo.html` (record it as **5-redo**).
 
 ## Doubtful takes (speech recognition heard something else; may be fine)
 

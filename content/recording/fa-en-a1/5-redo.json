@@ -1,0 +1,127 @@
+{
+ "course": "fa-en-a1",
+ "session": "5-redo",
+ "title": "Re-records",
+ "clips": [
+  {
+   "n": 1,
+   "text": "اسم من … است",
+   "tr": "esm-e man … ast",
+   "gloss": "my name is …",
+   "refs": [
+    "phrase:t-u1-new-neighbour-2"
+   ],
+   "section": "Sheet 1 · line 28",
+   "cue": null,
+   "from": "1:28"
+  },
+  {
+   "n": 2,
+   "text": "آنها",
+   "tr": "ânhâ",
+   "gloss": "they",
+   "refs": [
+    "item:anha"
+   ],
+   "section": "Sheet 1 · line 32",
+   "cue": null,
+   "from": "1:32"
+  },
+  {
+   "n": 3,
+   "text": "من خسته نیستم",
+   "tr": "man khaste nistam",
+   "gloss": "I'm not tired",
+   "refs": [
+    "item:khaste-nistam"
+   ],
+   "section": "Sheet 1 · line 43",
+   "cue": null,
+   "from": "1:43"
+  },
+  {
+   "n": 4,
+   "text": "به به! خیلی خوب.",
+   "tr": "bah bah! kheyli khub.",
+   "gloss": "How lovely! Very good.",
+   "refs": [
+    "line:s-u4-who-is-this-8"
+   ],
+   "section": "Sheet 1 · line 69",
+   "cue": "Maryam",
+   "from": "1:69"
+  },
+  {
+   "n": 5,
+   "text": "شما چی؟",
+   "tr": "shomâ chi?",
+   "gloss": "and you?",
+   "refs": [
+    "phrase:t-u4-family-gathering-4"
+   ],
+   "section": "Sheet 1 · line 74",
+   "cue": null,
+   "from": "1:74"
+  },
+  {
+   "n": 6,
+   "text": "آ",
+   "tr": "â",
+   "gloss": "alef madd — â at the start of a word",
+   "refs": [
+    "item:alef-madd"
+   ],
+   "section": "Sheet 4 · line 2",
+   "cue": "alef madd",
+   "from": "4:2"
+  },
+  {
+   "n": 7,
+   "text": "«بابا، نان داری؟»",
+   "tr": "«bâbâ, nân dâri?»",
+   "gloss": "Dad, do you have bread?",
+   "refs": [
+    "line:s-u2-bread-6"
+   ],
+   "section": "Sheet 4 · line 39",
+   "cue": "Narrator",
+   "from": "4:39"
+  },
+  {
+   "n": 8,
+   "text": "این … است",
+   "tr": "in … ast",
+   "gloss": "this is …",
+   "refs": [
+    "phrase:t-u2-reading-with-sina-1"
+   ],
+   "section": "Sheet 4 · line 42",
+   "cue": null,
+   "from": "4:42"
+  },
+  {
+   "n": 9,
+   "text": "چ",
+   "tr": "ch",
+   "gloss": "che — ch",
+   "refs": [
+    "item:che"
+   ],
+   "section": "Sheet 4 · line 55",
+   "cue": "che",
+   "from": "4:55"
+  },
+  {
+   "n": 10,
+   "text": "قند",
+   "tr": "ghand",
+   "gloss": "sugar cube",
+   "refs": [
+    "item:read-ghand"
+   ],
+   "section": "Sheet 4 · line 68",
+   "cue": null,
+   "from": "4:68"
+  }
+ ]
+}
