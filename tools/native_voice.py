@@ -150,7 +150,8 @@ def _whisper():
     return _model
 
 
-def units(path: Path, segs: list[tuple[float, float]], lang: str) -> list[tuple[float, float, str, int]]:
+def units(path: Path, segs: list[tuple[float, float]], lang: str, hotwords: str | None = None
+          ) -> list[tuple[float, float, str, int]]:
     """Spoken words with times: each pause-separated segment is transcribed on its own (Whisper drops
     repeats in long audio). Matching works on words, so a take can start or end inside a segment."""
     out: list[tuple[float, float, str, int]] = []
@@ -159,8 +160,10 @@ def units(path: Path, segs: list[tuple[float, float]], lang: str) -> list[tuple[
             s0 = max(0.0, a - 0.2)
             _ffmpeg("-y", "-ss", f"{s0:.3f}", "-t", f"{b - a + 0.4:.3f}", "-i", str(path), "-ac", "1", "-ar", "16000",
                     tmp.name)
+            # hotwords bias every window towards the expected words (an initial_prompt fades after the first
+            # window; tip from ohr-studio's notes/whisper.md).
             parts, _ = _whisper().transcribe(tmp.name, language=lang, beam_size=5, word_timestamps=True,
-                                             condition_on_previous_text=False)
+                                             condition_on_previous_text=False, hotwords=hotwords)
             words = [(s0 + w.start, s0 + w.end, w.word.strip(), seg_no)
                      for p in parts for w in (p.words or []) if w.word.strip()]
         if words:
@@ -329,7 +332,8 @@ def main() -> None:
     if len(speech) != want or args.align:
         print("  aligning by transcript (takes per text may differ)")
         # Dialogue lines and role-play phrases are read once; words and lesson phrases usually several times.
-        aligned = align(units(args.recording, speech, lang), texts, once=bool(args.story or args.scenario))
+        aligned = align(units(args.recording, speech, lang, hotwords=" ".join(texts)[:800]), texts,
+                        once=bool(args.story or args.scenario))
         aligned = split_touching(args.recording, aligned)
         plan = []
         for text, takes in zip(texts, aligned):

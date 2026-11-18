@@ -17,7 +17,8 @@ lessons or features; new ideas wait in "Ideas (parked)".
 - [ ] Offline-first app (agreed 2026-11-17, after the voice recordings): course, exercises, audio, progress and recordings on the phone; the laptop becomes the sync point and backup; optional Android APK (Capacitor). Write the plan first for approval [web, core]
 - [~] Your voice for the existing course — first part done 2026-11-18: lesson u1-l1 (6 words × 3 takes, `Greetings.m4a`) processed with `tools/native_voice.py`; the app plays a random take, Piper for the rest. Recording format that works: each word 3 times, a pause after each.
 - [x] Back up `.lingua-agent/` (2026-11-18): `tools/backup_data.sh`, nightly 03:30 via the systemd user timer `lingua-backup.timer` → Drive `home/language/lingua-agent-backup/current`, changed/deleted files kept 60 days under `old/<date>/`; voices and the speech cache skipped
-- [ ] Your voice for the existing course (rest; next: sheet 4, the alphabet, decided 2026-11-18): recordings from `content/recording/fa-en-a1/*.html` → Drive folder → split, match, normalise; the app prefers the native clip over Piper [content, core] — recording: **user**
+- [x] Sheet 4, the alphabet (2026-11-18): 90 lines, one take each (last take where repeated), from two files; no clipping, quiet background
+- [ ] Your voice for the existing course (rest: sheets 2 and 3): recordings from `content/recording/fa-en-a1/*.html` → Drive folder → split, match, normalise; the app prefers the native clip over Piper [content, core] — recording: **user**
 - [ ] Generated lessons ("Your lessons") are poor with `qwen2.5:7b` (see Phase 5b below); either fix or label them clearly as experimental [core]
 - [ ] Sara and Ali share one synthetic voice (only `fa_IR-amir` installed) — moot once your voice is in, except for lines not yet recorded [core]
 - [ ] Roadmap order still pre-v2 (architecture, clients, playground, README updated 2026-11-17) [docs]
