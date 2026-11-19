@@ -13,10 +13,17 @@ metadata:
 
 # lingua-manager: the adapter
 
-**Load the core first:** the `project-manager` skill (`.claude/skills/project-manager/SKILL.md`), a read-only
-copy of projio's core (version projio 6fe4e9d, copied 2026-11-18 from the user-level
-`~/.claude/skills/project-manager/`). Never edit it here; recopy after each projio push. This file only fills in
-what is specific to lingua-agent; the core's rules are not repeated here. Machine keys are in
+**Load the core first:** the `projio-workflow:project-manager` skill, from the projio-workflow plugin
+(marketplace `arashshahidi1997/projio-plugins`, installed on the XPS 2026-11-19; update with
+`/plugin marketplace update projio`). There is no repo copy. Run its helpers from the plugin's folder:
+
+```bash
+PM=$(ls -d ~/.claude/plugins/cache/projio/projio-workflow/*/skills/project-manager | sort -V | tail -1)
+python3 $PM/incoming.py; python3 $PM/round.py; python3 $PM/round.py board
+```
+
+Wherever the core says `.claude/skills/project-manager/<helper>`, read `$PM/<helper>`. This file only fills
+in what is specific to lingua-agent; the core's rules are not repeated here. Machine keys are in
 `.projio/manager.yml` (lingua is not a projio project otherwise: no `projio` command, no notio; notes and
 handoffs are plain files). Read `README.md` and `docs/roadmap.md` before the first round.
 
@@ -70,7 +77,7 @@ re-ask)", and in `docs/backlog.md` when it changes a backlog item. Relay it to t
 | Bugs | the unit of the fix | commits, handoffs |
 
 The direction under review is `docs/product-v2.md`; the completeness audit is `docs/audit/`. Next-work
-proposals follow "always complete, never finished" (`/always-complete`): complete what exists before new
+proposals follow "always complete, never finished" (`projio-workflow:always-complete`): complete what exists before new
 modes or content.
 
 **Incoming.** Notes routed from persolog or another workspace land in `docs/log/inbox/` (title
@@ -83,7 +90,7 @@ modes or content.
 - The app's data dir `.lingua-agent/` (Arash's and Anya's progress, recordings, approvals): read-only for
   the manager.
 - The manager's own writes: the board, its handoffs, this adapter, `.projio/manager.yml` (with the user),
-  the core copy, inbox notes' status, and `→ manager` items a session hands over.
+  inbox notes' status, and `→ manager` items a session hands over.
 
 ## Collision unit
 
