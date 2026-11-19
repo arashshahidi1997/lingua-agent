@@ -23,6 +23,6 @@ units:
   - {name: docs, paths: [docs, mkdocs.yml, README.md]}       # docs/log is "notes" (longest prefix wins)
   - {name: tests, paths: [tests]}
   - {name: notes, paths: [docs/log]}
-  - {name: config, paths: [.projio, .claude, pyproject.toml, pixi.lock, .gitignore, .gitattributes, .github]}
+  - {name: config, paths: [.projio, .claude, pyproject.toml, pixi.lock, uv.lock, .gitignore, .gitattributes, .github]}
 procs:
-  protect: [vscode-server, "^SCREEN", "^tmux", "ollama"]
+  protect: [vscode-server, "^SCREEN", "^tmux", "ollama", "lingua-agent serve"]
