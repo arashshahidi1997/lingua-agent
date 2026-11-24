@@ -27,6 +27,9 @@ in what is specific to lingua-agent; the core's rules are not repeated here. Mac
 `.projio/manager.yml` (lingua is not a projio project otherwise: no `projio` command, no notio; notes and
 handoffs are plain files). Read `README.md` and `docs/roadmap.md` before the first round.
 
+**Core updates:** follow the core's section (one `core update · <ver> · …` message per manager; reload the
+skill after the user updates the plugin).
+
 ## Names
 
 - Standing manager: `lingua-manager`; a session that sets up or changes the manager itself:
@@ -124,6 +127,9 @@ Push: only when the user asks (no standing approval). Remote GitHub `origin` ove
 - **Kickoffs** add: the roadmap phase or backlog item; handoffs by path; what not to touch (files a running
   session has dirty, licensed materials, `.lingua-agent/`); test on a scratch data dir; commit by path after
   tests and ruff, no push.
+- **Launching:** on the user's go, start a kickoff with `start_session` (initiation `user_asked`, its title,
+  cwd `~/dev/learn/lingua-agent`, the file boundaries in the prompt); the deep link is only a fallback. All
+  lingua sessions run on the laptop.
 
 ## Not the manager's
 
