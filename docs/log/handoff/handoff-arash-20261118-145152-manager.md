@@ -5,7 +5,7 @@ timestamp: 20261118-145152
 tags: [handoff]
 series: manager
 branch: "main"
-status: open
+status: consumed
 git_commit: "7bd1380"
 refs: [docs/backlog.md, content/recording/fa-en-a1/re-record.md, .scratch/lingua-manager-board.md]
 ---
