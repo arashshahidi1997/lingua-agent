@@ -59,9 +59,9 @@ skill after the user updates the plugin).
 
 Other managers in Sync:
 
-- `persolog-manager` · XPS · `local_d1d7fac3-f345-4985-89de-e2379bf20c6a`: the one above lingua (lingua is
+- `persolog-manager` · XPS · `local_edf2c63c-74b2-4913-a90c-47d32615e987`: the one above lingua (lingua is
   personal learning under persolog). Report up only to it, never to worklog or a work manager.
-- `inf-manager` · XPS · `local_6078ca0c-d5be-469e-9d3e-ca41d867df74`: the machine, Ollama, tailscale, Python
+- `inf-manager` · XPS · `local_61cc9fc3-d270-4fd0-8eed-4a4fbbfacc57`: the machine, Ollama, tailscale, Python
   envs.
 
 **Decisions (drill).** Record each answer, dated, in the manager handoff's "Decisions the user made (don't
@@ -107,9 +107,12 @@ only in small hunks committed by path; flag it when both have it dirty. `pyproje
 1. Before a session commits: the uv `.venv` (`.venv/bin/python` or `uv run`; never conda or ~/anaconda3,
    and plain `python3` on PATH has only PyYAML), `.venv/bin/python -m pytest -q` and
    `.venv/bin/ruff check src tests` pass; `npm --prefix web run build` when `web/` changed.
-2. The live app is the systemd user unit `lingua-agent.service` (served on the tailnet by tailscale serve,
-   port 443 → 127.0.0.1:8000); it picks up backend changes only after
-   `systemctl --user restart lingua-agent` (Arash runs it; check `/api/me` → 200 a few seconds later).
+2. The live app runs on the ASUS (`arashasus-ubuntu`, since 2026-11-26) as the systemd user unit
+   `lingua-agent.service` (tailscale serve, 443 → 127.0.0.1:8000), at
+   https://arashasus-ubuntu.tail58953c.ts.net/. It runs only what is pushed: deploy =
+   `ssh asus-ubuntu 'cd ~/dev/learn/lingua-agent && git pull --ff-only && systemctl --user restart lingua-agent'`
+   (plus the web build when `web/` changed), on Arash's go; check `/api/me` → 200. The XPS unit is disabled
+   (rollback). Hosting questions: inf-manager.
    Nightly backup: `lingua-backup.timer` (03:30, Drive).
 
 Push: only when the user asks (no standing approval). Remote GitHub `origin` over HTTPS with
@@ -130,6 +133,12 @@ Push: only when the user asks (no standing approval). Remote GitHub `origin` ove
 - **Launching:** on the user's go, start a kickoff with `start_session` (initiation `user_asked`, its title,
   cwd `~/dev/learn/lingua-agent`, the file boundaries in the prompt); the deep link is only a fallback. All
   lingua sessions run on the laptop.
+- Codex workers: a kickoff whose second line is `agent: codex · folder: <dir> · read-only|write` is started
+  with `codex-run -C <dir> [--write] --by lingua-manager --title "<kickoff title>" -f <kickoff>` instead of a
+  session; follow-ups with `codex-run --resume <run> "…"`. Each round:
+  `codex-threads --since <last round> --project lingua-agent`, read finished workers with
+  `codex-threads show <run>`; a row "continued interactively" is Arash's. Rules and guards:
+  /home/arash/dev/persolog/docs/setup/agents.md → "Codex workers".
 
 ## Not the manager's
 

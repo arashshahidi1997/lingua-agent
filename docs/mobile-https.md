@@ -69,20 +69,32 @@ This is the **best long-term workflow** if you're a Tailscale user already — s
 
 ## Running it for your phones (the setup in use)
 
-The XPS serves the app as a systemd **user** service, and `tailscale serve` puts it on the tailnet with HTTPS:
+Since 2026-11-26 the home server (the ASUS, `arashasus-ubuntu`) serves the app at
+**https://arashasus-ubuntu.tail58953c.ts.net/** (infra `e497b1b`, ADRs 0065–0070). Code is still edited on the XPS;
+the ASUS runs what is pushed to GitHub. Deploy from the XPS after a push:
+
+```bash
+ssh asus-ubuntu 'cd ~/dev/learn/lingua-agent && git pull --ff-only && systemctl --user restart lingua-agent'
+```
+
+When `web/` changed, rebuild the web app on the ASUS too (`npm --prefix web run build`, or `lingua-agent serve --build`)
+before the restart.
+The XPS unit is kept disabled as a rollback. Hosting questions go to infra (inf-manager).
+
+The setup on the serving machine is a systemd **user** service, and `tailscale serve` puts it on the tailnet with HTTPS:
 
 ```bash
 # ~/.config/systemd/user/lingua-agent.service runs:
 #   .venv/bin/lingua-agent serve --host 127.0.0.1 --port 8000   (Ollama env vars set in the unit)
 systemctl --user status lingua-agent
-tailscale serve --bg 8000          # → https://your-laptop.your-tailnet.ts.net
+tailscale serve --bg 8000          # → https://arashasus-ubuntu.tail58953c.ts.net
 ```
 
-Phones on any network (Wi-Fi or mobile data) reach it while they're signed in to Tailscale and the laptop is
-awake. Share the laptop with other people from the Tailscale admin page (machine → Share) rather than adding
+Phones on any network (Wi-Fi or mobile data) reach it while they're signed in to Tailscale (the server is
+always on). Share the server with other people from the Tailscale admin page (machine → Share) rather than adding
 them to the tailnet.
 
-**Shipping an update** to the phones: build the web app, restart the service; installed apps pick up the new
+**Shipping an update** to the phones (on the serving machine, after the pull): build the web app, restart the service; installed apps pick up the new
 version the next time they're opened.
 
 ```bash
