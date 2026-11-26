@@ -33,3 +33,4 @@ npm-debug.log*
 .pixi/*
 !.pixi/config.toml
 .scratch/
+inbox/
