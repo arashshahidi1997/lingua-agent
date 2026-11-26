@@ -3,8 +3,16 @@
   "configurations": [
     {
       "name": "lingua-agent",
-      "url": "http://localhost:8000",
-      "port": 8000
+      "runtimeExecutable": "env",
+      "runtimeArgs": [
+        "LINGUA_DATA_DIR=.scratch/dev-data",
+        "LINGUA_AI_PROVIDER=openai",
+        "OPENAI_BASE_URL=http://localhost:11434/v1",
+        "OPENAI_MODEL=qwen2.5:7b",
+        "OPENAI_TIMEOUT=900",
+        ".venv/bin/lingua-agent", "serve", "--host", "127.0.0.1", "--port", "8001"
+      ],
+      "port": 8001
     }
   ]
 }
