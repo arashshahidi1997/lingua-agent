@@ -67,7 +67,8 @@ export default defineConfig({
     port: 5173,
     proxy: {
       '/api': {
-        target: 'http://127.0.0.1:8000',
+        // The XPS dev server (.claude/launch.json) runs on :8001; the live app is on the ASUS.
+        target: process.env.LINGUA_API_URL || 'http://127.0.0.1:8001',
         changeOrigin: true,
       },
     },
