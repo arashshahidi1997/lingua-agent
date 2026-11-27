@@ -116,7 +116,8 @@ only in small hunks committed by path; flag it when both have it dirty. `pyproje
    Nightly backup: `lingua-backup.timer` (03:30, Drive).
 
 Push: only when the user asks (no standing approval). Remote GitHub `origin` over HTTPS with
-`git -c credential.helper='!gh auth git-credential' push origin main` (memory note `git_push_via_gh.md`).
+plain `git push origin main` (origin is SSH since 2026-11-27, `git@github.com:arashshahidi1997/lingua-agent.git`).
+After a push, deploy to the ASUS with `tools/deploy_asus.sh` (`--dry-run` first; a real run restarts the live app: Arash's go).
 
 ## lingua-specific round sections
 
